@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zach Chen | Personal Website</title>
+  <link rel="stylesheet" href="./styles/main.css" />
+</head>
+
+<body>
+  <canvas id="dot-canvas"></canvas>
+
+  <div class="app-container">
+    <nav class="main-nav">
+      <ul class="nav-list">
+        <li class="nav-item active" data-tab="resume">Resume</li>
+        <li class="nav-item" data-tab="writing">Writing</li>
+        <li class="nav-item" data-tab="arts">The Arts</li>
+      </ul>
+    </nav>
+
+    <main class="content-area">
+      <!-- Resume Section -->
+      <section id="resume" class="tab-content active">
+        <!-- Invisible element to expand the page height for scrolling -->
+        <div id="scroll-proxy"></div>
+
+        <!-- Section for the traditional clean resume -->
+        <div id="static-resume" class="plain-resume">
+          <div class="resume-wrap">
+            <h1 class="resume-name">Zach Chen</h1>
+
+            <p class="resume-lead">
+              Builder at Harvard interested in applied AI; Humanist & writer at heart. 
+            </p>
+
+            <div class="btn-group">
+              <a href="mailto:zach.chen101@gmail.com" class="pill-btn">Get in touch ↗</a>
+              <div class="social-links">
+                <a href="https://x.com/theZachChen" target="_blank" title="X (Twitter)">𝕏</a>
+                <a href="https://zachchen.substack.com" target="_blank" title="Substack">
+                  <img src="./assets/1.svg" alt="Substack" class="social-icon">
+                </a>
+                <a href="https://www.linkedin.com/in/zachary-chen31415/" target="_blank" title="LinkedIn">
+                  <img src="./assets/3.svg" alt="LinkedIn" class="social-icon">
+                </a>
+                <a href="https://www.instagram.com/zachchxn" target="_blank" title="Instagram">
+                  <img src="./assets/2.svg" alt="Instagram" class="social-icon">
+                </a>
+              </div>
+            </div>
+
+            <div class="resume-body">
+              <section class="body-sec">
+                <h3>Education</h3>
+                <div class="job">
+                  <strong>Harvard University</strong>
+                  <p class="institution">BS Computer Science (2024 – 2028)</p>
+                  <p class="coursework">
+                    <strong>Coursework:</strong> Systems Programming (CS 61), Distributed Systems (CS 262), Abstraction (CS 51), 
+                    Advanced Algorithms and Data Structures (CS 124), Topics in A.I (CS 182)
+                    Intro to Statistics (Stat 110), Algorithms and Data Structures (CS 120),
+                    Proofs-based Linear Algebra (Math22a), Multivariable Calculus (Math 21a), Mechanics and Special Relativity (Physics 15a).
+                  </p>
+                </div>
+              </section>
+
+              <section class="body-sec">
+                <h3>Experience</h3>
+                <div class="job">
+                  <strong>Sapentia AI — Cofounder & CTO</strong>
+                  <p>Architecting an AI coaching platform with 15k+ lines of production code. Scaled team to 20 interns
+                    and secured 700+ waitlist users in month one.</p>
+                </div>
+                <div class="job">
+                  <strong><a href="https://embedding.vc/" target="_blank" style="color: inherit; text-decoration: none;">Embedding VC</a> — VC Scout</strong>
+                  <p>Source and evaluate early-stage startups within the Harvard ecosystem for seed-stage investment.
+                  </p>
+                </div>
+                <div class="job">
+                  <strong>IvyLine Consulting — Co-Founder & CSO</strong>
+                  <p>Scaled college coaching startup to $20,000 net profit in first year. Personally secured 60% of all
+                    company clients. Roles included sales, marketing, operations, and strategy.</p>
+                </div>
+                <div class="job">
+                  <strong>Independent Research — Beth Israel, MGH</strong>
+                  <p>Python and R, data analysis, and wrangling. Genomic data cleaning for 1,000+ patient profiles. Identified genetic markers for
+                    Alzheimer's. AAIC 2024 Presenter. Mentored under Dr. Haoqi.</p>
+                </div>
+              </section>
+
+              <section class="body-sec">
+                <h3>Projects</h3>
+                <div class="job">
+                  <strong>Ambrose — Founder</strong>
+                  <p> Platform for automated content creation using image gen LLMs with AWS and OpenRouter, PostgresQL DB on Supabase, Langchain for evaluation and agent architecture. Helping content creators scale long form posts (blogs, articles, X threads) into short form content in consistent high quality style.
+                  </p>
+                </div>
+                <div class="job">
+                  <strong><a href="https://www.howtowantbetterthings.org/" target="_blank" style="color: inherit; text-decoration: none;">How to Want Better Things</a> — Co-Author</strong>
+                  <p>Strategy and distribution for book launch; Gave talks at Brown, Yale, and Tufts. This book guide young people towards impactful careers and teaching them <i>how</i> to live meaningful lives.</p>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Writing Section -->
+      <section id="writing" class="tab-content">
+        <div id="writing-scroll-proxy"></div>
+
+        <div id="substack-feed-container" class="plain-resume">
+          <div class="resume-wrap">
+            <h1 class="resume-name">All Writing</h1>
+            <p class="resume-lead">A collection of thoughts, essays, and deep-dives ranging from the macro to micro.</p>
+
+            <div id="substack-feed" class="feed-container">
+              <div class="loading">Loading posts...</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="arts" class="tab-content">
+        <div id="arts-scroll-proxy"></div>
+
+        <div id="arts-static-content" class="plain-resume">
+          <div class="resume-wrap">
+            <h1 class="resume-name">art gallery</h1>
+            <p class="resume-lead">A collection of aesthetics.</p>
+
+            <div id="arts-gallery-grid" class="gallery-grid">
+              <!-- Populated by contentManager.js -->
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Fixed container for the dynamic text (Global) -->
+    <div id="dynamic-content" class="fixed-content pos-hero">
+      <div class="content-block">
+        <h1>Zach Chen</h1>
+        <p>
+          Creative Technologist & Builder at Harvard. <br><br>
+          <a href="javascript:void(0)" class="jump-link"
+            onclick="document.getElementById('static-resume').scrollIntoView({behavior:'smooth'})">View Full Resume</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./js/main.js"></script>
+
+  <!-- Gallery Modal -->
+  <div id="gallery-modal" class="gallery-modal">
+    <span class="modal-close" onclick="document.getElementById('gallery-modal').classList.remove('active')">&times;</span>
+    <div id="modal-content-wrap" class="modal-content"></div>
+  </div>
+</body>
+
+</html>
