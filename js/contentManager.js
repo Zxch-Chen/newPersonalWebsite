@@ -9,7 +9,7 @@ export class ContentManager {
                 {
                     title: "Zach Chen",
                     subtitle: "",
-                    image: "./assets/zach-intro.jpg",
+                    image: "/assets/zach-intro.jpg",
                     text: `Hi, I'm Zach. I'm a sophomore at Harvard studying CS. I'm interested in living a meaningful life and helping others live meaningful lives. I want to build companies, communities, and good ideas. Seeking <i>ikigai</i> and <i>eudaimonia</i>. Reach out for collaborations. <br><br> 
                            <a href="javascript:void(0)" class="jump-link" onclick="document.getElementById('static-resume').scrollIntoView({behavior:'smooth'})">View Full Resume</a>`,
                     date: "",
@@ -99,47 +99,47 @@ export class ContentManager {
                     title: "my art",
                     subtitle: "a collection of my favorite photos, media, artwork, and AI generations",
                     cards: [
-                        { src: "./assets/arts/sfBridge.jpeg", info: "A misty morning at the Golden Gate. The scale is hard to capture until you're right under it." },
-                        { src: "./assets/arts/sanBridge.jpeg", info: "Me and my bro looking at the SF bridge." },
-                        { src: "./assets/arts/rainbowSF.jpeg", info: "One of the most crazy views ever in SF." },
-                        { src: "./assets/arts/nyc.jpeg", info: "Manhattan from a different angle. The geometry of the city is endless." }
+                        { src: "/assets/arts/sfBridge.jpeg", info: "A misty morning at the Golden Gate. The scale is hard to capture until you're right under it." },
+                        { src: "/assets/arts/sanBridge.jpeg", info: "Me and my bro looking at the SF bridge." },
+                        { src: "/assets/arts/rainbowSF.jpeg", info: "One of the most crazy views ever in SF." },
+                        { src: "/assets/arts/nyc.jpeg", info: "Manhattan from a different angle. The geometry of the city is endless." }
                     ]
                 },
                 {
                     sceneIndex: 1, posClass: "pos-arts-1", isArts: true,
                     cards: [
-                        { src: "./assets/arts/lowellTower.jpeg", info: "Harvard's architecture always feels timeless, especially on a quiet afternoon." },
-                        { src: "./assets/arts/clockTower.jpeg", info: "Still remember this day. What a long time ago, yet it lives with me." },
-                        { src: "./assets/arts/winthropGate.jpeg", info: "The gateway to a lot of good memories. This was where I always rested after my runs by the Charles." }
+                        { src: "/assets/arts/lowellTower.jpeg", info: "Harvard's architecture always feels timeless, especially on a quiet afternoon." },
+                        { src: "/assets/arts/clockTower.jpeg", info: "Still remember this day. What a long time ago, yet it lives with me." },
+                        { src: "/assets/arts/winthropGate.jpeg", info: "The gateway to a lot of good memories. This was where I always rested after my runs by the Charles." }
                     ]
                 },
                 {
                     sceneIndex: 2, posClass: "pos-arts-2", isArts: true,
                     cards: [
-                        { src: "./assets/arts/God’s creation.mp4", isVideo: true, info: "So delicate and perfect." }
+                        { src: "/assets/arts/God’s creation.mp4", isVideo: true, info: "So delicate and perfect." }
                     ]
                 },
                 {
                     sceneIndex: 0, posClass: "pos-arts-0", isArts: true,
                     cards: [
-                        { src: "./assets/arts/bahamas.jpeg", info: "Crystal clear waters with luch clouds in the Bahamas." },
-                        { src: "./assets/arts/bahamasBoat.jpeg", info: "Sunset in the Bahamas. Never seen such vibrancy." },
-                        { src: "./assets/arts/bahamasTwo.jpeg", info: "Another perspective of paradise. I have to come back." },
-                        { src: "./assets/arts/chinatown.jpeg", info: "The vibrant colors of Montreal Chinatown caught my eye." }
+                        { src: "/assets/arts/bahamas.jpeg", info: "Crystal clear waters with luch clouds in the Bahamas." },
+                        { src: "/assets/arts/bahamasBoat.jpeg", info: "Sunset in the Bahamas. Never seen such vibrancy." },
+                        { src: "/assets/arts/bahamasTwo.jpeg", info: "Another perspective of paradise. I have to come back." },
+                        { src: "/assets/arts/chinatown.jpeg", info: "The vibrant colors of Montreal Chinatown caught my eye." }
                     ]
                 },
                 {
                     sceneIndex: 1, posClass: "pos-arts-1", isArts: true,
                     cards: [
-                        { src: "./assets/arts/cemetery.jpeg", info: "One of my favorite photos I took in a cemetery near Boston." },
-                        { src: "./assets/arts/cemeteryTwo.jpeg", info: "Legacy preserved in stone." },
-                        { src: "./assets/arts/harvardSunset.jpeg", info: "The stillness is undescribable yet you can feel it." }
+                        { src: "/assets/arts/cemetery.jpeg", info: "One of my favorite photos I took in a cemetery near Boston." },
+                        { src: "/assets/arts/cemeteryTwo.jpeg", info: "Legacy preserved in stone." },
+                        { src: "/assets/arts/harvardSunset.jpeg", info: "The stillness is undescribable yet you can feel it." }
                     ]
                 },
                 {
                     sceneIndex: 2, posClass: "pos-arts-2", isArts: true,
                     cards: [
-                        { src: "./assets/arts/eliotQuote.jpeg", info: "A quote that I live by." }
+                        { src: "/assets/arts/eliotQuote.jpeg", info: "A quote that I live by." }
                     ]
                 }
             ]
@@ -187,7 +187,7 @@ export class ContentManager {
 
         grid.innerHTML = displayAssets.map(asset => {
             const isVideo = asset.endsWith('.mp4');
-            const path = `./assets/arts/${asset}`;
+            const path = `/assets/arts/${asset}`;
             return `
                 <div class="gallery-item" onclick="window.contentManager.openModal('${path}', ${isVideo})">
                     ${isVideo ? `<video src="${path}" autoplay muted loop></video>` : `<img src="${path}" alt="Artwork">`}

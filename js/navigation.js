@@ -21,19 +21,19 @@ export function initNavigation(dotArt) {
     // Map tabs to background image sets
     const backgrounds = {
         'resume': [
-            './assets/golden-gate-3.png',
-            './assets/golden-gate.png',
-            './assets/golden-gate-2.png'
+            '/assets/golden-gate-3.png',
+            '/assets/golden-gate.png',
+            '/assets/golden-gate-2.png'
         ],
         'writing': [
-            './assets/nyc-times-square.jpg',
-            './assets/nyc-liberty.jpg',
-            './assets/nyc-skyline.jpg'
+            '/assets/nyc-times-square.jpg',
+            '/assets/nyc-liberty.jpg',
+            '/assets/nyc-skyline.jpg'
         ],
         'arts': [
-            './assets/arts-skyline-bw.jpg',
-            './assets/arts-lowell-snow.jpg',
-            './assets/arts-customhouse.jpg'
+            '/assets/arts-skyline-bw.jpg',
+            '/assets/arts-lowell-snow.jpg',
+            '/assets/arts-customhouse.jpg'
         ]
     };
 
