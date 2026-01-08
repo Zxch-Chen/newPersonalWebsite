@@ -1,7 +1,6 @@
 {
   "functions": {
     "api/substack.js": {
-      "memory": 1024,
       "maxDuration": 10
     }
   }
