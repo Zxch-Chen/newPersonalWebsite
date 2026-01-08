@@ -1,4 +1,4 @@
-<img width="1290" height="1470" alt="image" src="https://github.com/user-attachments/assets/1383b4ad-b19c-4127-a5e9-7720584340b7" /><img width="2844" height="1470" alt="image" src="https://github.com/user-attachments/assets/9b455aa0-1544-4788-8bfa-7339511ca52e" /># Personal Website
+Personal Website
 
 A minimalistic, interactive personal website featuring dot-based ASCII art backgrounds and a chronological resume timeline.
 
