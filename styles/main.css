@@ -646,10 +646,29 @@ main, section {
   pointer-events: auto;
   user-select: none;
   z-index: 10;
+  /* Fade-in animation */
+  opacity: 0;
+  animation: artCardFadeIn 0.4s ease-out forwards;
+  /* Performance optimizations */
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+@keyframes artCardFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px) translateZ(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0) translateZ(0);
+  }
 }
 
 .art-card:hover {
-  transform: scale(1.08) rotate(0deg) !important;
+  transform: scale(1.08) rotate(0deg) translateZ(0) !important;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
   z-index: 100;
 }
@@ -735,6 +754,8 @@ main, section {
   gap: 2rem;
   margin-top: 4rem;
   text-align: left;
+  /* Performance optimization */
+  contain: layout style paint;
 }
 
 .gallery-item {
@@ -743,6 +764,9 @@ main, section {
   padding-bottom: 30px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   border-radius: 4px;
+  /* Performance optimization */
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .gallery-item img,
@@ -752,12 +776,15 @@ main, section {
   object-fit: cover;
   border-radius: 2px;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform 0.2s ease;
+  /* Performance optimization */
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .gallery-item img:hover,
 .gallery-item video:hover {
-  transform: scale(1.02);
+  transform: scale(1.02) translateZ(0);
 }
 
 /* Modal for full-view */

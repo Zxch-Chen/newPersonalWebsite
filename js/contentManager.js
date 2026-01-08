@@ -99,47 +99,47 @@ export class ContentManager {
                     title: "my art",
                     subtitle: "a collection of my favorite photos, media, artwork, and AI generations",
                     cards: [
-                        { src: "/assets/arts/sfBridge.jpeg", info: "A misty morning at the Golden Gate. The scale is hard to capture until you're right under it." },
-                        { src: "/assets/arts/sanBridge.jpeg", info: "Me and my bro looking at the SF bridge." },
-                        { src: "/assets/arts/rainbowSF.jpeg", info: "One of the most crazy views ever in SF." },
-                        { src: "/assets/arts/nyc.jpeg", info: "Manhattan from a different angle. The geometry of the city is endless." }
+                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/sfBridge.avif", info: "A misty morning at the Golden Gate. The scale is hard to capture until you're right under it." },
+                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/sanBridge.avif", info: "Me and my bro looking at the SF bridge." },
+                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/rainbowSF.avif", info: "One of the most crazy views ever in SF." },
+                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/nyc.avif", info: "Manhattan from a different angle. The geometry of the city is endless." }
                     ]
                 },
                 {
                     sceneIndex: 1, posClass: "pos-arts-1", isArts: true,
                     cards: [
-                        { src: "/assets/arts/lowellTower.jpeg", info: "Harvard's architecture always feels timeless, especially on a quiet afternoon." },
-                        { src: "/assets/arts/clockTower.jpeg", info: "Still remember this day. What a long time ago, yet it lives with me." },
-                        { src: "/assets/arts/winthropGate.jpeg", info: "The gateway to a lot of good memories. This was where I always rested after my runs by the Charles." }
+                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/lowellTower.avif", info: "Harvard's architecture always feels timeless, especially on a quiet afternoon." },
+                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/clockTower.avif", info: "Still remember this day. What a long time ago, yet it lives with me." },
+                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/winthropGate.avif", info: "The gateway to a lot of good memories. This was where I always rested after my runs by the Charles." }
                     ]
                 },
                 {
                     sceneIndex: 2, posClass: "pos-arts-2", isArts: true,
                     cards: [
-                        { src: "/assets/arts/God’s creation.mp4", isVideo: true, info: "So delicate and perfect." }
+                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/God%E2%80%99s%20creation-compressed.mp4", isVideo: true, info: "So delicate and perfect." }
                     ]
                 },
                 {
                     sceneIndex: 0, posClass: "pos-arts-0", isArts: true,
                     cards: [
-                        { src: "/assets/arts/bahamas.jpeg", info: "Crystal clear waters with luch clouds in the Bahamas." },
-                        { src: "/assets/arts/bahamasBoat.jpeg", info: "Sunset in the Bahamas. Never seen such vibrancy." },
-                        { src: "/assets/arts/bahamasTwo.jpeg", info: "Another perspective of paradise. I have to come back." },
-                        { src: "/assets/arts/chinatown.jpeg", info: "The vibrant colors of Montreal Chinatown caught my eye." }
+                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/bahamas.webp", info: "Crystal clear waters with luch clouds in the Bahamas." },
+                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/bahamasBoat.webp", info: "Sunset in the Bahamas. Never seen such vibrancy." },
+                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/bahamasTwo.webp", info: "Another perspective of paradise. I have to come back." },
+                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/chinatown.webp", info: "The vibrant colors of Montreal Chinatown caught my eye." }
                     ]
                 },
                 {
                     sceneIndex: 1, posClass: "pos-arts-1", isArts: true,
                     cards: [
-                        { src: "/assets/arts/cemetery.jpeg", info: "One of my favorite photos I took in a cemetery near Boston." },
-                        { src: "/assets/arts/cemeteryTwo.jpeg", info: "Legacy preserved in stone." },
-                        { src: "/assets/arts/harvardSunset.jpeg", info: "The stillness is undescribable yet you can feel it." }
+                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/cemeteryTwo.avif", info: "Legacy preserved in stone." },
+                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/cemetery.avif", info: "Boston resting place, a moment of quiet reflection." },
+                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/harvardSunset.avif", info: "The stillness is undescribable yet you can feel it." }
                     ]
                 },
                 {
                     sceneIndex: 2, posClass: "pos-arts-2", isArts: true,
                     cards: [
-                        { src: "/assets/arts/eliotQuote.jpeg", info: "A quote that I live by." }
+                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/eliotQuote.avif", info: "A quote that I live by." }
                     ]
                 }
             ]
@@ -176,7 +176,7 @@ export class ContentManager {
         if (!grid) return;
 
         const allAssets = [
-            "God’s creation.mp4", "bahamas.jpeg", "bahamasBoat.jpeg", "bahamasTwo.jpeg",
+            "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/God%E2%80%99s%20creation-compressed.mp4", "bahamas.jpeg", "bahamasBoat.jpeg", "bahamasTwo.jpeg",
             "cemetery.jpeg", "cemeteryTwo.jpeg", "chinatown.jpeg", "clockTower.jpeg",
             "lowellTower.jpeg", "nyc.jpeg", "rainbowSF.jpeg", "sanBridge.jpeg", "sfBridge.jpeg",
             "harvardSunset.jpeg", "winthropGate.jpeg", "eliotQuote.jpeg"
@@ -185,12 +185,24 @@ export class ContentManager {
         // Ensure we only show multiples of 3 to avoid lonely images on the last row
         const displayAssets = allAssets.slice(0, Math.floor(allAssets.length / 3) * 3);
 
-        grid.innerHTML = displayAssets.map(asset => {
+        grid.innerHTML = displayAssets.map((asset, index) => {
             const isVideo = asset.endsWith('.mp4');
-            const path = `/assets/arts/${asset}`;
+            // Handle video with special characters - use Vercel Blob storage
+            let path;
+            if (isVideo && asset.includes("God")) {
+                // Use the compressed version from Vercel Blob storage
+                path = "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/God%E2%80%99s%20creation-compressed.mp4";
+            } else {
+                // Properly encode the asset path to handle special characters
+                path = `/assets/arts/${encodeURIComponent(asset)}`;
+            }
+            // Use loading="lazy" for native lazy loading and data-src for Intersection Observer fallback
             return `
                 <div class="gallery-item" onclick="window.contentManager.openModal('${path}', ${isVideo})">
-                    ${isVideo ? `<video src="${path}" autoplay muted loop></video>` : `<img src="${path}" alt="Artwork">`}
+                    ${isVideo ? 
+                        `<video src="${path}" autoplay muted loop playsinline preload="metadata"></video>` : 
+                        `<img src="${path}" alt="Artwork">`
+                    }
                 </div>
             `;
         }).join('');
@@ -201,9 +213,19 @@ export class ContentManager {
         const wrap = document.getElementById('modal-content-wrap');
         if (!modal || !wrap) return;
 
-        wrap.innerHTML = isVideo ? 
-            `<video src="${path}" controls autoplay loop></video>` : 
-            `<img src="${path}" alt="Full view">`;
+        if (isVideo) {
+            wrap.innerHTML = `<video src="${path}" controls autoplay loop playsinline preload="metadata"></video>`;
+            // Add error handler
+            const video = wrap.querySelector('video');
+            if (video) {
+                video.onerror = () => {
+                    console.error('Video failed to load in modal:', path);
+                    wrap.innerHTML = '<p style="color: white; text-align: center;">Video failed to load</p>';
+                };
+            }
+        } else {
+            wrap.innerHTML = `<img src="${path}" alt="Full view">`;
+        }
         
         modal.classList.add('active');
 
@@ -227,6 +249,51 @@ export class ContentManager {
         
         // Update proxy height for the new tab
         this.refreshProxyHeight();
+    }
+
+    // Prefetch all arts images and video for instant loading
+    prefetchArts() {
+        const artsData = this.dataSets.arts;
+        if (!artsData) return;
+
+        const imagesToPrefetch = [];
+        
+        // Collect all image/video sources from arts data
+        artsData.forEach(scene => {
+            if (scene.cards) {
+                scene.cards.forEach(card => {
+                    if (card.src && !imagesToPrefetch.includes(card.src)) {
+                        imagesToPrefetch.push(card.src);
+                    }
+                });
+            }
+        });
+
+        console.log(`Prefetching ${imagesToPrefetch.length} arts assets...`);
+        
+        // Prefetch using link[rel=prefetch] for images and videos
+        imagesToPrefetch.forEach(src => {
+            const link = document.createElement('link');
+            link.rel = 'prefetch';
+            link.as = src.endsWith('.mp4') ? 'video' : 'image';
+            link.href = src;
+            document.head.appendChild(link);
+        });
+
+        // Also preload using Image objects for immediate caching (more aggressive)
+        imagesToPrefetch.forEach(src => {
+            if (!src.endsWith('.mp4')) {
+                const img = new Image();
+                img.src = src;
+            } else {
+                // For video, create a video element and preload metadata
+                const video = document.createElement('video');
+                video.preload = 'auto';
+                video.src = src;
+            }
+        });
+
+        console.log('Arts assets prefetch initiated');
     }
 
     reset() {
@@ -333,30 +400,16 @@ export class ContentManager {
 
             const cardsHtml = (data.cards || []).map((card, i) => {
                 const rotation = (i % 2 === 0 ? 1 : -1) * (2 + (i * 2));
-                
                 const count = data.cards.length;
-                
-                // Calculate position with safer bounds (keeping inside 0-100% minus card width/height)
-                // Assuming card width is roughly 25-35% of container width
                 const step = (count > 1) ? (60 / (count - 1)) : 0; 
-                
-                // Horizontal: restrict to 5% -> 60% range to avoid right-edge bleed
                 const offsetLeft = 5 + (i * step);
-                
-                // Vertical: restricted to avoid bottom-edge bleed
                 const offsetTop = 5 + ((i * 12) % 35); 
-
-                // Special handling for scene layouts
                 const isSingle = count === 1;
                 const isVideoScene = data.posClass === 'pos-arts-2';
                 const isLowellScene = data.posClass === 'pos-arts-1';
-                
                 let finalLeft = offsetLeft;
                 let finalTop = offsetTop;
-
                 if (isLowellScene && count === 3) {
-                    // Special layout for Lowell/Cemetery pages with 3 images
-                    // 2 spaced out on the left, 1 in the top right
                     if (i === 0) {
                         finalLeft = 8;
                         finalTop = 15;
@@ -371,11 +424,12 @@ export class ContentManager {
                     finalLeft = isVideoScene ? 40 : 15;
                     finalTop = isVideoScene ? 5 : 10;
                 }
-
                 const finalWidth = isSingle ? (isVideoScene ? '350px' : '500px') : '450px';
-
+                const rotateClass = card.rotate90 ? 'rotate-90' : '';
+                // Add staggered animation delay (100ms per card)
+                const animationDelay = i * 0.1;
                 return `
-                    <div class="art-card" style="width: ${finalWidth}; left: ${finalLeft}%; top: ${finalTop}%; transform: rotate(${rotation}deg)" onclick="this.classList.toggle('show-info')">
+                    <div class="art-card" style="width: ${finalWidth}; left: ${finalLeft}%; top: ${finalTop}%; transform: rotate(${rotation}deg); animation-delay: ${animationDelay}s" onclick="this.classList.toggle('show-info')">
                         ${card.isVideo ? 
                             `<video src="${card.src}" autoplay muted loop playsinline></video>` : 
                             `<img src="${card.src}" alt="Artwork">`

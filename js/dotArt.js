@@ -6,6 +6,7 @@ export class DotArtEngine {
         this.height = window.innerHeight;
         this.particles = [];
         this.mouse = { x: null, y: null, radius: 100 };
+        this.isInitializing = false;
 
         // State for morphing
         this.imageSet = [];  // Array of loaded Image objects
@@ -71,10 +72,19 @@ export class DotArtEngine {
             return { img, url };
         });
 
+        let firstImageLoaded = false;
+        
         const checkReady = () => {
             if (this.currentTab !== tabId) return;
 
             const loaded = imagesToLoad.filter(item => item.img.complete && item.img.naturalWidth > 0);
+
+            // Instant feedback: render with just the first image as soon as it loads
+            if (!firstImageLoaded && loaded.length > 0) {
+                firstImageLoaded = true;
+                this.imageSet = [loaded[0].img];
+                this.initParticles(tabId, false, true); // true = quick mode
+            }
 
             // Wait for ALL targets to be ready to avoid caching/rendering partial sets
             if (loaded.length === imageUrls.length) {
@@ -147,12 +157,13 @@ export class DotArtEngine {
         this.targetSceneIndex = actualIndex;
     }
 
-    initParticles(tabId, silent = false) {
+    initParticles(tabId, silent = false, quickMode = false) {
         if (this.imageSet.length === 0) {
             return;
         }
 
-        const gap = 12;
+        // Quick mode uses larger gap for instant initial render
+        const gap = quickMode ? 18 : 12;
         const cols = Math.floor(this.width / gap);
         const rows = Math.floor(this.height / gap);
         this.gridSize = { cols, rows };
@@ -160,7 +171,7 @@ export class DotArtEngine {
         const offCanvas = document.createElement('canvas');
         offCanvas.width = cols;
         offCanvas.height = rows;
-        const offCtx = offCanvas.getContext('2d');
+        const offCtx = offCanvas.getContext('2d', { willReadFrequently: true });
         const screenAspect = cols / rows;
 
         const sizeMaps = this.imageSet.map((img) => {
@@ -205,20 +216,16 @@ export class DotArtEngine {
             if (filename.includes('golden-gate-2')) { threshold = 0.05; exponent = 1.6; maxDS = 8.0; }
             else if (filename.includes('golden-gate')) { threshold = 0.05; exponent = 1.5; maxDS = 6.0; }
             else if (filename.includes('nyc-birdseye')) {
-                // Bird's eye NYC needs more contrast (higher threshold, higher exponent)
-                // to differentiate the buildings from the streets/background.
-                threshold = 0.15; // Filter out more light gray/haze
-                exponent = 2.0;   // Higher contrast transition
-                maxDS = 7.0;      // Slightly smaller dots for better detail
+                threshold = 0.15; 
+                exponent = 2.0;
+                maxDS = 7.0;
             }
             else if (filename.includes('nyc-')) {
-                // Super sensitive for NYC assets to "bring out" the background
-                threshold = 0.005; // Capture even the lightest grays (background clouds/sky)
-                exponent = 0.8;    // Gamma boost (lift midtones/background)
-                maxDS = 7.5;       // Slightly bigger dots overall
+                threshold = 0.005;
+                exponent = 0.8;
+                maxDS = 7.5;
             }
             else if (filename.includes('skyline-bw')) {
-                // Higher threshold to filter out any "haze" or gray skies in the background
                 threshold = 0.15; 
                 exponent = 1.4;
                 maxDS = 7.0;
@@ -234,17 +241,23 @@ export class DotArtEngine {
                 maxDS = 6.5;
             }
             else if (filename.includes('arts-')) {
-                // Default for any other arts images
                 threshold = 0.03;
                 exponent = 1.2;
                 maxDS = 7.0;
             }
 
-            for (let i = 0; i < data.length; i += 4) {
-                let intensity = 1 - ((data[i] + data[i + 1] + data[i + 2]) / 765);
-                if (intensity < threshold) intensity = 0;
-                else intensity = Math.pow((intensity - threshold) / (1 - threshold), exponent);
-                map[i / 4] = intensity * maxDS;
+            // Optimized loop with pre-calculated constants
+            const invThreshold = 1 / (1 - threshold);
+            const dataLength = data.length;
+            
+            for (let i = 0; i < dataLength; i += 4) {
+                let intensity = 1 - ((data[i] + data[i + 1] + data[i + 2]) * 0.001307189542); // Pre-calculated 1/765
+                if (intensity < threshold) {
+                    map[i >> 2] = 0; // Bit shift instead of division
+                } else {
+                    intensity = Math.pow((intensity - threshold) * invThreshold, exponent) * maxDS;
+                    map[i >> 2] = intensity;
+                }
             }
 
             this.sizeMapCache[cacheKey] = map;
@@ -253,11 +266,17 @@ export class DotArtEngine {
 
         const newParticles = [];
         const numScenes = sizeMaps.length;
+        const totalCells = cols * rows;
 
-        for (let i = 0; i < cols * rows; i++) {
+        // Pre-allocate array with estimated size for better performance
+        const estimatedParticles = Math.floor(totalCells * 0.3); // ~30% of cells have particles
+        newParticles.length = 0; // Ensure clean start
+
+        for (let i = 0; i < totalCells; i++) {
             let maxV = 0;
             for (let s = 0; s < numScenes; s++) {
-                if (sizeMaps[s][i] > maxV) maxV = sizeMaps[s][i];
+                const val = sizeMaps[s][i];
+                if (val > maxV) maxV = val;
             }
 
             if (maxV > 0.05) {
@@ -284,7 +303,19 @@ export class DotArtEngine {
         }
 
         if (!silent && this.currentTab === tabId) {
-            this.particles = newParticles;
+            // Progressive rendering: show particles immediately for instant feedback
+            // Start with a subset for immediate visual, then fill in the rest
+            const chunkSize = Math.min(5000, Math.floor(newParticles.length / 3));
+            this.particles = newParticles.slice(0, chunkSize);
+            
+            // Add remaining particles in next frame to avoid blocking
+            if (newParticles.length > chunkSize) {
+                requestAnimationFrame(() => {
+                    if (this.currentTab === tabId) {
+                        this.particles = newParticles;
+                    }
+                });
+            }
         }
     }
 
@@ -349,12 +380,15 @@ export class DotArtEngine {
 
     animate() {
         requestAnimationFrame(this.animate);
-        this.ctx.clearRect(0, 0, this.width, this.height);
-
+        
         if (this.particles.length === 0) return;
+        
+        this.ctx.clearRect(0, 0, this.width, this.height);
 
         // BATCH DRAWING: Sort dots into color groups to minimize state changes
         const batches = {};
+        const hasMouseInteraction = this.mouse.x != null && this.mouse.y != null;
+        const textRectsLength = this.textRects.length;
 
         for (let i = 0; i < this.particles.length; i++) {
             let p = this.particles[i];
@@ -363,25 +397,30 @@ export class DotArtEngine {
             const targetBase = p.targetSizes[this.targetSceneIndex] || 0;
             p.baseSize += (targetBase - p.baseSize) * 0.1;
 
-            // Masking Check
+            // Masking Check (only if we have text rects)
             let isMasked = false;
-            for (let r of this.textRects) {
-                if (p.x >= r.left && p.x <= r.right && p.y >= r.top && p.y <= r.bottom) {
-                    isMasked = true;
-                    break;
+            if (textRectsLength > 0) {
+                const px = p.x;
+                const py = p.y;
+                for (let j = 0; j < textRectsLength; j++) {
+                    const r = this.textRects[j];
+                    if (px >= r.left && px <= r.right && py >= r.top && py <= r.bottom) {
+                        isMasked = true;
+                        break;
+                    }
                 }
             }
 
-            // 2. Cursor Interaction
-            let dx = this.mouse.x - p.x;
-            let dy = this.mouse.y - p.y;
-            let distanceSq = dx * dx + dy * dy;
-
-            const maxDist = 75;
-            const maxDistSq = maxDist * maxDist;
+            // 2. Cursor Interaction (only if mouse is active)
             let force = 0;
-            if (distanceSq < maxDistSq) {
-                force = (maxDist - Math.sqrt(distanceSq)) / maxDist;
+            if (hasMouseInteraction) {
+                let dx = this.mouse.x - p.x;
+                let dy = this.mouse.y - p.y;
+                let distanceSq = dx * dx + dy * dy;
+                const maxDistSq = 5625; // 75 * 75 pre-calculated
+                if (distanceSq < maxDistSq) {
+                    force = (75 - Math.sqrt(distanceSq)) / 75;
+                }
             }
 
             let targetSize = isMasked ? 0 : p.baseSize + (force * 5);
