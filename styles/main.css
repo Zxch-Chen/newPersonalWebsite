@@ -210,12 +210,14 @@ main, section {
 
 /* Typography for dynamic content - Clean OpenAI style */
 .content-block {
-  max-width: 500px;
+  max-width: min(500px, 90vw);
   background: transparent;
   backdrop-filter: none;
   border: none;
   box-shadow: none;
   pointer-events: auto;
+  padding: 0;
+  border-radius: 0;
 }
 
 .intro-image {
@@ -231,7 +233,7 @@ main, section {
 
 .content-block h1 {
   font-family: var(--font-main);
-  font-size: 3.5rem;
+  font-size: clamp(1.8rem, 6vw, 3.5rem);
   font-weight: 700;
   margin: 0 0 0.5rem 0;
   line-height: 1;
@@ -253,7 +255,7 @@ main, section {
 
 .content-block h2 {
   font-family: var(--font-main);
-  font-size: 1.1rem;
+  font-size: clamp(0.85rem, 2vw, 1.1rem);
   font-weight: 500;
   color: #666;
   margin: 0 0 1rem 0;
@@ -262,7 +264,7 @@ main, section {
 
 .content-block p {
   font-family: var(--font-main);
-  font-size: 1.1rem;
+  font-size: clamp(0.9rem, 2.5vw, 1.1rem);
   line-height: 1.5;
   color: #1a1a1a;
   font-weight: 400;
@@ -846,4 +848,120 @@ main, section {
   border: 1px dashed #ccc;
   border-radius: 10px;
   color: #888;
+}
+
+/* Mobile Optimizations */
+.mobile-notice {
+  display: none;
+  background: #f0f0f0;
+  border-bottom: 2px solid #ddd;
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #666;
+  font-weight: 500;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.mobile-notice p {
+  margin: 0;
+}
+
+.close-notice-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.close-notice-btn:hover {
+  color: #333;
+}
+
+.mobile-notice.hidden {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  /* Show mobile notice */
+  .mobile-notice {
+    display: flex;
+  }
+
+  /* Hide dot art canvas and storytelling content on mobile */
+  #dot-canvas {
+    display: none !important;
+  }
+
+  #dynamic-content {
+    display: none !important;
+  }
+
+  .fixed-content {
+    display: none !important;
+  }
+
+  /* Hide scroll-proxy on mobile to skip the dot art area - all tabs */
+  #scroll-proxy,
+  #writing-scroll-proxy,
+  #arts-scroll-proxy {
+    display: none !important;
+    height: 0 !important;
+  }
+
+  /* Add padding to account for notice */
+  .app-container {
+    margin-top: 3rem;
+  }
+
+  /* Adjust nav for mobile */
+  .main-nav {
+    position: relative;
+  }
+
+  /* Improve mobile content spacing */
+  .plain-resume {
+    margin-top: 0 !important;
+    padding: 60px 20px !important;
+  }
+
+  .resume-name {
+    font-size: clamp(2rem, 8vw, 4rem);
+    margin: 1rem 0 1rem 0;
+  }
+
+  .resume-lead {
+    font-size: 1rem;
+    margin: 0 auto 1.5rem;
+  }
+
+  .btn-group {
+    margin-bottom: 3rem;
+    gap: 1rem;
+  }
+
+  .pill-btn {
+    font-size: 0.9rem;
+    padding: 0.6rem 1.2rem;
+  }
+
+  .social-links {
+    gap: 1.5rem;
+    font-size: 1.2rem;
+  }
 }

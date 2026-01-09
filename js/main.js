@@ -10,6 +10,16 @@ if ('scrollRestoration' in history) {
 }
 window.scrollTo(0, 0);
 
+// Handle mobile notice close button
+document.addEventListener('DOMContentLoaded', () => {
+    const closeBtn = document.getElementById('close-mobile-notice');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            document.getElementById('mobile-notice').classList.add('hidden');
+        });
+    }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize Art Engine
     const dotArt = new DotArtEngine('dot-canvas');

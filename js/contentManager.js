@@ -30,7 +30,7 @@ export class ContentManager {
                 {
                     title: "IvyLine Consulting",
                     subtitle: "Co-Founder & CSO",
-                    text: "Scaled a college coaching startup to $20,000 net profit in its first year, personally securing over $8,000 in contracts.",
+                    text: "Scaled a college coaching startup to 5 figures profit in its first year.",
                     date: "2024 — 2025",
                     posClass: "pos-side",
                     sceneIndex: 1
