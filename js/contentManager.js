@@ -178,10 +178,10 @@ export class ContentManager {
         if (!grid) return;
 
         const allAssets = [
-            "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/God%E2%80%99s%20creation-compressed.mp4", "bahamas.jpeg", "bahamasBoat.jpeg", "bahamasTwo.jpeg",
-            "cemetery.jpeg", "cemeteryTwo.jpeg", "chinatown.jpeg", "clockTower.jpeg",
-            "lowellTower.jpeg", "nyc.jpeg", "rainbowSF.jpeg", "sanBridge.jpeg", "sfBridge.jpeg",
-            "harvardSunset.jpeg", "winthropGate.jpeg", "eliotQuote.jpeg"
+            "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/God%E2%80%99s%20creation-compressed.mp4", "bahamas.avif", "bahamasBoat.avif", "bahamasTwo.avif",
+            "cemetery.avif", "cemeteryTwo.avif", "chinatown.avif", "clockTower.avif",
+            "lowellTower.avif", "nyc.avif", "rainbowSF.avif", "sanBridge.avif", "sfBridge.avif",
+            "harvardSunset.avif", "winthropGate.avif", "eliotQuote.avif"
         ];
 
         // Ensure we only show multiples of 3 to avoid lonely images on the last row
@@ -195,8 +195,8 @@ export class ContentManager {
                 // Use the compressed version from Vercel Blob storage
                 path = "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/God%E2%80%99s%20creation-compressed.mp4";
             } else {
-                // Properly encode the asset path to handle special characters
-                path = `/assets/arts/${encodeURIComponent(asset)}`;
+                // Use optimized AVIF images from optimized-assets folder
+                path = `/optimized-assets/${encodeURIComponent(asset)}`;
             }
             // Use loading="lazy" for native lazy loading and data-src for Intersection Observer fallback
             return `
