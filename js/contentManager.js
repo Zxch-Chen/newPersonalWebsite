@@ -11,7 +11,9 @@ export class ContentManager {
                     subtitle: "",
                     image: "/assets/zach-intro.jpg",
                     text: `Hi, I'm Zach. I'm a sophomore at Harvard studying CS. I'm interested in living a meaningful life and helping others live meaningful lives. I want to build companies, communities, and good ideas. Seeking <i>ikigai</i> and <i>eudaimonia</i>. Reach out for collaborations. <br><br> 
-                           <a href="javascript:void(0)" class="jump-link" onclick="document.getElementById('static-resume').scrollIntoView({behavior:'smooth'})">View Full Resume</a>`,
+                           <a href="javascript:void(0)" class="jump-link" onclick="document.getElementById('static-resume').scrollIntoView({behavior:'smooth'})">View Full Resume</a>
+                           &nbsp;|&nbsp;
+                           <a href="https://github.com/Zxch-Chen/newPersonalWebsite" class="jump-link" target="_blank">Website Code</a>`,
                     date: "",
                     posClass: "pos-hero",
                     sceneIndex: 0

@@ -5,7 +5,7 @@ export class DotArtEngine {
         this.width = window.innerWidth;
         this.height = window.innerHeight;
         this.particles = [];
-        this.mouse = { x: null, y: null, radius: 100 };
+        this.mouse = { x: null, y: null, radius: 40 };
         this.isInitializing = false;
 
         // State for morphing
@@ -417,9 +417,9 @@ export class DotArtEngine {
                 let dx = this.mouse.x - p.x;
                 let dy = this.mouse.y - p.y;
                 let distanceSq = dx * dx + dy * dy;
-                const maxDistSq = 5625; // 75 * 75 pre-calculated
+                const maxDistSq = this.mouse.radius * this.mouse.radius;
                 if (distanceSq < maxDistSq) {
-                    force = (75 - Math.sqrt(distanceSq)) / 75;
+                    force = (this.mouse.radius - Math.sqrt(distanceSq)) / this.mouse.radius;
                 }
             }
 

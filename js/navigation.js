@@ -21,7 +21,7 @@ export function initNavigation(dotArt) {
     // Map tabs to background image sets
     const backgrounds = {
         'resume': [
-            '/assets/golden-gate-3.png',
+            '/assets/golden-gate-1.png',
             '/assets/golden-gate.png',
             '/assets/golden-gate-2.png'
         ],

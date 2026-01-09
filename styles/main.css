@@ -288,7 +288,7 @@ main, section {
 
 /* Hero: Higher up (approx 5 inches / 10%) */
 .fixed-content.pos-hero {
-  top: 12%;
+  top: 5%;
   left: 8%;
   right: auto;
   bottom: auto;
