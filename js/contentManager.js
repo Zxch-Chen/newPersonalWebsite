@@ -124,10 +124,10 @@ export class ContentManager {
                 {
                     sceneIndex: 0, posClass: "pos-arts-0", isArts: true,
                     cards: [
-                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/bahamas.webp", info: "Crystal clear waters with luch clouds in the Bahamas." },
-                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/bahamasBoat.webp", info: "Sunset in the Bahamas. Never seen such vibrancy." },
-                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/bahamasTwo.webp", info: "Another perspective of paradise. I have to come back." },
-                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/chinatown.webp", info: "The vibrant colors of Montreal Chinatown caught my eye." }
+                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/bahamas.avif", info: "Crystal clear waters with luch clouds in the Bahamas." },
+                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/bahamasBoat.avif", info: "Sunset in the Bahamas. Never seen such vibrancy." },
+                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/bahamasTwo.avif", info: "Another perspective of paradise. I have to come back." },
+                        { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/chinatown.avif", info: "The vibrant colors of Montreal Chinatown caught my eye." }
                     ]
                 },
                 {
