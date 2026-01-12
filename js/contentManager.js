@@ -177,11 +177,24 @@ export class ContentManager {
         const grid = document.getElementById('arts-gallery-grid');
         if (!grid) return;
 
+        // All assets use full Vercel Blob URLs
         const allAssets = [
-            "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/God%E2%80%99s%20creation-compressed.mp4", "bahamas.avif", "bahamasBoat.avif", "bahamasTwo.avif",
-            "cemetery.avif", "cemeteryTwo.avif", "chinatown.avif", "clockTower.avif",
-            "lowellTower.avif", "nyc.avif", "rainbowSF.avif", "sanBridge.avif", "sfBridge.avif",
-            "harvardSunset.avif", "winthropGate.avif", "eliotQuote.avif"
+            "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/God%E2%80%99s%20creation-compressed.mp4",
+            "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/bahamas.avif",
+            "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/bahamasBoat.avif",
+            "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/bahamasTwo.avif",
+            "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/cemetery.avif",
+            "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/cemeteryTwo.avif",
+            "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/chinatown.avif",
+            "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/clockTower.avif",
+            "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/lowellTower.avif",
+            "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/nyc.avif",
+            "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/rainbowSF.avif",
+            "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/sanBridge.avif",
+            "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/sfBridge.avif",
+            "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/harvardSunset.avif",
+            "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/winthropGate.avif",
+            "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/eliotQuote.avif"
         ];
 
         // Ensure we only show multiples of 3 to avoid lonely images on the last row
@@ -189,16 +202,7 @@ export class ContentManager {
 
         grid.innerHTML = displayAssets.map((asset, index) => {
             const isVideo = asset.endsWith('.mp4');
-            // Handle video with special characters - use Vercel Blob storage
-            let path;
-            if (isVideo && asset.includes("God")) {
-                // Use the compressed version from Vercel Blob storage
-                path = "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/God%E2%80%99s%20creation-compressed.mp4";
-            } else {
-                // Use optimized AVIF images from optimized-assets folder
-                path = `/optimized-assets/${encodeURIComponent(asset)}`;
-            }
-            // Use loading="lazy" for native lazy loading and data-src for Intersection Observer fallback
+            const path = asset; // Already a full URL
             return `
                 <div class="gallery-item" onclick="window.contentManager.openModal('${path}', ${isVideo})">
                     ${isVideo ? 
