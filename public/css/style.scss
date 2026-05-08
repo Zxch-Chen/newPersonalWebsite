@@ -1,0 +1,21 @@
+---
+---
+
+@import
+  "minima/skins/{{ site.minima.skin | default: 'classic' }}",
+  "minima/initialize";
+
+// Force icons to black in light mode (works regardless of original PNG color)
+.social-links img {
+  filter: brightness(0) saturate(100%);
+  transition: filter 0.3s ease;
+}
+
+[data-theme="dark"] .social-links img {
+  filter: brightness(0) invert(1);
+}
+
+// .post-description {
+//   color: #ffffff !important;
+//   transition: color 0.3s ease;
+// }

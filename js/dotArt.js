@@ -341,33 +341,22 @@ export class DotArtEngine {
     }
 
     updateTextRects() {
-        // Only query elements relevant to the current tab to prevent "bleed"
-        // Removed .content-block from masking to let dots show through text areas
-        let selector = '.writing-header, .arts-header'; // Headers masked on all tabs (or specific ones)
-
-        if (this.currentTab === 'resume') {
-            // No longer masking .content-block - text will render on top of dots
-            // selector += ', .content-block';
-        } else if (this.currentTab === 'writing') {
-            // We consciously EXCLUDE .post-item here to allow dots to flow behind glass boxes
-            // selector += ', .post-item'; 
-        }
+        // Optional rectangular masks were removed: erasing dots in a box left a sharp "white hole"
+        // in the halftone. Legibility uses CSS text-shadow on .content-block instead.
+        const selector = '.writing-header, .arts-header';
 
         const elements = document.querySelectorAll(selector);
         this.textRects = [];
+        const pad = Math.max(12, Math.min(32, this.width * 0.02));
         elements.forEach(el => {
             const rect = el.getBoundingClientRect();
 
-            // Visibility Check
             const style = window.getComputedStyle(el);
             const isVisible = style.display !== 'none' &&
                 style.visibility !== 'hidden' &&
                 parseFloat(style.opacity) > 0.1;
 
-            // Only add if visible on screen AND not hidden via opacity/display
             if (isVisible && rect.bottom > 0 && rect.top < this.height && rect.width > 0 && rect.height > 0) {
-                // Tighter padding for a cleaner look
-                const pad = 4;
                 this.textRects.push({
                     left: rect.left - pad,
                     right: rect.right + pad,

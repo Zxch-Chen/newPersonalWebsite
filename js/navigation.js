@@ -14,6 +14,7 @@ export function initNavigation(dotArt) {
     const scrollPositions = {
         'resume': 0,
         'writing': 0,
+        'thoughts': 0,
         'arts': 0
     };
     let currentActiveTab = '';
@@ -29,6 +30,11 @@ export function initNavigation(dotArt) {
             '/assets/nyc-times-square.jpg',
             '/assets/nyc-liberty.jpg',
             '/assets/nyc-skyline.jpg'
+        ],
+        'thoughts': [
+            '/assets/nyc-skyline.jpg',
+            '/assets/nyc-times-square.jpg',
+            '/assets/nyc-liberty.jpg'
         ],
         'arts': [
             '/assets/arts-skyline-bw.jpg',
@@ -68,7 +74,7 @@ export function initNavigation(dotArt) {
         // Ensure global dynamic content is visible
         const dynamicContent = document.getElementById('dynamic-content');
         if (dynamicContent) {
-            dynamicContent.style.display = (tabId === 'resume' || tabId === 'writing' || tabId === 'arts') ? 'block' : 'none';
+            dynamicContent.style.display = (tabId === 'resume' || tabId === 'writing' || tabId === 'thoughts' || tabId === 'arts') ? 'block' : 'none';
         }
 
         // Isolate scroll proxies to their respective tabs
@@ -77,6 +83,9 @@ export function initNavigation(dotArt) {
 
         const writingProxy = document.getElementById('writing-scroll-proxy');
         if (writingProxy) writingProxy.style.display = (tabId === 'writing') ? 'block' : 'none';
+
+        const thoughtsProxy = document.getElementById('thoughts-scroll-proxy');
+        if (thoughtsProxy) thoughtsProxy.style.display = (tabId === 'thoughts') ? 'block' : 'none';
 
         const artsProxy = document.getElementById('arts-scroll-proxy');
         if (artsProxy) artsProxy.style.display = (tabId === 'arts') ? 'block' : 'none';

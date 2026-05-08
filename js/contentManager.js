@@ -1,3 +1,16 @@
+function headingTextAlignStyle(posClass, isHero) {
+    if (isHero) return '';
+    if (posClass === 'pos-center-top' || posClass === 'pos-thoughts-center') {
+        return 'text-align: center;';
+    }
+    /* pos-thoughts-void alignment comes from CSS (.pos-thoughts-void-scene-*) */
+    if (posClass === 'pos-thoughts-void') {
+        return '';
+    }
+    if (posClass === 'pos-left-side') return 'text-align: left;';
+    return 'text-align: right;';
+}
+
 export class ContentManager {
     constructor() {
         this.container = document.getElementById('dynamic-content');
@@ -10,10 +23,10 @@ export class ContentManager {
                     title: "Zach Chen",
                     subtitle: "",
                     image: "/assets/zach-intro.jpg",
-                    text: `Hi, I'm Zach. I'm a sophomore at Harvard studying CS. I'm interested in living a meaningful life and helping others live meaningful lives. I want to build companies, communities, and good ideas. Seeking <i>ikigai</i> and <i>eudaimonia</i>. Reach out for collaborations. <br><br> 
+                    text: `I'm a philosopher builder at Harvard focused on applying AI, ML systems, and the messy process of deploying them well. I study CS and philosophy, and focus my free time on AI Safety research, writing, and thinking about the future. <br><br> 
                            <a href="javascript:void(0)" class="jump-link" onclick="document.getElementById('static-resume').scrollIntoView({behavior:'smooth'})">View Full Resume</a>
                            &nbsp;|&nbsp;
-                           <a href="https://github.com/Zxch-Chen/newPersonalWebsite" class="jump-link" target="_blank">Website Code</a>`,
+                           <a href="/" class="jump-link">View New Style</a>`,
                     date: "",
                     posClass: "pos-hero",
                     sceneIndex: 0
@@ -36,20 +49,21 @@ export class ContentManager {
                     sceneIndex: 1
                 },
                 {
-                    title: "Independent Research",
-                    subtitle: "Beth Israel, MGH",
-                    text: "Automated genomic data cleaning for 1,000+ patient profiles. Identified genetic markers for Alzheimer's using PCA models. Mentored under Dr. Haoqi.",
-                    date: "2023 — 2024",
+                    title: "Kempner Institute",
+                    subtitle: "AI Safety Research",
+                    link: "https://kempnerinstitute.harvard.edu/",
+                    text: "Research on AI safety and hallucinations at Harvard's Kempner Institute.",
+                    date: "2025 — Present",
                     posClass: "pos-low",
                     sceneIndex: 2
                 },
                 {
-                    title: "Ambrose",
-                    subtitle: "Founder",
-                    text: "Building the best reposting platform for creators, using multi-agent systems.",
-                    date: "2026 — Present",
-                    posClass: "pos-low",
-                    sceneIndex: 2
+                    title: "Cursor Growth @ Harvard",
+                    subtitle: "Growth",
+                    text: "Helping grow Cursor's presence and usage across the Harvard builder ecosystem. Focused on student adoption, product feedback, and AI-native developer workflows.",
+                    date: "2025 — Present",
+                    posClass: "pos-side",
+                    sceneIndex: 1
                 },
                 {
                     title: "How to Want Better Things",
@@ -95,11 +109,63 @@ export class ContentManager {
                     sceneIndex: 2
                 }
             ],
+            'thoughts': [
+                {
+                    title: "thoughts",
+                    text: `A running collection of lines and ideas I want to keep in view. <br><br>
+                           <a href="javascript:void(0)" class="jump-link" onclick="document.getElementById('thoughts-static-content').scrollIntoView({behavior:'smooth'})">View All Thoughts</a>`,
+                    date: "",
+                    posClass: "pos-thoughts-center",
+                    sceneIndex: 0
+                },
+                {
+                    title: "come alive",
+                    text: "Don't ask what the world needs. Ask what makes you come alive, and go do it. Because what the world needs is people who have come alive",
+                    date: "",
+                    posClass: "pos-thoughts-void",
+                    sceneIndex: 1,
+                    halftoneNative: true
+                },
+                {
+                    title: "capability progress",
+                    text: "It is challenging to really reason as if you believe in continued capability progress, even when you do. It is challenging to reason about the pace of change. These winning companies may not be the first ones.",
+                    date: "",
+                    posClass: "pos-thoughts-void",
+                    sceneIndex: 2,
+                    thoughtsLibertySlot: 0,
+                    halftoneNative: true
+                },
+                {
+                    title: "Galatians 6:7-8",
+                    text: "Do not be deceived: God is not mocked, for whatever one sows, that will he also reap. For the one who sows to his own flesh will from the flesh reap corruption, but the one who sows to the Spirit will from the Spirit reap eternal life.",
+                    date: "",
+                    posClass: "pos-thoughts-void",
+                    sceneIndex: 0,
+                    halftoneNative: true
+                },
+                {
+                    title: "focus",
+                    text: "There are many places that a company can choose to allocate its limited time and resources. There is never enough time to do everything, so companies need to choose what change they want to see in the world and focus there. It can take decades to move the needle on large global challenges.",
+                    date: "",
+                    posClass: "pos-thoughts-void",
+                    sceneIndex: 1,
+                    halftoneNative: true
+                },
+                {
+                    title: "selection, not education",
+                    text: "The deeper insight is about selection, not education. The research found that 62% of unicorn founders held post-graduate degrees, and founders with at least three years of prior work",
+                    date: "",
+                    posClass: "pos-thoughts-void",
+                    sceneIndex: 2,
+                    thoughtsLibertySlot: 1,
+                    halftoneNative: true
+                }
+            ],
             'arts': [
                 {
                     sceneIndex: 0, posClass: "pos-arts-0", isArts: true,
-                    title: "my art",
-                    subtitle: "a collection of my favorite photos, media, artwork, and AI generations",
+                    title: "aesthetics worth remembering",
+                    subtitle: "a collection of art, photography, and moments worth holding onto",
                     cards: [
                         { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/sfBridge.avif", info: "A misty morning at the Golden Gate. The scale is hard to capture until you're right under it." },
                         { src: "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/sanBridge.avif", info: "Me and my bro looking at the SF bridge." },
@@ -165,6 +231,7 @@ export class ContentManager {
         let proxyId = '';
         if (tabId === 'resume') proxyId = 'scroll-proxy';
         else if (tabId === 'writing') proxyId = 'writing-scroll-proxy';
+        else if (tabId === 'thoughts') proxyId = 'thoughts-scroll-proxy';
         else if (tabId === 'arts') proxyId = 'arts-scroll-proxy';
 
         const proxy = document.getElementById(proxyId);
@@ -348,6 +415,7 @@ export class ContentManager {
             const oldIndex = this.currentIndex;
             this.currentIndex = -1;
             this.update(oldIndex >= 0 ? oldIndex : 0);
+            window.dispatchEvent(new Event('scroll'));
         }
     }
 
@@ -480,17 +548,31 @@ export class ContentManager {
                 </div>
             `;
         } else {
-            // Update Classes
-            this.container.className = 'fixed-content ' + data.posClass;
+            // Update Classes — per-thought scene for halftone quotes (different images ⇒ different sparse regions)
+            let frameClass = 'fixed-content ' + data.posClass;
+            if (data.halftoneNative === true && typeof data.sceneIndex === 'number') {
+                const si = Math.min(2, Math.max(0, data.sceneIndex | 0));
+                if (si === 2 && typeof data.thoughtsLibertySlot === 'number') {
+                    const slot = Math.min(1, Math.max(0, data.thoughtsLibertySlot | 0));
+                    frameClass += ` pos-thoughts-void-scene-2-slot-${slot}`;
+                } else {
+                    frameClass += ` pos-thoughts-void-scene-${si}`;
+                }
+            }
+            this.container.className = frameClass;
 
             // Update Content
             const isHero = data.title === "Zach Chen";
 
+            const blockClass = data.halftoneNative
+                ? 'content-block content-block--halftone-native'
+                : 'content-block';
+
             this.container.innerHTML = `
-                <div class="content-block">
+                <div class="${blockClass}">
                     ${data.image ? `<img src="${data.image}" class="intro-image" alt="${data.title}">` : ''}
                     ${data.date ? `<span class="date-tag">${data.date}</span>` : ''}
-                    <h1 style="${isHero ? '' : (data.posClass === 'pos-center-top' ? 'text-align: center;' : (data.posClass === 'pos-left-side' ? 'text-align: left;' : 'text-align: right;'))}">
+                    <h1 style="${headingTextAlignStyle(data.posClass, isHero)}">
                         ${data.link ? `<a href="${data.link}" target="_blank" class="title-link">${data.title}</a>` : data.title}
                     </h1>
                     ${data.subtitle ? `<h2>${data.subtitle}</h2>` : ''}

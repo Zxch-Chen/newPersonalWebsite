@@ -3,5 +3,11 @@
     "api/substack.js": {
       "maxDuration": 10
     }
-  }
+  },
+  "rewrites": [
+    { "source": "/old", "destination": "/old/index.html" },
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/old/(.*)", "destination": "/old/$1" },
+    { "source": "/((?!assets|styles|js|css|zach|art|favicon|old).*)", "destination": "/index.html" }
+  ]
 }

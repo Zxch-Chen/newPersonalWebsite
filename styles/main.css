@@ -212,6 +212,7 @@ main, section {
 .content-block {
   max-width: min(500px, 90vw);
   background: transparent;
+  background-color: transparent;
   backdrop-filter: none;
   border: none;
   box-shadow: none;
@@ -239,6 +240,10 @@ main, section {
   line-height: 1;
   letter-spacing: -0.04em;
   color: #000;
+  text-shadow:
+    0 0 1px rgba(255, 255, 255, 1),
+    0 0 12px rgba(255, 255, 255, 0.88),
+    0 0 28px rgba(255, 255, 255, 0.55);
 }
 
 .title-link {
@@ -260,6 +265,10 @@ main, section {
   color: #666;
   margin: 0 0 1rem 0;
   letter-spacing: -0.01em;
+  text-shadow:
+    0 0 1px rgba(255, 255, 255, 0.98),
+    0 0 10px rgba(255, 255, 255, 0.8),
+    0 0 20px rgba(255, 255, 255, 0.45);
 }
 
 .content-block p {
@@ -269,6 +278,10 @@ main, section {
   color: #1a1a1a;
   font-weight: 400;
   letter-spacing: -0.01em;
+  text-shadow:
+    0 0 1px rgba(255, 255, 255, 0.95),
+    0 0 8px rgba(255, 255, 255, 0.78),
+    0 0 18px rgba(255, 255, 255, 0.42);
 }
 
 .small-h1 h1 {
@@ -286,14 +299,41 @@ main, section {
   letter-spacing: 0.05em;
 }
 
+.content-block .date-tag {
+  text-shadow:
+    0 0 1px rgba(255, 255, 255, 0.95),
+    0 0 8px rgba(255, 255, 255, 0.75);
+}
+
 /* Positions mapping to Artwork White Space */
 
-/* Hero: Higher up (approx 5 inches / 10%) */
+/* Hero: left side in sky / white space — no inner scroll; halftone runs behind (text uses soft halo) */
 .fixed-content.pos-hero {
-  top: 5%;
-  left: 8%;
+  top: clamp(2rem, 5vh, 4.5rem);
+  left: clamp(1rem, 5vw, 3rem);
   right: auto;
   bottom: auto;
+  transform: none;
+  text-align: left;
+  width: min(520px, calc(100vw - clamp(2rem, 10vw, 6rem)));
+}
+
+.pos-hero .content-block {
+  margin-left: 0;
+  margin-right: 0;
+  text-align: left;
+  max-width: min(500px, calc(100vw - clamp(2rem, 10vw, 6rem)));
+}
+
+.pos-hero .content-block h1,
+.pos-hero .content-block h2,
+.pos-hero .content-block p {
+  text-align: left;
+}
+
+.pos-hero .intro-image {
+  margin-left: 0;
+  margin-right: auto;
 }
 
 /* Center Top: For "my writing" intro */
@@ -309,6 +349,161 @@ main, section {
 .pos-center-top .content-block {
   margin: 0 auto;
   max-width: 600px;
+}
+
+.fixed-content.pos-thoughts-center {
+  top: clamp(5.5rem, 15vh, 10rem);
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  width: min(620px, 74vw);
+}
+
+.pos-thoughts-center .content-block {
+  margin: 0 auto;
+  max-width: 560px;
+}
+
+.pos-thoughts-center .content-block h1,
+.pos-thoughts-center .content-block h2,
+.pos-thoughts-center .content-block p {
+  text-align: center;
+}
+
+.pos-thoughts-center .content-block p {
+  font-size: clamp(0.88rem, 1.65vw, 1.02rem);
+  line-height: 1.45;
+}
+
+/* Thought quotes (#thoughts halftone): same overlay typography as Writing — use global .content-block
+   shadows only (no separate “box” framing). Placement follows scene sparse regions:
+   0 skyline — upper sky band; 1 Times Square — upper-middle light column; Liberty: slot 0 = top-left, slot 1 = bottom-right */
+
+.pos-thoughts-void .content-block {
+  max-width: min(520px, 88vw);
+}
+
+/* Skyline (0): keep copy in the empty sky — vertical center sits on building tops */
+.fixed-content.pos-thoughts-void.pos-thoughts-void-scene-0 {
+  top: max(13%, 5.5rem);
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  transform: translateX(-50%);
+  width: min(520px, 88vw);
+  text-align: center;
+}
+
+/* Times Square (1): upper-middle light column (same anchoring as skyline — avoids mid-frame density below) */
+.fixed-content.pos-thoughts-void.pos-thoughts-void-scene-1 {
+  top: max(14%, 5.75rem);
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  transform: translateX(-50%);
+  width: min(520px, 88vw);
+  text-align: center;
+}
+
+.fixed-content.pos-thoughts-void.pos-thoughts-void-scene-0 .content-block,
+.fixed-content.pos-thoughts-void.pos-thoughts-void-scene-1 .content-block {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.fixed-content.pos-thoughts-void.pos-thoughts-void-scene-0 .content-block h1,
+.fixed-content.pos-thoughts-void.pos-thoughts-void-scene-0 .content-block h2,
+.fixed-content.pos-thoughts-void.pos-thoughts-void-scene-0 .content-block p,
+.fixed-content.pos-thoughts-void.pos-thoughts-void-scene-1 .content-block h1,
+.fixed-content.pos-thoughts-void.pos-thoughts-void-scene-1 .content-block h2,
+.fixed-content.pos-thoughts-void.pos-thoughts-void-scene-1 .content-block p {
+  text-align: center;
+}
+
+/* Liberty — beside the statue mass: upper-left vs lower-right voids */
+
+.fixed-content.pos-thoughts-void.pos-thoughts-void-scene-2-slot-0 {
+  top: max(12%, 5.5rem);
+  left: 4%;
+  right: auto;
+  bottom: auto;
+  transform: none;
+  width: min(410px, 42vw);
+  text-align: left;
+}
+
+.fixed-content.pos-thoughts-void.pos-thoughts-void-scene-2-slot-0 .content-block {
+  margin-right: auto;
+}
+
+.fixed-content.pos-thoughts-void.pos-thoughts-void-scene-2-slot-0 .content-block h1,
+.fixed-content.pos-thoughts-void.pos-thoughts-void-scene-2-slot-0 .content-block h2,
+.fixed-content.pos-thoughts-void.pos-thoughts-void-scene-2-slot-0 .content-block p {
+  text-align: left;
+}
+
+.fixed-content.pos-thoughts-void.pos-thoughts-void-scene-2-slot-1 {
+  top: auto;
+  bottom: max(14%, 3.5rem);
+  right: 4%;
+  left: auto;
+  transform: none;
+  width: min(410px, 42vw);
+  text-align: right;
+}
+
+.fixed-content.pos-thoughts-void.pos-thoughts-void-scene-2-slot-1 .content-block {
+  margin-left: auto;
+}
+
+.fixed-content.pos-thoughts-void.pos-thoughts-void-scene-2-slot-1 .content-block h1,
+.fixed-content.pos-thoughts-void.pos-thoughts-void-scene-2-slot-1 .content-block h2,
+.fixed-content.pos-thoughts-void.pos-thoughts-void-scene-2-slot-1 .content-block p {
+  text-align: right;
+}
+
+@media (max-width: 720px) {
+  .fixed-content.pos-thoughts-void.pos-thoughts-void-scene-0 {
+    top: max(16%, 6.25rem);
+    transform: translateX(-50%);
+  }
+
+  .fixed-content.pos-thoughts-void.pos-thoughts-void-scene-1 {
+    top: max(17%, 6.35rem);
+    transform: translateX(-50%);
+    width: min(520px, 92vw);
+  }
+
+  .fixed-content.pos-thoughts-void.pos-thoughts-void-scene-2-slot-0 {
+    left: 3%;
+    top: max(20%, 6.5rem);
+    width: min(94vw, 440px);
+  }
+
+  .fixed-content.pos-thoughts-void.pos-thoughts-void-scene-2-slot-1 {
+    right: 3%;
+    bottom: max(18%, 5.5rem);
+    width: min(94vw, 440px);
+  }
+}
+
+.fixed-content.pos-thoughts-right {
+  top: 11%;
+  right: 6%;
+  left: auto;
+  transform: none;
+  text-align: right;
+  width: min(470px, 36vw);
+}
+
+.pos-thoughts-right .content-block {
+  margin-left: auto;
+  max-width: 470px;
+}
+
+.pos-thoughts-right .content-block p {
+  font-size: clamp(0.86rem, 1.5vw, 0.98rem);
+  line-height: 1.42;
 }
 
 /* Side: Higher up (approx 3 inches higher than before) */
@@ -420,6 +615,13 @@ main, section {
 
 .jump-link:hover {
   opacity: 0.7;
+}
+
+.content-block .jump-link {
+  text-shadow:
+    0 0 1px rgba(255, 255, 255, 0.98),
+    0 0 8px rgba(255, 255, 255, 0.82),
+    0 0 16px rgba(255, 255, 255, 0.45);
 }
 
 /* Static Plain Resume Styles */
@@ -589,6 +791,16 @@ main, section {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+.thoughts-body .job {
+  max-width: 760px;
+}
+
+.thoughts-body .job p {
+  font-size: 1.35rem;
+  line-height: 1.7;
+  color: #2a2a2a;
 }
 
 .post-item {
@@ -919,6 +1131,7 @@ main, section {
   /* Hide scroll-proxy on mobile to skip the dot art area - all tabs */
   #scroll-proxy,
   #writing-scroll-proxy,
+  #thoughts-scroll-proxy,
   #arts-scroll-proxy {
     display: none !important;
     height: 0 !important;

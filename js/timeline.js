@@ -49,6 +49,12 @@ export function initTimeline(dotArt, contentManager) {
                 const rect = feed.getBoundingClientRect();
                 hideScrolly = rect.top < window.innerHeight;
             }
+        } else if (tabId === 'thoughts') {
+            const thoughts = document.getElementById('thoughts-static-content');
+            if (thoughts) {
+                const rect = thoughts.getBoundingClientRect();
+                hideScrolly = rect.top < window.innerHeight;
+            }
         } else if (tabId === 'arts') {
             const staticArts = document.getElementById('arts-static-content');
             if (staticArts) {
