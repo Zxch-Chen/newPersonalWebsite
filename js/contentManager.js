@@ -146,18 +146,43 @@ export class ContentManager {
                 {
                     title: "focus",
                     text: "There are many places that a company can choose to allocate its limited time and resources. There is never enough time to do everything, so companies need to choose what change they want to see in the world and focus there. It can take decades to move the needle on large global challenges.",
-                    date: "",
+                    date: "Coinbase",
                     posClass: "pos-thoughts-void",
                     sceneIndex: 1,
                     halftoneNative: true
                 },
                 {
                     title: "selection, not education",
-                    text: "The deeper insight is about selection, not education. The research found that 62% of unicorn founders held post-graduate degrees, and founders with at least three years of prior work",
+                    text: "The deeper insight is about selection, not education. The research found that 62% of unicorn founders held post-graduate degrees, and founders with at least three years of prior work experience in their startup's specific industry were 85% more likely to launch a highly successful venture.",
                     date: "",
                     posClass: "pos-thoughts-void",
                     sceneIndex: 2,
                     thoughtsLibertySlot: 1,
+                    halftoneNative: true
+                },
+                {
+                    title: "north star",
+                    text: "Use a north star as a heuristic. Will doing this make me more free? Will doing this help the customer?",
+                    date: "",
+                    posClass: "pos-thoughts-void",
+                    sceneIndex: 0,
+                    halftoneNative: true
+                },
+                {
+                    title: "on the exponential",
+                    text: "Am I on the exponential? If not, what can I do to get on it?",
+                    date: "",
+                    posClass: "pos-thoughts-void",
+                    sceneIndex: 1,
+                    halftoneNative: true
+                },
+                {
+                    title: "I never left",
+                    text: "When I told my friends, family and colleagues about my plans for what was next, they were really excited that I was \"coming back.\" The thing is, I never left.",
+                    date: "Travis Kalanick",
+                    posClass: "pos-thoughts-void",
+                    sceneIndex: 2,
+                    thoughtsLibertySlot: 0,
                     halftoneNative: true
                 }
             ],
