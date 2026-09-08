@@ -255,7 +255,7 @@ function Footer() {
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
               </svg>
             </a>
-            <a href="https://github.com/Zxch-Chen/newPersonalWebsite" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+            <a href="https://github.com/Zxch-Chen" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
               </svg>
@@ -297,9 +297,19 @@ function ProfileSection() {
       <p className="intro">
         I'm Zach Chen. I'm a philosopher builder at{' '}
         <CustomLink href="https://www.harvard.edu/">Harvard</CustomLink>{' '}
-        focused on applying AI, ML systems, and the messy process of deploying them well.
-        I study CS and philosophy, and focus my free time on AI Safety research, writing,
-        side projects, and thinking about the future.
+        studying CS with a secondary in philosophy. I work on LLM hallucinations and
+        mechanistic interpretability at the{' '}
+        <CustomLink href="https://kempnerinstitute.harvard.edu/">Kempner Institute</CustomLink>,
+        build agent systems and inference infrastructure as cofounder/CTO of{' '}
+        <CustomLink href="https://sapentia.ai">Sapentia AI</CustomLink>, and ship growth
+        engineering at Alex AI.
+      </p>
+      <p className="intro intro-contact">
+        I also invest at the earliest stage — technical diligence on pre-seed and seed AI
+        and deep-tech companies as a scout for{' '}
+        <CustomLink href="https://embedding.vc/">Embedding VC</CustomLink> and V11, and
+        operator work with founders at{' '}
+        <CustomLink href="https://tnt.so">TNT</CustomLink>, the Harvard/MIT accelerator.
       </p>
       <p className="intro intro-contact">
         I'm based between Harvard and wherever the next good idea needs me. Get in touch
@@ -322,22 +332,29 @@ function ResumePreview() {
 
       <ul className="favourite-essays">
         <li>
-          <span className="essay-date">Founder,</span>{' '}
-          <span>Sapentia AI — Cofounder &amp; CTO</span>
-        </li>
-        <li>
           <span className="essay-date">Research,</span>{' '}
           <a href="https://kempnerinstitute.harvard.edu/">
-            Kempner Institute — AI safety research on hallucinations
+            Kempner Institute — hallucinations &amp; mechanistic interpretability
           </a>
         </li>
         <li>
-          <span className="essay-date">Growth,</span>{' '}
-          <span>Cursor Growth @ Harvard</span>
+          <span className="essay-date">Growth eng,</span>{' '}
+          <span>Alex AI — content orchestration pipeline, Remotion render system</span>
         </li>
         <li>
-          <span className="essay-date">Scout,</span>{' '}
-          <a href="https://embedding.vc/">Embedding VC — Harvard ecosystem startups</a>
+          <span className="essay-date">Founder,</span>{' '}
+          <a href="https://sapentia.ai">Sapentia AI — Cofounder &amp; CTO</a>
+        </li>
+        <li>
+          <span className="essay-date">Investing,</span>{' '}
+          <a href="https://embedding.vc/">Embedding VC</a>, V11, and{' '}
+          <a href="https://tnt.so">TNT</a> — pre-seed/seed technical diligence
+        </li>
+        <li>
+          <span className="essay-date">Project,</span>{' '}
+          <a href="https://github.com/Zxch-Chen/cua-privacy-layer">
+            Privacy layer for computer-use agents — 1st place, H Company hackathon
+          </a>
         </li>
       </ul>
       <p className="background-text">
@@ -443,72 +460,144 @@ function ResumePage() {
         <div className="resume-entry">
           <div className="resume-entry-header">
             <strong>Harvard University</strong>
-            <span className="resume-entry-date">2024 — 2028</span>
+            <span className="resume-entry-date">Sep 2024 — May 2028</span>
           </div>
-          <p className="resume-entry-subtitle">BS Computer Science</p>
+          <p className="resume-entry-subtitle">B.S. Computer Science, Secondary in Philosophy</p>
           <p className="resume-entry-detail">
-            <strong>Coursework:</strong> Systems Programming (CS 61), Distributed Systems (CS 262),
-            Abstraction &amp; Design (CS 51), Advanced Algorithms &amp; Data Structures (CS 124),
-            Topics in AI (CS 182), Intro to Statistics (Stat 110), Algorithms &amp; Data Structures (CS 120),
-            Proofs-based Linear Algebra (Math 22a), Multivariable Calculus (Math 21a),
-            Mechanics &amp; Special Relativity (Physics 15a).
+            <strong>Coursework:</strong> Algorithms &amp; Data Structures (CS 120, CS 124),
+            Distributed Systems (CS 262), Systems Programming (CS 61),
+            Artificial Intelligence (CS 182), Proof-Based Linear Algebra (Math 22a),
+            Multivariable Calculus (Math 21a), Probability (Stat 110),
+            Statistics &amp; Inference (Stat 111).
           </p>
         </div>
 
         <h3 className="resume-section-heading">Experience</h3>
         <div className="resume-entry">
           <div className="resume-entry-header">
-            <strong>Sapentia AI — Cofounder &amp; CTO</strong>
-            <span className="resume-entry-date">2025 — Present</span>
+            <strong>
+              <a href="https://kempnerinstitute.harvard.edu/">Kempner Institute</a> — AI Safety Researcher
+            </strong>
+            <span className="resume-entry-date">Mar 2026 — Present</span>
           </div>
           <p className="resume-entry-detail">
-            Architecting an AI coaching platform with 15k+ lines of production code.
-            Scaled team to 20 interns and secured 700+ waitlist users in month one.
+            Hallucination reduction in LLMs via activation analysis, sparse autoencoders,
+            representation steering, and controlled post-training experiments. Second author
+            on a paper about mitigating factual-recall failures during SFT and RLHF; built
+            reproducible eval pipelines to isolate hallucination mechanisms.
+          </p>
+        </div>
+        <div className="resume-entry">
+          <div className="resume-entry-header">
+            <strong>Alex AI — Growth Engineer</strong>
+            <span className="resume-entry-date">Jul 2026 — Present</span>
+          </div>
+          <p className="resume-entry-detail">
+            Built a Python content-orchestration pipeline that ingests blogs, videos, customer
+            stories, and internal metrics, generates channel-specific content with Claude, and
+            publishes through the Ordinal API — with an automated brand-QA and revision loop
+            that checks factual, stylistic, and positioning constraints before scheduling.
+            Built a Remotion/React rendering system for branded clips, vertical shorts, lower
+            thirds, and quote cards, plus{' '}
+            <a href="https://ta20awards.com">ta20awards.com</a> and internal content tooling.
           </p>
         </div>
         <div className="resume-entry">
           <div className="resume-entry-header">
             <strong>
-              <a href="https://kempnerinstitute.harvard.edu/">Kempner Institute</a> — AI Safety Research
+              <a href="https://sapentia.ai">Sapentia AI</a> — Cofounder &amp; CTO
             </strong>
-            <span className="resume-entry-date">2025 — Present</span>
+            <span className="resume-entry-date">Jan 2026 — Present</span>
           </div>
           <p className="resume-entry-detail">
-            Research on AI safety and hallucinations at Harvard's Kempner Institute.
-          </p>
-        </div>
-        <div className="resume-entry">
-          <div className="resume-entry-header">
-            <strong>Cursor Growth @ Harvard</strong>
-            <span className="resume-entry-date">2025 — Present</span>
-          </div>
-          <p className="resume-entry-detail">
-            Helping grow Cursor's presence and usage across the Harvard builder ecosystem.
-            Focused on student adoption, product feedback, and AI-native developer workflows.
+            Architected a multi-agent admissions platform on Next.js, TypeScript, the OpenAI
+            Agent SDK, LangChain, PostgreSQL, and pgvector — routing, tool use, RAG, structured
+            outputs, persistent user memory. Deployed containerized inference and app services
+            on AWS ECS/Fargate behind an ALB with streaming APIs, rate limiting, and PII-safe
+            observability. Built LLM evals for factuality, plan quality, safety, and
+            prompt-injection resistance. 750+ waitlist users; led a 40+ person team.
           </p>
         </div>
         <div className="resume-entry">
           <div className="resume-entry-header">
             <strong>
-              <a href="https://embedding.vc/">Embedding VC</a> — VC Scout
+              <a href="https://www.mgh.harvard.edu">MGH</a> / Harvard Medical School — Computational Genomics
             </strong>
-            <span className="resume-entry-date">2025 — Present</span>
+            <span className="resume-entry-date">2021 — 2025</span>
           </div>
           <p className="resume-entry-detail">
-            Source and evaluate early-stage startups within the Harvard ecosystem for seed-stage investment.
+            Principal investigator. Python and R pipelines to clean, normalize, and validate
+            genomic data across 1,000+ patient profiles (~80% less manual processing).
+            Logistic regression, covariate adjustment, AUROC, and permutation-based
+            multiple-testing correction to find markers of Alzheimer's risk. Co-authored work
+            accepted at AAIC 2024.
+          </p>
+        </div>
+
+        <h3 className="resume-section-heading">Early-Stage Investing</h3>
+        <div className="resume-entry">
+          <div className="resume-entry-header">
+            <strong>
+              <a href="https://embedding.vc/">Embedding VC</a> — Venture Scout
+            </strong>
+            <span className="resume-entry-date">Sep 2025 — Present</span>
+          </div>
+          <p className="resume-entry-detail">
+            Technical diligence on early-stage AI and deep-tech companies: model architecture,
+            infrastructure, data advantages, and product defensibility.
           </p>
         </div>
         <div className="resume-entry">
           <div className="resume-entry-header">
-            <strong>IvyLine Consulting — Co-Founder &amp; CSO</strong>
-            <span className="resume-entry-date">2024 — 2025</span>
+            <strong>V11 — Venture Scout</strong>
+            <span className="resume-entry-date">Jan 2026 — Present</span>
           </div>
           <p className="resume-entry-detail">
-            Scaled a college coaching startup to 5 figures profit in its first year.
+            Sourcing and evaluating high-potential technology companies for leading venture
+            firms as part of a selective network of operators, founders, and researchers.
+            Technical and market diligence on early-stage AI and software startups.
+          </p>
+        </div>
+        <div className="resume-entry">
+          <div className="resume-entry-header">
+            <strong>
+              <a href="https://tnt.so">TNT</a> — Operator
+            </strong>
+            <span className="resume-entry-date">2026 — Present</span>
+          </div>
+          <p className="resume-entry-detail">
+            Operations for a Harvard/MIT accelerator: working with technical founders on
+            formation, product strategy, fundraising, and GTM; sourcing founders and connecting
+            companies to operators and investors across the ecosystem.
           </p>
         </div>
 
         <h3 className="resume-section-heading">Projects</h3>
+        <div className="resume-entry">
+          <div className="resume-entry-header">
+            <strong>
+              <a href="https://github.com/Zxch-Chen/cua-privacy-layer">
+                Privacy Layer for Computer-Use Agents
+              </a>
+            </strong>
+            <span className="resume-entry-date">Jul 2026</span>
+          </div>
+          <p className="resume-entry-subtitle">
+            Python · TypeScript · ONNX · RapidOCR · MiniLM · Playwright · Core ML
+          </p>
+          <p className="resume-entry-detail">
+            1st place at the H Company Computer Use Agent Hackathon. A local, fail-closed
+            privacy layer for autonomous browser agents: an OpenAI-compatible loopback proxy
+            around HoloDesktop's closed runtime that rewrites screenshots and model actions
+            bidirectionally with session-scoped placeholders and hide-use / approval / blocked
+            policies. Fuses an ONNX visual detector, RapidOCR, deterministic credential and
+            card rules, and a quantized semantic PII classifier — irreversible masks for
+            passwords, CVCs, and card numbers before frames reach the model. Fine-tuned a
+            MiniLM-L6-H384 BIO tagger on Modal over 4k synthetic screen/OCR samples, with an
+            INT8 ONNX deployment path. A Playwright harness separates privacy leakage from task
+            capability.
+          </p>
+        </div>
         <div className="resume-entry">
           <div className="resume-entry-header">
             <strong><a href="https://www.cambridgecollider.com/">Cambridge Collider</a></strong>
@@ -523,20 +612,61 @@ function ResumePage() {
             <strong>
               <a href="https://www.howtowantbetterthings.org/">How to Want Better Things</a> — Co-Author
             </strong>
-            <span className="resume-entry-date">2025 — Present</span>
+            <span className="resume-entry-date">Sep 2025 — Present</span>
           </div>
           <p className="resume-entry-detail">
-            Strategy and distribution for book launch. Gave talks at Brown, Yale, and Tufts.
-            Helping young people navigate impactful careers and live meaningful lives.
+            A book on career choice and moral ambition. Led launch strategy; presented at
+            Brown, Yale, and Tufts.
+          </p>
+        </div>
+        <div className="resume-entry">
+          <div className="resume-entry-header">
+            <strong>
+              <a href="https://zachchen.substack.com/">Towards the North Star</a> — Author
+            </strong>
+            <span className="resume-entry-date">Jan 2025 — Present</span>
+          </div>
+          <p className="resume-entry-detail">
+            Essays on technology, history, ambition, and individual agency in a world shaped by
+            rapidly changing social and technical systems.
           </p>
         </div>
 
-        <h3 className="resume-section-heading">Background</h3>
+        <h3 className="resume-section-heading">Technical Skills</h3>
+        <div className="resume-entry">
+          <p className="resume-entry-detail">
+            <strong>Languages:</strong> Python, TypeScript, JavaScript, SQL, R.
+          </p>
+          <p className="resume-entry-detail">
+            <strong>Machine learning:</strong> PyTorch, Transformers, ONNX Runtime, supervised
+            fine-tuning, BIO sequence tagging, synthetic data generation, mechanistic
+            interpretability, sparse autoencoders, representation steering, LLM evaluation, RLHF.
+          </p>
+          <p className="resume-entry-detail">
+            <strong>Agents &amp; applied AI:</strong> OpenAI Agent SDK, LangChain, computer-use
+            agents, tool calling, RAG, vector search, structured generation, prompt-injection
+            defense, PII detection and redaction, local inference.
+          </p>
+          <p className="resume-entry-detail">
+            <strong>Backend &amp; infra:</strong> FastAPI, Node.js, PostgreSQL, Supabase,
+            pgvector, Docker, AWS ECS/Fargate, ALB, Vercel, Modal.
+          </p>
+          <p className="resume-entry-detail">
+            <strong>Frontend &amp; testing:</strong> Next.js, React, Remotion, Vite, Playwright,
+            Vitest, pytest.
+          </p>
+          <p className="resume-entry-detail">
+            <strong>Tools:</strong> Git, Linux, Claude Code, Cursor, Codex.
+          </p>
+        </div>
+
+        <h3 className="resume-section-heading">Elsewhere</h3>
         <p>
-          At Harvard, I am studying computer science with coursework across systems,
-          distributed systems, algorithms, AI/ML, statistics, linear algebra, multivariable
-          calculus, and physics. I study philosophy on the side and focus my free time on
-          AI Safety research, writing, and thinking about the future.
+          <a href="https://www.linkedin.com/in/zachary-chen31415/">LinkedIn</a> ·{' '}
+          <a href="https://github.com/Zxch-Chen">GitHub</a> ·{' '}
+          <a href="https://zachchen.substack.com/">Substack</a> ·{' '}
+          <a href="https://x.com/theZachChen">X</a> ·{' '}
+          <a href="mailto:zach.chen101@gmail.com">zach.chen101@gmail.com</a>
         </p>
       </div>
     </div>
