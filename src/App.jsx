@@ -53,12 +53,16 @@ const ALL_ARTS = [
 ]
 
 const HARDCODED_WRITING = [
+  { title: 'What I learned this summer', link: 'https://zachchen.substack.com/p/what-i-learned-this-summer', date: "Aug '26" },
+  { title: 'Spiderman grew up with us', link: 'https://zachchen.substack.com/p/spiderman-grew-up-with-us', date: "Aug '26" },
+  { title: 'the curse of ambition', link: 'https://zachchen.substack.com/p/the-curse-of-ambition', date: "Jun '26" },
+  { title: 'what harvard feels like from each year', link: 'https://zachchen.substack.com/p/what-harvard-feels-like-from-each', date: "May '26" },
+  { title: 'Reflection of sophomore year at Harvard', link: 'https://zachchen.substack.com/p/reflection-of-sophomore-year-at-harvard', date: "May '26" },
   { title: 'Diminished Personhood', link: 'https://zachchen.substack.com/p/diminished-personhood', date: "Apr '26" },
   { title: 'Time just seems to fly by', link: 'https://zachchen.substack.com/p/time-just-seems-to-fly-by', date: "Mar '26" },
   { title: 'On Birthdays', link: 'https://zachchen.substack.com/p/on-birthdays', date: "Feb '26" },
-  { title: 'The arc of power through human history', link: 'https://zachchen.substack.com/p/the-arc-of-power-through-human-history', date: "Jan '26" },
+  { title: 'how to kill morality', link: 'https://zachchen.substack.com/p/how-to-kill-morality', date: "Jan '26" },
   { title: 'On Effective Altruism', link: 'https://zachchen.substack.com/p/on-effective-altruism', date: "Jan '26" },
-  { title: 'why kindness is the answer', link: 'https://zachchen.substack.com/p/why-kindness-is-the-answer', date: "Nov '25" },
 ]
 
 // ─── Hooks ────────────────────────────────────────────────────────────────────
@@ -297,19 +301,15 @@ function ProfileSection() {
       <p className="intro">
         I'm Zach Chen. I'm a philosopher builder at{' '}
         <CustomLink href="https://www.harvard.edu/">Harvard</CustomLink>{' '}
-        studying CS with a secondary in philosophy. I work on LLM hallucinations and
-        mechanistic interpretability at the{' '}
-        <CustomLink href="https://kempnerinstitute.harvard.edu/">Kempner Institute</CustomLink>,
-        build agent systems and inference infrastructure as cofounder/CTO of{' '}
-        <CustomLink href="https://sapentia.ai">Sapentia AI</CustomLink>, and ship growth
-        engineering at Alex AI.
-      </p>
-      <p className="intro intro-contact">
-        I also invest at the earliest stage — technical diligence on pre-seed and seed AI
-        and deep-tech companies as a scout for{' '}
-        <CustomLink href="https://embedding.vc/">Embedding VC</CustomLink> and V11, and
-        operator work with founders at{' '}
-        <CustomLink href="https://tnt.so">TNT</CustomLink>, the Harvard/MIT accelerator.
+        studying CS with a secondary in philosophy. Right now I'm building{' '}
+        <CustomLink href="https://trycirca.org">Circa</CustomLink>, a friends-first social
+        app; working on ML projects — interpretability, evals, and fine-tuning small models;
+        and thinking and writing about the future and human flourishing. I'm also involved
+        with early-stage investing: I scout for{' '}
+        <CustomLink href="https://embedding.vc/">Embedding VC</CustomLink>, am a venture
+        partner at V11, and work with founders at{' '}
+        <CustomLink href="https://tnt.so">TNT</CustomLink>, the Harvard/MIT accelerator —
+        mostly technical diligence on pre-seed and seed AI and deep-tech companies.
       </p>
       <p className="intro intro-contact">
         I'm based between Harvard and wherever the next good idea needs me. Get in touch
@@ -332,18 +332,20 @@ function ResumePreview() {
 
       <ul className="favourite-essays">
         <li>
-          <span className="essay-date">Research,</span>{' '}
-          <a href="https://kempnerinstitute.harvard.edu/">
-            Kempner Institute — hallucinations &amp; mechanistic interpretability
+          <span className="essay-date">Now,</span>{' '}
+          <a href="https://trycirca.org">
+            Circa — a more authentic space for close friends
           </a>
         </li>
         <li>
-          <span className="essay-date">Growth eng,</span>{' '}
-          <span>Alex AI — content orchestration pipeline, Remotion render system</span>
+          <span className="essay-date">Now,</span>{' '}
+          <span>ML projects — interpretability, evals, fine-tuning</span>
         </li>
         <li>
-          <span className="essay-date">Founder,</span>{' '}
-          <a href="https://sapentia.ai">Sapentia AI — Cofounder &amp; CTO</a>
+          <span className="essay-date">Now,</span>{' '}
+          <a href="https://zachchen.substack.com/">
+            Thinking about the future and human flourishing
+          </a>
         </li>
         <li>
           <span className="essay-date">Investing,</span>{' '}
@@ -351,9 +353,13 @@ function ResumePreview() {
           <a href="https://tnt.so">TNT</a> — pre-seed/seed technical diligence
         </li>
         <li>
-          <span className="essay-date">Project,</span>{' '}
+          <span className="essay-date">Prev,</span>{' '}
+          <a href="https://sapentia.ai">Sapentia AI — Cofounder</a>
+        </li>
+        <li>
+          <span className="essay-date">Prev,</span>{' '}
           <a href="https://github.com/Zxch-Chen/cua-privacy-layer">
-            Privacy layer for computer-use agents — 1st place, H Company hackathon
+            PLVA — 1st place, H Company Computer Use Agent Hackathon
           </a>
         </li>
       </ul>
@@ -472,65 +478,59 @@ function ResumePage() {
           </p>
         </div>
 
-        <h3 className="resume-section-heading">Experience</h3>
+        <h3 className="resume-section-heading">Now</h3>
         <div className="resume-entry">
           <div className="resume-entry-header">
             <strong>
-              <a href="https://kempnerinstitute.harvard.edu/">Kempner Institute</a> — AI Safety Researcher
+              <a href="https://trycirca.org">Circa</a> — Cofounder
             </strong>
-            <span className="resume-entry-date">Mar 2026 — Present</span>
+            <span className="resume-entry-date">2026 — Present</span>
           </div>
           <p className="resume-entry-detail">
-            Hallucination reduction in LLMs via activation analysis, sparse autoencoders,
-            representation steering, and controlled post-training experiments. Second author
-            on a paper about mitigating factual-recall failures during SFT and RLHF; built
-            reproducible eval pipelines to isolate hallucination mechanisms.
+            Creating a more authentic space for close friends — a friends-first mobile
+            network built around relational depth rather than engagement metrics, for
+            college students and people in their twenties.
           </p>
         </div>
         <div className="resume-entry">
           <div className="resume-entry-header">
-            <strong>Alex AI — Growth Engineer</strong>
-            <span className="resume-entry-date">Jul 2026 — Present</span>
+            <strong>ML Projects</strong>
+            <span className="resume-entry-date">Ongoing</span>
           </div>
           <p className="resume-entry-detail">
-            Built a Python content-orchestration pipeline that ingests blogs, videos, customer
-            stories, and internal metrics, generates channel-specific content with Claude, and
-            publishes through the Ordinal API — with an automated brand-QA and revision loop
-            that checks factual, stylistic, and positioning constraints before scheduling.
-            Built a Remotion/React rendering system for branded clips, vertical shorts, lower
-            thirds, and quote cards, plus{' '}
-            <a href="https://ta20awards.com">ta20awards.com</a> and internal content tooling.
+            Independent work on mechanistic interpretability, sparse autoencoders,
+            representation steering, LLM evaluation, and supervised fine-tuning of small
+            models — plus reproducible eval pipelines for measuring factual-recall failures.
           </p>
         </div>
         <div className="resume-entry">
           <div className="resume-entry-header">
-            <strong>
-              <a href="https://sapentia.ai">Sapentia AI</a> — Cofounder &amp; CTO
-            </strong>
-            <span className="resume-entry-date">Jan 2026 — Present</span>
+            <strong>Thinking about the future and human flourishing</strong>
+            <span className="resume-entry-date">Ongoing</span>
           </div>
           <p className="resume-entry-detail">
-            Architected a multi-agent admissions platform on Next.js, TypeScript, the OpenAI
-            Agent SDK, LangChain, PostgreSQL, and pgvector — routing, tool use, RAG, structured
-            outputs, persistent user memory. Deployed containerized inference and app services
-            on AWS ECS/Fargate behind an ALB with streaming APIs, rate limiting, and PII-safe
-            observability. Built LLM evals for factuality, plan quality, safety, and
-            prompt-injection resistance. 750+ waitlist users; led a 40+ person team.
+            Reading and writing on where technology is taking us and what a good life looks
+            like inside it — ambition, friendship, morality, and agency. Published at{' '}
+            <a href="https://zachchen.substack.com/">Towards the North Star</a>.
           </p>
         </div>
         <div className="resume-entry">
           <div className="resume-entry-header">
-            <strong>
-              <a href="https://www.mgh.harvard.edu">MGH</a> / Harvard Medical School — Computational Genomics
-            </strong>
-            <span className="resume-entry-date">2021 — 2025</span>
+            <strong>AI Safety Student Team — Member</strong>
+            <span className="resume-entry-date">Feb 2026 — Present</span>
           </div>
           <p className="resume-entry-detail">
-            Principal investigator. Python and R pipelines to clean, normalize, and validate
-            genomic data across 1,000+ patient profiles (~80% less manual processing).
-            Logistic regression, covariate adjustment, AUROC, and permutation-based
-            multiple-testing correction to find markers of Alzheimer's risk. Co-authored work
-            accepted at AAIC 2024.
+            Technical AI safety workshop at Harvard.
+          </p>
+        </div>
+        <div className="resume-entry">
+          <div className="resume-entry-header">
+            <strong>SpaceXAI — Campus Lead</strong>
+            <span className="resume-entry-date">Sep 2025 — Present</span>
+          </div>
+          <p className="resume-entry-detail">
+            Growing SpaceXAI at Harvard — developer adoption, product feedback, and
+            programming for technical students.
           </p>
         </div>
 
@@ -538,7 +538,7 @@ function ResumePage() {
         <div className="resume-entry">
           <div className="resume-entry-header">
             <strong>
-              <a href="https://embedding.vc/">Embedding VC</a> — Venture Scout
+              <a href="https://embedding.vc/">Embedding VC</a> — Scout
             </strong>
             <span className="resume-entry-date">Sep 2025 — Present</span>
           </div>
@@ -549,8 +549,8 @@ function ResumePage() {
         </div>
         <div className="resume-entry">
           <div className="resume-entry-header">
-            <strong>V11 — Venture Scout</strong>
-            <span className="resume-entry-date">Jan 2026 — Present</span>
+            <strong>V11 — Venture Partner</strong>
+            <span className="resume-entry-date">Mar 2026 — Present</span>
           </div>
           <p className="resume-entry-detail">
             Sourcing and evaluating high-potential technology companies for leading venture
@@ -572,12 +572,91 @@ function ResumePage() {
           </p>
         </div>
 
+        <h3 className="resume-section-heading">Previously</h3>
+        <div className="resume-entry">
+          <div className="resume-entry-header">
+            <strong>
+              <a href="https://sapentia.ai">Sapentia AI</a> — Cofounder
+            </strong>
+            <span className="resume-entry-date">Jan 2026 — 2026</span>
+          </div>
+          <p className="resume-entry-detail">
+            Architected a multi-agent admissions platform on Next.js, TypeScript, the OpenAI
+            Agent SDK, LangChain, PostgreSQL, and pgvector — routing, tool use, RAG, structured
+            outputs, persistent user memory. Deployed containerized inference and app services
+            on AWS ECS/Fargate behind an ALB with streaming APIs, rate limiting, and PII-safe
+            observability. Built LLM evals for factuality, plan quality, safety, and
+            prompt-injection resistance. 750+ waitlist users; led a 40+ person team.
+          </p>
+        </div>
+        <div className="resume-entry">
+          <div className="resume-entry-header">
+            <strong>Alex AI — GTM</strong>
+            <span className="resume-entry-date">Jun 2026 — Aug 2026</span>
+          </div>
+          <p className="resume-entry-detail">
+            Built a Python content-orchestration pipeline that ingests blogs, videos, customer
+            stories, and internal metrics, generates channel-specific content with Claude, and
+            publishes through the Ordinal API — with an automated brand-QA and revision loop
+            that checks factual, stylistic, and positioning constraints before scheduling.
+            Built a Remotion/React rendering system for branded clips, vertical shorts, lower
+            thirds, and quote cards, plus{' '}
+            <a href="https://ta20awards.com">ta20awards.com</a> and internal content tooling.
+          </p>
+        </div>
+        <div className="resume-entry">
+          <div className="resume-entry-header">
+            <strong>Cursor Growth @ Harvard</strong>
+            <span className="resume-entry-date">2025</span>
+          </div>
+          <p className="resume-entry-detail">
+            Grew Cursor's usage across the Harvard builder ecosystem: student adoption,
+            product feedback, and AI-native developer workflows.
+          </p>
+        </div>
+        <div className="resume-entry">
+          <div className="resume-entry-header">
+            <strong>IvyLine Consulting — Cofounder &amp; CSO</strong>
+            <span className="resume-entry-date">2024 — 2025</span>
+          </div>
+          <p className="resume-entry-detail">
+            Ran ops, consulting, marketing, and sales. Scaled to five figures of profit in
+            year one.
+          </p>
+        </div>
+        <div className="resume-entry">
+          <div className="resume-entry-header">
+            <strong>
+              <a href="https://www.mgh.harvard.edu">MGH</a> / Harvard Medical School — Computational Genomics
+            </strong>
+            <span className="resume-entry-date">2021 — 2025</span>
+          </div>
+          <p className="resume-entry-detail">
+            Principal investigator. Python and R pipelines to clean, normalize, and validate
+            genomic data across 1,000+ patient profiles (~80% less manual processing).
+            Logistic regression, covariate adjustment, AUROC, and permutation-based
+            multiple-testing correction to find markers of Alzheimer's risk. Co-authored work
+            accepted at AAIC 2024.
+          </p>
+        </div>
+        <div className="resume-entry">
+          <div className="resume-entry-header">
+            <strong>Unity Network — Founder</strong>
+            <span className="resume-entry-date">Jun 2023 — May 2024</span>
+          </div>
+          <p className="resume-entry-detail">
+            Built a national organization helping students with research. Distributed
+            resources to 100 Title I schools, partnered with 3 state fairs, and ran leaders
+            in 10+ states.
+          </p>
+        </div>
+
         <h3 className="resume-section-heading">Projects</h3>
         <div className="resume-entry">
           <div className="resume-entry-header">
             <strong>
               <a href="https://github.com/Zxch-Chen/cua-privacy-layer">
-                Privacy Layer for Computer-Use Agents
+                PLVA — Privacy Layer for Visual Agents
               </a>
             </strong>
             <span className="resume-entry-date">Jul 2026</span>
@@ -600,19 +679,10 @@ function ResumePage() {
         </div>
         <div className="resume-entry">
           <div className="resume-entry-header">
-            <strong><a href="https://www.cambridgecollider.com/">Cambridge Collider</a></strong>
-            <span className="resume-entry-date">2025 — Present</span>
-          </div>
-          <p className="resume-entry-detail">
-            Building community and programming for Harvard's builder ecosystem.
-          </p>
-        </div>
-        <div className="resume-entry">
-          <div className="resume-entry-header">
             <strong>
               <a href="https://www.howtowantbetterthings.org/">How to Want Better Things</a> — Co-Author
             </strong>
-            <span className="resume-entry-date">Sep 2025 — Present</span>
+            <span className="resume-entry-date">Sep 2025 — Apr 2026</span>
           </div>
           <p className="resume-entry-detail">
             A book on career choice and moral ambition. Led launch strategy; presented at
