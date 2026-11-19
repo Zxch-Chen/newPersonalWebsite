@@ -52,6 +52,15 @@ const ALL_ARTS = [
   { src: 'https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/eliotQuote.avif', alt: 'T.S. Eliot quote', title: 'T.S. Eliot' },
 ]
 
+// Painted stroke by stroke by a brush engine written in code; each video is the
+// painting being made. Files live in public/art/paintings.
+const PAINTINGS = [
+  { src: '/art/paintings/rowers.jpg', video: '/art/paintings/rowers.mp4', alt: 'Painting of rowers on a river under a red sunset', title: 'Rowers at Sunset' },
+  { src: '/art/paintings/golden_gate.jpg', video: '/art/paintings/golden_gate.mp4', alt: 'Painting of the Golden Gate Bridge at dusk', title: 'Golden Gate, Dusk' },
+  { src: '/art/paintings/pink_sky.jpg', video: '/art/paintings/pink_sky.mp4', alt: 'Painting of pink clouds over dark trees', title: 'Pink Sky' },
+  { src: '/art/paintings/alpenglow.jpg', video: '/art/paintings/alpenglow.mp4', alt: 'Painting of a snow peak over a lake at sunset', title: 'Alpenglow (imagined)' },
+]
+
 const HARDCODED_WRITING = [
   { title: 'What I learned this summer', link: 'https://zachchen.substack.com/p/what-i-learned-this-summer', date: "Aug '26" },
   { title: 'Spiderman grew up with us', link: 'https://zachchen.substack.com/p/spiderman-grew-up-with-us', date: "Aug '26" },
@@ -235,7 +244,20 @@ function Lightbox({ art, onClose }) {
   return (
     <div className="lightbox active" onClick={onClose}>
       <span className="lightbox-close" onClick={onClose}>×</span>
-      <img src={art.src} alt={art.alt} onClick={e => e.stopPropagation()} />
+      {art.video ? (
+        <video
+          key={art.video}
+          src={art.video}
+          poster={art.src}
+          aria-label={art.alt}
+          autoPlay
+          controls
+          playsInline
+          onClick={e => e.stopPropagation()}
+        />
+      ) : (
+        <img src={art.src} alt={art.alt} onClick={e => e.stopPropagation()} />
+      )}
     </div>
   )
 }
@@ -824,6 +846,13 @@ function AestheticsPage() {
         A collection of art, photography, and moments worth holding onto.
       </p>
       <ArtGrid arts={ALL_ARTS} onSelect={setLightbox} />
+
+      <h2 className="post-list-heading">[paintings]</h2>
+      <p className="civilisation-lead">
+        Three of my photos and one imagined scene, painted stroke by stroke by a
+        brush engine written in code. Click one to watch it being painted.
+      </p>
+      <ArtGrid arts={PAINTINGS} onSelect={setLightbox} />
       <Lightbox art={lightbox} onClose={() => setLightbox(null)} />
     </div>
   )

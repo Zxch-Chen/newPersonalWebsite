@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>Zach Chen</title>
+  <meta name="description" content="Zach Chen studies computer science and philosophy at Harvard, builds Circa, does ML research, and writes Towards the North Star." />
+  <meta name="robots" content="noindex" />
+
+  <!-- Standalone like /old and /paper.
+       On first visit a montage of horizons plays, after the Opus 5.5 launch
+       film: the same curved planet edge in a different material each cut,
+       cutting faster and faster (1.5s down to ~3ms) until it holds on the
+       orbit at dawn. Every frame is drawn live by the WebGL shader below; a
+       few use Zach's own paintings as the planet surface.
+       To update the site, edit the DATA block in the <script> at the bottom.
+       Debug: ?frame=N shows one frame, ?intro=1 replays the intro. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..600;1,8..60,300..500&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --serif: "Source Serif 4", "Iowan Old Style", Georgia, serif;
+      --ease: cubic-bezier(.22, .8, .24, 1);
+      --night: #070b12;          /* the planet's dark side, and the page */
+      --text: #eef0f2;
+      --dim: #8a94a2;
+      --H: .55;                  /* horizon height as a fraction of the hero, same for every shot */
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-text-size-adjust: 100%; background: var(--night); }
+    body {
+      background: var(--night); color: var(--dim);
+      font-family: var(--serif); font-size: 19px; line-height: 1.62;
+      font-optical-sizing: auto; -webkit-font-smoothing: antialiased;
+    }
+    body.playing { overflow: hidden; }
+    a { color: var(--text); text-decoration: none; }
+    a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .2em; }
+    a:focus-visible { outline: 1.5px solid var(--text); outline-offset: 3px; border-radius: 2px; }
+
+    /* Grain over everything. */
+    body::after {
+      content: ""; position: fixed; inset: 0; z-index: 90; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1.1 -.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay; opacity: .45;
+    }
+
+    /* ── Hero: the film frame ─────────────────────────────── */
+    .hero { position: relative; height: 100svh; min-height: 480px; overflow: hidden;
+      background: radial-gradient(120% 60% at 50% calc(var(--H) * 100%), #1d3346 0%, #0c1320 45%, #0a1019 100%); }
+    .hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    .cap {
+      position: absolute; left: 0; right: 0; bottom: calc((1 - var(--H)) * 100% + clamp(10px, 1.4vw, 18px));
+      text-align: center; color: var(--cap, var(--text));
+      font-weight: 400; font-size: clamp(32px, 4.4vw, 58px); line-height: 1; letter-spacing: -.01em;
+      font-variation-settings: "opsz" 26; pointer-events: none;
+      text-shadow: 0 0 24px rgba(0, 0, 0, var(--cap-shadow, .25));
+    }
+    .cap.focus { animation: focus .55s var(--ease) both; }
+    .cap.focus-slow { animation: focus 1.6s var(--ease) both; }
+    @keyframes focus { from { opacity: 0; filter: blur(12px); } to { opacity: 1; filter: blur(0); } }
+    .cap a { color: inherit; pointer-events: auto; }
+    .cap a:hover { text-decoration: none; }
+    .skip {
+      position: absolute; right: 22px; bottom: 20px; z-index: 5; font: inherit; font-size: 14px;
+      color: rgba(255,255,255,.55); background: none; border: 0; cursor: pointer; padding: 6px;
+    }
+    .skip:hover { color: #fff; }
+    body:not(.playing) .skip { display: none; }
+
+    /* ── Everything else: a wide page inside the planet ─── */
+    .doc {
+      position: relative; z-index: 2; max-width: 1560px; margin: 0 auto;
+      margin-top: calc((var(--H) - 1) * 100svh + clamp(44px, 6vh, 72px));
+      padding: 0 clamp(24px, 5vw, 72px) 120px;
+    }
+    .doc > * { transition: opacity 1.3s var(--ease), filter 1.3s var(--ease); transition-delay: calc(var(--base, 0s) + var(--i, 0) * 110ms); }
+    body.hide-doc .doc > * { opacity: 0; filter: blur(6px); }
+    body.hide-doc .doc { pointer-events: none; }
+
+    .doc .bio { max-width: 52em; font-size: 1.08em; }
+    .doc .bio p + p { margin-top: 1em; }
+    .sec { display: grid; grid-template-columns: 200px 1fr; gap: 24px 56px; margin-top: 104px; scroll-margin-top: 80px; }
+    .doc h2 { color: var(--text); font: inherit; font-size: 17px; letter-spacing: .01em; }
+    .list { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 34px 48px; }
+    .list .n { color: var(--text); }
+    .list .m { color: var(--dim); font-style: italic; font-size: .88em; display: block; margin-top: 2px; }
+    .list .s { display: block; margin-top: 6px; }
+    .thoughts { columns: 3 280px; column-gap: 48px; }
+    .thoughts p { break-inside: avoid; margin-bottom: 28px; font-size: .94em; }
+    .thoughts .src { color: var(--dim); font-style: italic; }
+    .dimp { color: var(--dim); }
+    .elsewhere { display: flex; flex-wrap: wrap; gap: 6px 26px; margin-top: 120px; }
+    .elsewhere a { color: var(--dim); }
+    .elsewhere a:hover { color: var(--text); }
+
+    /* Aesthetics: paintings, then photos. Square crops, no chrome. */
+    .lede { margin-bottom: 22px; max-width: 34em; }
+    .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .grid.paintings { grid-template-columns: repeat(4, 1fr); margin-bottom: 6px; }
+    .grid button { all: unset; cursor: zoom-in; display: block; aspect-ratio: 1; overflow: hidden; background: #0d1420; position: relative; }
+    .grid button:focus-visible { outline: 1.5px solid var(--text); outline-offset: 2px; }
+    .grid img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity .5s; }
+    .grid button:hover img { opacity: .82; }
+    .grid .play { position: absolute; left: 8px; bottom: 6px; font-size: 13px; color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,.6); }
+
+    dialog.view { margin: auto; padding: 0; border: 0; background: transparent; max-width: min(92vw, 1100px); max-height: 92vh; color: var(--text); }
+    dialog.view::backdrop { background: rgba(4, 7, 12, .92); }
+    dialog.view img, dialog.view video { display: block; max-width: min(92vw, 1100px); max-height: 82vh; margin: 0 auto; }
+    dialog.view p { text-align: center; margin-top: 12px; color: var(--dim); font-size: 16px; }
+    dialog.view button { position: fixed; top: 16px; right: 20px; font: inherit; font-size: 15px; color: var(--dim); background: none; border: 0; cursor: pointer; }
+    dialog.view button:hover { color: var(--text); }
+
+    /* Top nav: plain words. Hidden while the film plays, in with the page. */
+    html { scroll-behavior: smooth; }
+    .top {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+      display: flex; justify-content: space-between; gap: 8px 28px; flex-wrap: wrap;
+      padding: 20px 28px; font-size: 15px; line-height: 1.4;
+      transition: opacity 1.2s var(--ease), background-color .4s, backdrop-filter .4s;
+    }
+    .top a { color: rgba(238, 240, 242, .62); }
+    .top a:hover { color: var(--text); text-decoration: none; }
+    .top .me { color: var(--text); display: none; }
+    .top.scrolled { background: rgba(7, 11, 18, .72); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+    .top.scrolled .me { display: inline; }
+    .top span { display: flex; flex-wrap: wrap; gap: 6px 22px; }
+    body.hide-doc .top { opacity: 0; pointer-events: none; }
+
+    @media (max-width: 600px) {
+      .top { padding: 14px 16px; font-size: 14px; }
+      .top .ext, .top.scrolled .me { display: none; }
+      .top span { gap: 6px 16px; }
+      body { font-size: 17.5px; }
+      :root { --H: .5; }
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .sec { grid-template-columns: 1fr; margin-top: 72px; }
+      .grid.paintings { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cap.focus, .cap.focus-slow { animation: none; }
+      .doc > * { transition: none; }
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body class="hide-doc">
+
+  <nav class="top" id="top" aria-label="Site">
+    <span><a class="me" href="#hero">Zach Chen</a><a href="#s-now">Now</a><a href="#s-former">Projects</a><a href="#s-thoughts">Thoughts</a><a href="#s-investments">Investments</a><a href="#s-aesthetics">Aesthetics</a></span>
+    <span class="ext" id="navLinks"></span>
+  </nav>
+
+  <header class="hero" id="hero">
+    <canvas id="film" aria-hidden="true"></canvas>
+    <h1 class="cap" id="cap" aria-label="Zach Chen"></h1>
+    <button class="skip" id="skip" type="button">skip</button>
+  </header>
+
+  <main class="doc" id="doc">
+    <div class="bio" id="bio"></div>
+
+    <section class="sec" id="s-now">
+      <h2>[Currently working on]</h2>
+      <ul class="list" id="now"></ul>
+    </section>
+
+    <section class="sec" id="s-former">
+      <h2>[Former projects]</h2>
+      <ul class="list" id="former"></ul>
+    </section>
+
+    <section class="sec" id="s-thoughts">
+      <h2>[Thoughts]</h2>
+      <div class="thoughts" id="thoughts"></div>
+    </section>
+
+    <section class="sec" id="s-investments">
+      <h2>[Investments]</h2>
+      <p class="dimp">Not disclosed yet.</p>
+    </section>
+
+    <section class="sec" id="s-aesthetics">
+      <h2>[Aesthetics]</h2>
+      <div>
+        <p class="lede">Four paintings made stroke by stroke by a brush engine written in code, and photographs worth holding onto. Open a painting to watch it being painted.</p>
+        <div class="grid paintings" id="paintings"></div>
+        <div class="grid" id="photos"></div>
+      </div>
+    </section>
+
+    <footer class="elsewhere" id="links"></footer>
+  </main>
+
+  <dialog class="view" id="view">
+    <button type="button" id="close">Close</button>
+    <div id="viewBody"></div>
+  </dialog>
+
+<script id="frag" type="x-shader/x-fragment">
+precision highp float;
+uniform vec2  u_res;
+uniform float u_mat, u_seed, u_H, u_grain, u_vig, u_fin, u_time, u_stars;
+uniform vec3  u_sky;
+uniform vec4  u_crop;
+uniform sampler2D u_tex;
+
+float hash(vec2 p) {
+  p = fract((p + u_seed * 3.17) * vec2(123.34, 456.21));
+  p += dot(p, p + 45.32);
+  return fract(p.x * p.y);
+}
+float noise(vec2 p) {
+  vec2 i = floor(p), f = fract(p), u = f * f * (3. - 2. * f);
+  return mix(mix(hash(i), hash(i + vec2(1, 0)), u.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), u.x), u.y);
+}
+float fbm(vec2 p) {
+  float v = 0., a = .5;
+  mat2 m = mat2(1.6, 1.2, -1.2, 1.6);
+  for (int i = 0; i < 6; i++) { v += a * noise(p); p = m * p; a *= .5; }
+  return v;
+}
+vec3 voro(vec2 p) {                     // (distance to nearest cell point, cell hash, cell hash 2)
+  vec2 i = floor(p), f = fract(p), mc = vec2(0.);
+  float md = 8.;
+  for (int y = -1; y <= 1; y++) for (int x = -1; x <= 1; x++) {
+    vec2 g = vec2(float(x), float(y));
+    vec2 o = vec2(hash(i + g), hash(i + g + 19.7));
+    vec2 r = g + o - f;
+    float d = dot(r, r);
+    if (d < md) { md = d; mc = i + g; }
+  }
+  return vec3(sqrt(md), hash(mc + 3.1), hash(mc + 7.7));
+}
+float seg(vec2 p, vec2 a, vec2 b) {
+  vec2 pa = p - a, ba = b - a;
+  return length(pa - ba * clamp(dot(pa, ba) / dot(ba, ba), 0., 1.));
+}
+float near(float x, float w, float px) { return 1. - smoothstep(w, w + px, x); }
+
+/* Every material gets: q (screen, y down, units of screen height), a (arc length
+   along the horizon, 0 at center), t (depth below the horizon), d = -t. */
+
+/* Stars for the end card: two layers drifting slowly sideways, each star twinkling at
+   its own rate. Positions are continuous inside each grid cell, so the drift never pops. */
+float stars(vec2 q) {
+  float s = 0.;
+  for (int L = 0; L < 2; L++) {
+    float fl = float(L);
+    float sc = mix(38., 90., fl);
+    vec2 g = (q + vec2(u_time * mix(.0035, .0016, fl), 0.)) * sc;
+    vec2 i = floor(g), f = fract(g);
+    float h = hash(i + fl * 31.);
+    if (h > mix(.55, .7, fl)) {
+      vec2 c = vec2(hash(i + 5.1), hash(i + 9.3)) * .8 + .1;
+      float rp = length(f - c) / sc * u_res.y;                 // distance in pixels
+      float b = mix(.35, 1., hash(i + 2.7)) * mix(1., .55, fl);
+      float tw = .55 + .45 * sin(u_time * mix(.7, 2.6, hash(i + 4.4)) + 6.283 * hash(i + 7.2));
+      s += b * tw * (exp(-rp * rp * .9) + .25 * exp(-rp * .9));  // core plus a faint halo
+    }
+  }
+  return s;
+}
+
+vec3 orbit(vec2 q, float a, float t, float d, float asp, float px, float fin) {
+  float sd = max(d, 0.);
+  float cen = exp(-a * a * mix(1.1, 2.4, fin));
+  vec3 warm = mix(vec3(1., .5, .16), vec3(.95, .72, .58), fin);
+  vec3 cool = mix(vec3(.33, .43, .58), vec3(.48, .72, .86), fin);
+  vec3 sky = mix(mix(vec3(.03, .033, .04), vec3(.045, .07, .12), fin),
+                 mix(vec3(.2, .23, .28), vec3(.11, .19, .28), fin), exp(-sd * 5.));
+  sky += cool * exp(-sd * mix(18., 26., fin)) * mix(.5, .9, fin);
+  sky += warm * exp(-sd * mix(60., 110., fin)) * cen * mix(1.4, .9, fin);
+  sky += warm * exp(-sd * 11.) * cen * mix(.22, .06, fin);
+  if (fin > .5) sky += vec3(.84, .9, 1.) * stars(q) * u_stars * smoothstep(.05, .32, d);
+  vec3 base = mix(vec3(.045, .038, .035), vec3(7., 11., 18.) / 255., fin);
+  float cl = fbm(vec2(a * 3., t * 26.) + 4.);
+  float lit = exp(-max(t, 0.) * mix(9., 22., fin));
+  vec3 g = base + mix(vec3(.5, .27, .11), vec3(.1, .17, .24), fin) * smoothstep(.35, .8, cl) * lit;
+  g += warm * exp(-max(t, 0.) * mix(120., 220., fin)) * cen * mix(1., .6, fin);
+  g += cool * exp(-max(t, 0.) * 60.) * .22;
+  return mix(sky, g, smoothstep(-px, px, t));
+}
+
+vec3 honey(vec2 q, float a, float t, float d, float asp, float px) {
+  float sd = max(d, 0.);
+  vec3 sky = vec3(.012, .008, .006) + vec3(.2, .06, .02) * exp(-sd * 14.) * exp(-a * a * .8);
+  vec2 p = vec2(a, t), k = vec2(5., 9.);
+  float h = fbm(p * k), hx = fbm((p + vec2(.004, 0.)) * k), hy = fbm((p + vec2(0., .004)) * k);
+  vec3 n = normalize(vec3((h - hx) * 7., (h - hy) * 7., 1.));
+  vec3 base = mix(vec3(.96, .67, .25), vec3(.78, .41, .1), smoothstep(0., .5, t));
+  base *= .9 + .22 * fbm(p * vec2(2., 3.) + 3.);
+  vec3 g = base * (.72 + .38 * clamp(dot(n, normalize(vec3(-.3, -.6, .8))), 0., 1.));
+  g += vec3(1., .9, .72) * pow(clamp(dot(n, normalize(vec3(.2, -.5, 1.))), 0., 1.), 40.) * .3;
+  vec3 v = voro(p * vec2(26., 30.));
+  float spk = step(.62, v.y) * (1. - smoothstep(.02 + .05 * v.z, .04 + .07 * v.z, v.x));
+  g = mix(g, vec3(.24, .09, .03), spk * .92);
+  g += vec3(.9, .55, .2) * step(.62, v.y) * (1. - smoothstep(.0, .03, abs(v.x - .06 - .05 * v.z))) * .25;
+  g = mix(g, vec3(.32, .05, .03), exp(-max(t, 0.) * 70.) * .9);
+  return mix(sky, g, smoothstep(-px, px, t));
+}
+
+vec3 oil(vec2 q, float a, float t, float d, float asp, float px) {
+  float sd = max(d, 0.);
+  float st = fbm(vec2(q.x * 1.5, q.y * 45.) + 7.);
+  vec3 sky = mix(vec3(.055, .042, .038), vec3(.14, .1, .075), st);
+  sky += vec3(.36, .3, .64) * exp(-sd * 28.) * (.45 + .7 * fbm(vec2(a * 6., sd * 80.)));
+  sky += vec3(.92, .88, 1.) * exp(-sd * 120.) * .3 * smoothstep(.5, .7, fbm(vec2(a * 18., 1.)));
+  vec2 p = vec2(a, t);
+  float w = fbm(p * vec2(2., 6.) + 11.);
+  float s = fbm(vec2(a * 1.4 + w * .6, t * 26.));
+  float br = noise(vec2(a * 4., t * 520.));
+  vec3 g = mix(vec3(.4, .21, .1), vec3(.84, .52, .27), smoothstep(.25, .7, s));
+  g = mix(g, vec3(.95, .83, .65), smoothstep(.62, .82, s) * .85);
+  g *= .84 + .26 * br;
+  g = mix(g, vec3(.28, .4, .56), exp(-max(t, 0.) * 40.) * .6);
+  return mix(sky, g, smoothstep(-px, px, t));
+}
+
+vec3 soil(vec2 q, float a, float t, float d, float asp, float px) {
+  float tt = t + (fbm(vec2(a * 10., 2.)) - .5) * .05 + (noise(vec2(a * 55., 5.)) - .5) * .012;
+  vec2 L = vec2(asp * .32, u_H - .3);
+  float ld = length(q - L);
+  vec3 sky = mix(vec3(.11, .02, .01), vec3(.93, .4, .09), exp(-ld * 1.8));
+  sky = mix(sky, vec3(1., .63, .24), exp(-ld * 5.) * .6);
+  sky *= .9 + .15 * fbm(q * 3.);
+  vec3 g = vec3(.07, .012, .01) * (.7 + .6 * fbm(vec2(a, t) * 30.));
+  g += vec3(.78, .3, .08) * exp(-max(tt, 0.) * 50.) * fbm(vec2(a * 35., tt * 35.)) * 1.2;
+  return mix(sky, g, smoothstep(-px, px, tt));
+}
+
+vec3 agate(vec2 q, float a, float t, float d, float asp, float px) {
+  float w = t + (fbm(vec2(a * 4., t * 4.) + 5.) - .5) * .05 + (noise(vec2(a * 60., t * 60.)) - .5) * .008;
+  vec3 sky = vec3(.64, .27, .56) * (.94 + .08 * fbm(q * vec2(120., 140.)));
+  sky += vec3(.07, .03, .05) * exp(-max(d, 0.) * 10.);
+  float bw = w - .04;
+  float b = .5 + .5 * sin(bw * 150. + fbm(vec2(a * 3., w * 20.)) * 4.);
+  vec3 g = mix(vec3(.79, .5, .69), vec3(.62, .55, .8), smoothstep(.2, .8, b));
+  g = mix(g, vec3(.96, .92, .95), smoothstep(.75, .95, fract(bw * 38. + fbm(vec2(a * 2., w * 9.)))));
+  g = mix(g, vec3(.95, .92, .9), smoothstep(.1, .24, w));
+  vec3 v = voro(vec2(a * 40., w * 60.));
+  float crys = smoothstep(.034, .04, w) * (1. - smoothstep(.055, .075, w));
+  g = mix(g, mix(vec3(.55, .45, .72), vec3(.93, .89, .99), v.y) * (.8 + .3 * v.x), crys * .8);
+  vec3 cr = mix(vec3(.13, .12, .08), vec3(.25, .23, .15), fbm(vec2(a, w) * 50.));
+  g = mix(g, cr, 1. - smoothstep(.034, .042, w));
+  g = mix(g, vec3(.98, .94, .84), 1. - smoothstep(0., .006, w));
+  return mix(sky, g, smoothstep(-px, px, w));
+}
+
+vec3 collage(vec2 q, float a, float t, float d, float asp, float px) {
+  vec3 sky = vec3(.89, .75, .22) * (.9 + .12 * fbm(q * vec2(6., 60.))) * (.95 + .08 * fbm(q * 40.));
+  float pl = min(min(seg(q, vec2(asp * .16, 1.), vec2(asp * .56, 0.)), seg(q, vec2(asp * .62, .05), vec2(asp * .7, .6))), seg(q, vec2(asp * .8, 0.), vec2(asp * .86, .7)));
+  sky = mix(sky, vec3(.3, .24, .12), near(pl, .0009, px) * .6);
+  float sx = asp * .1 + (noise(vec2(q.y * 30., 1.)) - .5) * .012;
+  float sw = .022 + (noise(vec2(q.y * 25., 4.)) - .5) * .01;
+  sky = mix(sky, vec3(.95, .93, .87) * (.95 + .05 * fbm(q * 50.)), near(abs(q.x - sx), sw, px));
+  // Woodcut: contour lines of a warped grain field, cut with a ragged edge like a print.
+  vec2 wp = vec2(a * 1.1, t * 7.);
+  float v = (fbm(wp + fbm(wp * 2.2 + 3.) * .9) + t * 1.2) * 22.;
+  float edge = (noise(vec2(a * 160., t * 90.)) - .5) * .22;
+  vec3 g = mix(vec3(.1, .085, .07), vec3(.87, .8, .65), smoothstep(.36, .44, fract(v) + edge));
+  g *= .9 + .12 * fbm(vec2(a, t) * 140.);
+  float paint = smoothstep(.74, .78, fbm(vec2(a * 3.2, t * 5.) + 21.)) * (1. - smoothstep(.1, .3, t));
+  g = mix(g, vec3(.96, .95, .92) * (.95 + .05 * fbm(vec2(a, t) * 60.)), paint);
+  g = mix(g, vec3(.08), 1. - smoothstep(0., .004, t));
+  return mix(sky, g, smoothstep(-px, px, t));
+}
+
+vec3 xray(vec2 q, float a, float t, float d, float asp, float px) {
+  float sd = max(d, 0.);
+  vec3 sky = vec3(.055) + vec3(.35) * exp(-sd * 60.);
+  vec2 p = vec2(a, t);
+  vec2 wq = p * 5. + vec2(fbm(p * 3.), fbm(p * 3. + 4.)) * 1.6;
+  float n = fbm(wq);
+  float cav = smoothstep(.48, .62, n);
+  float l = .93 - .25 * smoothstep(0., .6, t);
+  vec3 g = vec3(mix(l, .1, cav * .9));
+  g += vec3(.35) * exp(-abs(n - .55) * 25.) * (1. - cav);
+  float rr = length(p - vec2(-asp * .22, .32)) - .22;
+  g = mix(g, vec3(.86), near(abs(rr), .01, .004) * .7);
+  g = mix(g, g * .75, step(rr, 0.) * .4);
+  return mix(sky, g, smoothstep(-px, px, t));
+}
+
+vec3 cells(vec2 q, float a, float t, float d, float asp, float px) {
+  float sd = max(d, 0.);
+  vec3 sky = vec3(.02, .005, .008) + vec3(.15, .02, .03) * exp(-sd * 12.);
+  vec2 p = vec2(a, t);
+  float rid = 1. - abs(fbm(p * 9.) * 2. - 1.);
+  vec3 g = mix(vec3(.86, .42, .6), vec3(.6, .18, .36), smoothstep(0., .45, t));
+  g = mix(g, vec3(.97, .78, .85), exp(-max(t, 0.) * 25.) * .8);
+  g = mix(g, vec3(.98, .75, .85), smoothstep(.9, .97, rid) * .6);
+  vec3 col = mix(sky, g, smoothstep(-px, px, t));
+  float S = .15, k0 = floor(a / S);
+  for (int i = -1; i <= 1; i++) {
+    float k = k0 + float(i);
+    float ac = (k + .5) * S + (hash(vec2(k, 1.)) - .5) * S * .35;
+    float rr = S * (.16 + .3 * hash(vec2(k, 2.)));
+    vec2 lp = vec2(a - ac, t + rr * .55);
+    float bd = length(lp) - rr;
+    lp /= rr;
+    vec3 bc = mix(vec3(.75, .15, .08), vec3(.97, .52, .2), fbm(lp * 3. + k));
+    bc = mix(bc, vec3(.35, .05, .03), smoothstep(.55, .75, fbm(lp * 6. + k * 3.)) * .6);
+    bc *= 1. - .35 * smoothstep(-.25, 0., bd / rr);
+    bc += vec3(1., .8, .6) * exp(-dot(lp - vec2(-.3, -.4), lp - vec2(-.3, -.4)) * 12.) * .25;
+    col = mix(col, bc, 1. - smoothstep(-px, px, bd));
+  }
+  return col;
+}
+
+vec3 ink(vec2 q, float a, float t, float d, float asp, float px) {
+  vec3 paper = vec3(.89, .81, .64) * (.92 + .1 * fbm(q * 5.)) * (.97 + .05 * fbm(q * 60.));
+  paper = mix(paper, paper * .88, smoothstep(.66, .82, fbm(q * 7. + 3.)) * .35);
+  vec3 sp = voro(q * 90.);
+  paper = mix(paper, vec3(.35, .26, .16), step(.93, sp.y) * (1. - smoothstep(.05, .12, sp.x)) * .5);
+  float l1 = abs(d + (noise(vec2(a * 25., 1.)) - .5) * .003);
+  float l2 = abs(d - .011 + (noise(vec2(a * 18., 7.)) - .5) * .004);
+  float m = near(l1, px * .7, px);
+  m = max(m, near(l2, px * .5, px) * .75);
+  if (t > -.03) {
+    float K = 80., c0 = floor(a * K);
+    for (int i = -3; i <= 3; i++) {
+      float c = c0 + float(i);
+      float h1 = hash(vec2(c, 11.)), h2 = hash(vec2(c, 12.)), h3 = hash(vec2(c, 13.));
+      float ac = (c + .5) / K;
+      if (h1 < exp(-ac * ac * 1.6) * .9) {
+        float L = .05 + .42 * h2 * h2, tip = -.02 + .05 * h3;   // some reeds poke above the line
+        float s = (t - tip) / L;
+        if (s > 0. && s < 1.) {
+          float lean = (h3 - .5) * .09 + (h2 - .5) * .04;
+          float x = ac + lean * (1. - s) * (1. - s) + (noise(vec2(c, t * 30.)) - .5) * .005;
+          float wd = (.0008 + .0022 * h1 * h1) * (.35 + .65 * s);
+          m = max(m, near(abs(a - x), wd, px) * (1. - smoothstep(.75, 1., s)));
+        }
+      }
+    }
+    // tangles of loops low in the grass
+    vec2 lp = vec2(a * 9., t * 9.);
+    float loops = abs(fbm(lp + fbm(lp * 2.) * 2.) - .5);
+    m = max(m, near(loops, .006, .004) * smoothstep(.05, .12, t) * (1. - smoothstep(.25, .4, t)) * exp(-a * a * 2.) * .8);
+  }
+  return mix(paper, vec3(.14, .1, .07), m * .9);
+}
+
+vec3 ice(vec2 q, float a, float t, float d, float asp, float px) {
+  float sd = max(d, 0.);
+  vec3 sky = mix(vec3(.015, .025, .04), vec3(.2, .3, .4), exp(-sd * 7.));
+  sky += vec3(.7, .85, .95) * exp(-sd * 70.) * .45;
+  vec2 p = vec2(a, t);
+  float n = fbm(p * vec2(2.5, 4.) + 2.);
+  vec3 g = mix(vec3(.8, .91, .96), vec3(.14, .38, .58), clamp(smoothstep(0., .45, t) + (n - .5) * .7, 0., 1.));
+  float cr = pow(1. - abs(fbm(p * vec2(4., 7.) + 9.) * 2. - 1.), 14.);
+  float cr2 = pow(1. - abs(fbm(p * vec2(11., 16.) + 3.) * 2. - 1.), 24.);
+  g = mix(g, vec3(.04, .16, .32), cr * .85);
+  g = mix(g, vec3(.92, .98, 1.), cr2 * .5);
+  vec3 v = voro(p * vec2(30., 40.));
+  g += vec3(.85, .95, 1.) * step(.9, v.y) * (1. - smoothstep(0., .06, v.x)) * .5 * exp(-max(t, 0.) * 4.);
+  g = mix(g, vec3(.96, .99, 1.), exp(-max(t, 0.) * 80.) * .85);
+  return mix(sky, g, smoothstep(-px, px, t));
+}
+
+vec3 marble(vec2 q, float a, float t, float d, float asp, float px) {
+  float sd = max(d, 0.);
+  vec3 sky = mix(vec3(.025, .05, .04), vec3(.09, .15, .12), exp(-sd * 6.));
+  sky += vec3(.5, .6, .5) * exp(-sd * 50.) * .25;
+  vec2 p = vec2(a, t);
+  vec2 w = p * vec2(1.6, 3.) + vec2(fbm(p * 2.5), fbm(p * 2.5 + 5.)) * 1.4;
+  float vein = 1. - smoothstep(0., .035, abs(fbm(w) - .5));
+  float fine = 1. - smoothstep(0., .012, abs(fbm(w * 2.3 + 7.) - .5));
+  vec3 g = mix(vec3(.93, .91, .86), vec3(.82, .8, .76), fbm(p * 8.));
+  g = mix(g, vec3(.42, .4, .38), vein * .75);
+  g = mix(g, vec3(.68, .56, .35), fine * .45);
+  g *= 1. - .25 * smoothstep(0., .6, t);
+  g += vec3(.15) * exp(-max(t, 0.) * 120.);
+  return mix(sky, g, smoothstep(-px, px, t));
+}
+
+vec3 ocean(vec2 q, float a, float t, float d, float asp, float px) {
+  float sd = max(d, 0.);
+  vec3 sky = mix(vec3(.16, .07, .2), vec3(.98, .52, .22), exp(-sd * 6.));
+  sky = mix(sky, vec3(1., .78, .45), exp(-sd * 30.) * .7);
+  float sa = a - .5;                                   // sun off to the right, clear of the caption
+  float sun = length(vec2(sa, d - .03)) - .05;
+  sky = mix(sky, vec3(1., .92, .75), 1. - smoothstep(-px, px, sun));
+  sky += vec3(1., .7, .4) * exp(-max(sun, 0.) * 18.) * .35;
+  float tt = max(t, 0.);
+  float rip = noise(vec2(a * 18. / (tt + .03), tt * 260.)) * .6 + noise(vec2(a * 50. / (tt + .03), tt * 700.)) * .4;
+  vec3 g = mix(vec3(.18, .1, .16), vec3(.03, .04, .09), smoothstep(0., .4, tt));
+  g += vec3(.5, .25, .2) * exp(-tt * 18.) * .4;
+  g += vec3(1., .75, .45) * exp(-sa * sa / (.002 + tt * .05)) * smoothstep(.55, .85, rip) * 1.4;
+  g += vec3(.9, .5, .3) * smoothstep(.75, .95, rip) * .15 * exp(-tt * 6.);
+  return mix(sky, g, smoothstep(-px, px, t));
+}
+
+vec3 topo(vec2 q, float a, float t, float d, float asp, float px) {
+  vec3 paper = vec3(.9, .87, .79) * (.95 + .06 * fbm(q * 40.));
+  vec3 sky = mix(paper, vec3(.74, .8, .84), .55 * (1. - exp(-max(d, 0.) * 4.)));
+  vec2 p = vec2(a, t);
+  float h = fbm(p * vec2(2.2, 3.5) + 1.) + t * .35;
+  float c = h * 26.;
+  float f = abs(fract(c) - .5);
+  float major = step(mod(floor(c + .5), 5.), .5);
+  float line = smoothstep(mix(.44, .4, major), mix(.48, .46, major), f);
+  vec3 g = mix(paper, vec3(.78, .83, .66), smoothstep(.45, .75, h) * .6);
+  g = mix(g, vec3(.45, .3, .18), line * mix(.6, .9, major));
+  g = mix(g, vec3(.3, .2, .12), 1. - smoothstep(0., .003, t));
+  return mix(sky, g, smoothstep(-px, px, t));
+}
+
+vec3 moss(vec2 q, float a, float t, float d, float asp, float px) {
+  float sd = max(d, 0.);
+  vec3 sky = mix(vec3(.5, .56, .5), vec3(.82, .85, .8), exp(-sd * 5.)) * (.95 + .08 * fbm(q * 3.));
+  vec2 p = vec2(a, t);
+  vec3 v = voro(p * vec2(70., 90.));
+  vec3 v2 = voro(p * vec2(18., 24.) + 3.);
+  float clump = smoothstep(.3, .75, fbm(p * vec2(6., 9.)));
+  vec3 g = mix(vec3(.08, .16, .04), vec3(.42, .58, .14), clump);
+  g *= .65 + .5 * (1. - v.x);
+  g = mix(g, g * .55, smoothstep(.2, .6, v2.x) * .5);
+  g += vec3(.8, .9, .4) * step(.85, v.y) * (1. - smoothstep(0., .25, v.x)) * .35;
+  g *= 1. - .4 * smoothstep(0., .6, t);
+  float tt = t + (noise(vec2(a * 220., 1.)) - .5) * .01;
+  return mix(sky, g, smoothstep(-px, px, tt));
+}
+
+vec3 dunes(vec2 q, float a, float t, float d, float asp, float px) {
+  float sd = max(d, 0.);
+  vec3 sky = mix(vec3(.52, .62, .78), vec3(.98, .86, .7), exp(-sd * 7.));
+  vec2 p = vec2(a, t);
+  float w = fbm(p * vec2(1.5, 3.) + 4.);
+  float r = fract(a * 2.2 + w * 1.8 + t * 9.);
+  float lit = smoothstep(0., .08, r) * (1. - smoothstep(.55, 1., r));
+  vec3 g = mix(vec3(.42, .2, .18), vec3(.93, .6, .33), lit);
+  g = mix(g, vec3(.98, .78, .5), smoothstep(.02, .06, r) * (1. - smoothstep(.06, .14, r)) * .6);
+  g *= .9 + .12 * noise(vec2(a * 300., t * 900.));
+  g = mix(g, vec3(.85, .7, .6), exp(-max(t, 0.) * 30.) * .5);
+  return mix(sky, g, smoothstep(-px, px, t));
+}
+
+vec3 lava(vec2 q, float a, float t, float d, float asp, float px) {
+  float sd = max(d, 0.);
+  vec3 sky = vec3(.01, .005, .005) + vec3(.6, .12, .02) * exp(-sd * 16.) * exp(-a * a * .6) + vec3(.2, .05, .02) * exp(-sd * 4.);
+  vec2 p = vec2(a, t);
+  vec2 w = p * vec2(4., 6.) + vec2(fbm(p * 3.), fbm(p * 3. + 2.)) * .8;
+  float glow = max(pow(1. - abs(fbm(w) * 2. - 1.), 10.), pow(1. - abs(fbm(w * 2.6 + 5.) * 2. - 1.), 16.) * .7);
+  vec3 g = vec3(.035, .03, .035) * (.6 + .8 * fbm(p * 40.));
+  g += vec3(1., .3, .03) * glow * 1.3 + vec3(1., .85, .4) * pow(glow, 4.) * .9;
+  g += vec3(.9, .25, .03) * exp(-max(t, 0.) * 25.) * .6;
+  return mix(sky, g, smoothstep(-px, px, t));
+}
+
+// Risograph print: blue halftone dots sized by tone, a pink sun overprinted at another screen angle.
+vec3 halftone(vec2 q, float a, float t, float d, float asp, float px) {
+  vec3 paper = vec3(.95, .92, .85) * (.96 + .05 * fbm(q * 50.));
+  vec2 p = vec2(a, t);
+  float ts = .03 + .45 * exp(-max(d, 0.) * 7.);
+  float tg = .45 + .55 * smoothstep(.2, .8, fbm(p * vec2(3., 5.) + 2.));
+  float tone = mix(ts, tg, smoothstep(-px, px, t));
+  vec2 c = fract(mat2(.966, -.259, .259, .966) * q * 110.) - .5;
+  vec3 col = mix(paper, vec3(.13, .25, .62), 1. - smoothstep(-.06, .06, length(c) - sqrt(tone) * .56));
+  float sun = length(q - vec2(asp * .5 + .3, u_H - .14)) - .1;
+  vec2 c2 = fract(mat2(.87, -.5, .5, .87) * q * 110.) - .5;
+  float pink = (1. - smoothstep(-px, px, sun)) * (1. - smoothstep(-.06, .06, length(c2) - .42));
+  return mix(col, col * vec3(1., .42, .58), pink * .9);
+}
+
+vec2 mirror(vec2 uv) { return 1. - abs(1. - mod(uv, 2.)); }
+vec3 painting(vec2 q, float a, float t, float d, float asp, float px) {
+  float gh = 1. - u_H;
+  float u = u_crop.x + (a / asp) * u_crop.z;
+  vec3 g = texture2D(u_tex, mirror(vec2(u, u_crop.y + (max(t, 0.) / gh - .5) * u_crop.w))).rgb;
+  g = pow(g, vec3(1.06)) * 1.05;
+  vec2 eu = vec2(u, u_crop.y - .5 * u_crop.w + .015);
+  vec3 edge = (texture2D(u_tex, mirror(eu)).rgb + texture2D(u_tex, mirror(eu + vec2(.04, .01))).rgb
+             + texture2D(u_tex, mirror(eu - vec2(.04, -.01))).rgb) / 3.;
+  vec3 sky = u_sky * (.75 + .5 * q.y / u_H) + edge * exp(-max(d, 0.) * 14.) * .55;
+  sky *= .94 + .1 * fbm(q * vec2(4., 30.));
+  g += edge * exp(-max(t, 0.) * 160.) * .35;
+  return mix(sky, g, smoothstep(-px, px, t));
+}
+
+void main() {
+  vec2 q = vec2(gl_FragCoord.x, u_res.y - gl_FragCoord.y) / u_res.y;
+  float asp = u_res.x / u_res.y;
+  float px = 1.4 / u_res.y;
+  float R = max(asp, .8) * 1.7;
+  vec2 dv = q - vec2(asp * .5, u_H + R);
+  float d = length(dv) - R;
+  float t = -d;
+  float a = atan(dv.x, -dv.y) * R;
+  int m = int(u_mat + .5);
+  vec3 col;
+  if      (m == 0)  col = orbit(q, a, t, d, asp, px, 0.);
+  else if (m == 1)  col = honey(q, a, t, d, asp, px);
+  else if (m == 2)  col = oil(q, a, t, d, asp, px);
+  else if (m == 3)  col = agate(q, a, t, d, asp, px);
+  else if (m == 4)  col = painting(q, a, t, d, asp, px);
+  else if (m == 5)  col = soil(q, a, t, d, asp, px);
+  else if (m == 6)  col = collage(q, a, t, d, asp, px);
+  else if (m == 7)  col = xray(q, a, t, d, asp, px);
+  else if (m == 8)  col = cells(q, a, t, d, asp, px);
+  else if (m == 9)  col = ink(q, a, t, d, asp, px);
+  else if (m == 11) col = ice(q, a, t, d, asp, px);
+  else if (m == 12) col = marble(q, a, t, d, asp, px);
+  else if (m == 13) col = ocean(q, a, t, d, asp, px);
+  else if (m == 14) col = topo(q, a, t, d, asp, px);
+  else if (m == 15) col = moss(q, a, t, d, asp, px);
+  else if (m == 16) col = dunes(q, a, t, d, asp, px);
+  else if (m == 17) col = lava(q, a, t, d, asp, px);
+  else if (m == 18) col = halftone(q, a, t, d, asp, px);
+  else              col = orbit(q, a, t, d, asp, px, u_fin);   // 10: the end card; u_fin runs 0 → 1 as it settles
+  vec2 vq = (q - vec2(asp * .5, .5)) / vec2(asp, 1.);
+  col *= 1. - u_vig * dot(vq, vq) * 1.6;
+  col += (hash(gl_FragCoord.xy * .731 + 17.) - .5) * u_grain;
+  gl_FragColor = vec4(max(col, 0.), 1.);
+}
+</script>
+
+<script>
+/* ═══ DATA: edit this block to update the site ═══════════════════════════ */
+
+// Each inner array is a paragraph. Parts with an href become the bright links.
+const BIO = [
+  ["Hi, my name is Zach Chen. I'm a philosopher builder. I'm studying CS, Stats, & Philosophy at ", { t: "Harvard", href: "https://www.harvard.edu/" },
+   ". Right now I'm working on ", { t: "Circa", href: "https://trycirca.org" },
+   ", the app to help your closest friends stay in touch; building Orbit[s], a pre-seed/seed fund that partners with exceptional young founders to invest in their friends and network, because they are capital constrained, not network constrained; and lastly, ML research on long-horizon tasks and interpretability for AI safety."],
+  ["I'm interested in living a flourishing life, surrounded by people I love, working on impactful projects, and exploring most of what life has to offer. You can reach out to me ",
+   { t: "here", href: "mailto:zach.chen101@gmail.com" }, ", read my ", { t: "thoughts", href: "https://zachchen.substack.com" },
+   ", and find me on ", { t: "X", href: "https://x.com/theZachChen" }, "."],
+];
+
+const NOW = [
+  { name: "Circa", meta: "Cofounder", href: "https://trycirca.org",
+    text: "The app to help your closest friends stay in touch." },
+  { name: "Orbit[s]", meta: "Pre-seed / seed fund",
+    text: "Partners with exceptional young founders to invest in their friends and network. They are capital constrained, not network constrained." },
+  { name: "Persona vs. math in post-training", meta: "CS 2881R, with Jeffrey Zhou and Benedikt Koch",
+    text: "We post-trained Qwen2.5-3B to talk like Sheldon Cooper while getting better at math, through SFT, RLAIF, and RLVR, and tracked whether the two trade off.",
+    href: "https://huggingface.co/zachchxn/Qwen2.5-3B-Instruct-Sheldon-SFT-v2" },
+  { name: "Factual sycophancy in Qwen2.5-7B", meta: "CS 2881R, with Jeffrey Zhou",
+    text: "How often the model adopts a user's wrong answer to a trivia question, and whether a linear probe on its activations can catch it on questions it hasn't seen." },
+  { name: "One neuron that bypasses safety", meta: "CS 2881R, with Radha Munver, Raj Saha, and Sam Chen",
+    text: "A reproduction of “A Single Neuron Is Sufficient to Bypass Safety Alignment” across seven models and 1,400 judged responses." },
+  { name: "Are neural networks already clean?", meta: "Interpretability, independent",
+    text: "Replicating Goodfire's neuron-level interpretability claims on Qwen3-1.7B and Pythia-160m, on one laptop." },
+  { name: "Dropping small activations", meta: "Interpretability, pilot",
+    text: "When the smallest activations in an LLM are zeroed, do facts break before the averages show it?" },
+];
+
+const FORMER = [
+  { name: "PLVA", meta: "First place, H Company hackathon", href: "https://github.com/Zxch-Chen/cua-privacy-layer",
+    text: "A privacy layer for computer-use agents that hides passwords, card numbers, and personal data before the model sees the screen." },
+  { name: "Paper Radar", meta: "Side project",
+    text: "Reads new preprints every morning and uses Claude to flag the rare paper that could change its field." },
+  { name: "Sapentia AI", meta: "Cofounder", href: "https://sapentia.ai",
+    text: "A multi-agent admissions platform with retrieval, memory, and safety evals. 750 people joined the waitlist." },
+  { name: "Alex AI", meta: "GTM, summer 2026",
+    text: "A content pipeline that drafts with Claude and checks itself against brand rules before anything is published." },
+  { name: "How to Want Better Things", meta: "Co-author",
+    text: "A book on career choice and moral ambition, presented at Brown, Yale, and Tufts." },
+];
+
+// A commonplace book, carried over from the previous site.
+const THOUGHTS = [
+  { text: "Don't ask what the world needs. Ask what makes you come alive, and go do it. Because what the world needs is people who have come alive." },
+  { text: "If all external metrics disappeared tomorrow — no salary, no recognition, no one watching — would you still do this? With the same intensity?" },
+  { text: "Use a north star as a heuristic. Will doing this make me more free?", src: "Naval" },
+  { text: "Will doing this help the customer?", src: "Jeff Bezos" },
+  { text: "Am I on the exponential? If not, what can I do to get on it?" },
+  { text: "I often get the question from entrepreneurs or executives, \"What should I do next?\" My answer has always been \"become deeply self aware and when the right thing comes, you will know it. If you know yourself, your next thing, your new idea, your work soulmate will reveal itself.\" When I told my friends, family and colleagues about my plans for what was next, they were really excited that I was \"coming back.\" The thing is, I never left.", src: "Travis Kalanick" },
+  { text: "It is challenging to really reason as if you believe in continued capability progress, even when you do. It is challenging to reason about the pace of change. These winning companies may not be the first ones." },
+  { text: "Do not be deceived: God is not mocked, for whatever one sows, that will he also reap. For the one who sows to his own flesh will from the flesh reap corruption, but the one who sows to the Spirit will from the Spirit reap eternal life.", src: "Galatians 6:7-8" },
+  { text: "If we deliberately keep on sinning after we have received the knowledge of the truth, no sacrifice for sins is left, but only a fearful expectation of judgment and of raging fire that will consume the enemies of God. Anyone who rejected the law of Moses died without mercy on the testimony of two or three witnesses. How much more severely do you think someone deserves to be punished who has trampled the Son of God underfoot, who has treated as an unholy thing the blood of the covenant that sanctified them, and who has insulted the Spirit of grace? For we know him who said, \"It is mine to avenge; I will repay,\" and again, \"The Lord will judge his people.\" It is a dreadful thing to fall into the hands of the living God.", src: "Hebrews 10:26-31" },
+  { text: "There are many places that a company can choose to allocate its limited time and resources. There is never enough time to do everything, so companies need to choose what change they want to see in the world and focus there. It can take decades to move the needle on large global challenges.", src: "Coinbase" },
+  { text: "The deeper insight is about selection, not education. The research found that 62% of unicorn founders held post-graduate degrees, and founders with at least three years of prior work experience in their startup's specific industry were 85% more likely to launch a highly successful venture. Even VCs who are enthusiastic about dropouts note that founders still get \"a lot of the social value\" from elite universities even without a diploma — because what really matters is the network and brand signal, not the degree itself." },
+  { text: "Thiel's actual argument isn't really \"ignore Kelly and bet everything on moonshots.\" It's closer to: develop such deep understanding of something that you genuinely have edge, then bet accordingly. That's actually consistent with everything in the essay. The problem is most people hear \"Thiel made a 1000x return on Facebook\" and conclude \"concentrated moonshots work\" without doing the harder work of actually developing genuine edge first. The question to ask yourself isn't \"should I do moonshots like Thiel?\" but \"do I actually have the edge that would make a concentrated bet Kelly-rational?\"" },
+  { text: "A person acts with their own body, while an institution acts through distributed layers of authorized execution, role structure, process, and enforcement. This difference explains why scale has always depended on delegation rather than on intelligence or will in isolation. No city, state, empire, firm, or administrative order ever scaled through direct presence alone. Scale begins when intent no longer needs to remain physically attached to the person who initiated it, and when action can continue elsewhere under recognizable authority. Delegation extends reach, increases continuity, and enlarges the effective surface through which power can be exercised across distance, time, and complexity." },
+  { text: "In short, imitation is good and you have to do it initially. But once you're bootstrapped enough, if you want to beat the teacher you must do on-policy RL and play to your own strengths and weaknesses. The lesson of doing RL on policy is that beating the teacher requires walking your own path and taking risks and rewards from the environment." },
+  { text: "The disciplined life looks impressive, but the well-designed life lasts longer. Before you try to find more willpower, design your environment and arrange your day so you're more likely to follow through." },
+  { text: "No one tells you running is 10 percent cardio and 90 percent negotiating with the voice begging you to quit.", src: "David Dack" },
+  { text: "If you only wished to be happy, this could be easily accomplished; but we wish to be happier than other people, and this is always difficult, for we believe others to be happier than they are.", src: "Montesquieu" },
+];
+
+const BLOB = "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/";
+const PHOTOS = [
+  ["sfBridge", "Golden Gate Bridge"], ["harvardSunset", "Harvard sunset"], ["bahamasBoat", "Bahamas sunset"],
+  ["rainbowSF", "Rainbow over San Francisco"], ["lowellTower", "Lowell House tower"], ["cemeteryTwo", "Legacy in stone"],
+  ["nyc", "Manhattan"], ["winthropGate", "Winthrop gate"], ["bahamasTwo", "Bahamas"],
+  ["chinatown", "Montreal Chinatown"], ["clockTower", "Clock tower"], ["bahamas", "Bahamas shore"],
+  ["sanBridge", "Golden Gate viewpoint"], ["cemetery", "Boston resting place"], ["eliotQuote", "T. S. Eliot"],
+].map(([k, title]) => ({ src: BLOB + k + ".avif", title }));
+
+const PAINTINGS = [
+  { src: "/art/paintings/rowers.jpg", video: "/art/paintings/rowers.mp4", title: "Rowers at Sunset" },
+  { src: "/art/paintings/golden_gate.jpg", video: "/art/paintings/golden_gate.mp4", title: "Golden Gate, Dusk" },
+  { src: "/art/paintings/pink_sky.jpg", video: "/art/paintings/pink_sky.mp4", title: "Pink Sky" },
+  { src: "/art/paintings/alpenglow.jpg", video: "/art/paintings/alpenglow.mp4", title: "Alpenglow (imagined)" },
+];
+
+const LINKS = [
+  { label: "Email", href: "mailto:zach.chen101@gmail.com" },
+  { label: "Substack", href: "https://zachchen.substack.com" },
+  { label: "X", href: "https://x.com/theZachChen" },
+  { label: "GitHub", href: "https://github.com/Zxch-Chen" },
+  { label: "Resume", href: "/resume" },
+];
+
+/* ═══ Page ══════════════════════════════════════════════════════════════ */
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const link = (text, href) => href
+  ? `<a href="${esc(href)}"${/^https?:/.test(href) ? ' target="_blank" rel="noopener"' : ""}>${esc(text)}</a>`
+  : esc(text);
+const items = (list) => list.map((p) =>
+  `<li><span class="n">${link(p.name, p.href)}</span>${p.meta ? `<span class="m">${esc(p.meta)}</span>` : ""}<span class="s">${esc(p.text)}</span></li>`).join("");
+
+$("#bio").innerHTML = BIO.map((para) => "<p>" + para.map((b) => typeof b === "string" ? esc(b) : link(b.t, b.href)).join("") + "</p>").join("");
+$("#now").innerHTML = items(NOW);
+$("#former").innerHTML = items(FORMER);
+$("#thoughts").innerHTML = THOUGHTS.map((t) => `<p>${esc(t.text)}${t.src ? ` <span class="src">— ${esc(t.src)}</span>` : ""}</p>`).join("");
+$("#links").innerHTML = LINKS.map((l) => link(l.label, l.href)).join("");
+
+const tile = (a, i, kind) => `<button type="button" data-kind="${kind}" data-i="${i}" aria-label="${esc(a.title)}">
+  <img src="${esc(a.src)}" alt="${esc(a.title)}" loading="lazy" decoding="async" />${kind === "painting" ? '<span class="play">▶</span>' : ""}</button>`;
+$("#paintings").innerHTML = PAINTINGS.map((a, i) => tile(a, i, "painting")).join("");
+$("#photos").innerHTML = PHOTOS.map((a, i) => tile(a, i, "photo")).join("");
+
+const view = $("#view"), viewBody = $("#viewBody");
+document.querySelectorAll(".grid button").forEach((b) => b.addEventListener("click", () => {
+  const a = (b.dataset.kind === "painting" ? PAINTINGS : PHOTOS)[+b.dataset.i];
+  viewBody.innerHTML = (a.video
+    ? `<video src="${esc(a.video)}" poster="${esc(a.src)}" autoplay muted playsinline controls></video>`
+    : `<img src="${esc(a.src)}" alt="${esc(a.title)}" />`) + `<p>${esc(a.title)}</p>`;
+  view.showModal();
+}));
+$("#close").addEventListener("click", () => view.close());
+view.addEventListener("click", (e) => { if (e.target === view) view.close(); });
+view.addEventListener("close", () => { viewBody.innerHTML = ""; });
+
+[...$("#doc").children].forEach((c, i) => c.style.setProperty("--i", Math.min(i, 6)));
+
+/* ═══ The film ══════════════════════════════════════════════════════════ */
+
+// Images used as planet surfaces. cy/sh: which band of the image to show (center, height, as fractions).
+const PAINT = {
+  rowers:  { src: "/art/paintings/rowers.jpg",      cy: .3,  sh: .42, sky: [.09, .025, .012] },
+  pink:    { src: "/art/paintings/pink_sky.jpg",    cy: .5,  sh: .5,  sky: [.05, .045, .11] },
+  gate:    { src: "/art/paintings/golden_gate.jpg", cy: .45, sh: .45, sky: [.06, .06, .14] },
+  alpen:   { src: "/art/paintings/alpenglow.jpg",   cy: .42, sh: .6,  sky: [.07, .05, .12] },
+  boat:    { src: BLOB + "bahamasBoat.avif",        cy: .48,  sh: .4,  sky: [.06, .04, .08] },
+  gold:    { src: BLOB + "bahamasTwo.avif",         cy: .42, sh: .4,  sky: [.05, .04, .035] },
+  rainbow: { src: BLOB + "rainbowSF.avif",          cy: .36, sh: .42, sky: [.03, .03, .05] },
+  redsky:  { src: BLOB + "cemeteryTwo.avif",        cy: .12, sh: .38, sky: [.08, .02, .01] },
+  shore:   { src: BLOB + "bahamas.avif",            cy: .55, sh: .42, sky: [.03, .06, .1] },
+};
+const M = { orbit: 0, honey: 1, oil: 2, agate: 3, paint: 4, soil: 5, collage: 6, xray: 7, cells: 8, ink: 9, end: 10,
+            ice: 11, marble: 12, ocean: 13, topo: 14, moss: 15, dunes: 16, lava: 17, halftone: 18 };
+const LIGHT = "#f4ede4", DARK = "#231b14";
+
+// The cut list. Words carry across cuts the way the film holds a word over several shots.
+// Every frame shares the same horizon, so the landing on the final shot doesn't jump.
+// A photo frame whose image hasn't loaded yet is skipped, so the film never waits.
+const FRAMES = [
+  { m: M.orbit,    seed: 1,  cap: "Towards the" },
+  { m: M.honey,    seed: 2,  cap: "Towards the" },
+  { m: M.oil,      seed: 3,  cap: "North Star" },
+  { m: M.ocean,    seed: 4,  cap: "North Star" },
+  { m: M.agate,    seed: 5,  cap: "North Star" },
+  { m: M.paint,    seed: 6,  cap: "North Star", tex: "rowers" },
+  { m: M.marble,   seed: 7 },
+  { m: M.soil,     seed: 8 },
+  { m: M.paint,    seed: 9,  tex: "boat" },
+  { m: M.ice,      seed: 10 },
+  { m: M.collage,  seed: 11 },
+  { m: M.dunes,    seed: 12 },
+  { m: M.xray,     seed: 13 },
+  { m: M.paint,    seed: 14, tex: "gold" },
+  { m: M.halftone, seed: 15 },
+  { m: M.lava,     seed: 16 },
+  { m: M.paint,    seed: 17, tex: "rainbow" },
+  { m: M.cells,    seed: 18 },
+  { m: M.topo,     seed: 19 },
+  { m: M.ink,      seed: 20 },
+  { m: M.moss,     seed: 21 },
+  { m: M.paint,    seed: 22, tex: "pink" },
+  { m: M.paint,    seed: 23, tex: "redsky" },
+  { m: M.agate,    seed: 24 },
+  { m: M.paint,    seed: 25, tex: "gate" },
+  { m: M.ice,      seed: 26 },
+  { m: M.paint,    seed: 27, tex: "shore" },
+  { m: M.honey,    seed: 28 },
+  { m: M.paint,    seed: 29, tex: "alpen" },
+];
+const FINAL = { m: M.end, seed: 40, cap: "Zach Chen", final: true };
+const ON_PAPER = new Set([M.ink, M.topo, M.halftone, M.dunes, M.moss]);
+const capColor = (f) => ON_PAPER.has(f.m) ? DARK : LIGHT;
+
+// Exponential cut lengths: 1.5s for the first shot down to ~3ms for the last.
+const FIRST_MS = 1500, LAST_MS = 3;
+
+const hero = $("#hero"), canvas = $("#film"), cap = $("#cap");
+const params = new URLSearchParams(location.search);
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const horizon = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--H")) || .55;
+
+let gl, prog, U = {}, textures = {};
+
+function initGL() {
+  gl = canvas.getContext("webgl", { antialias: false, alpha: false, preserveDrawingBuffer: true });
+  if (!gl) return false;
+  const vs = gl.createShader(gl.VERTEX_SHADER);
+  gl.shaderSource(vs, "attribute vec2 p; void main(){ gl_Position = vec4(p, 0., 1.); }");
+  gl.compileShader(vs);
+  const fs = gl.createShader(gl.FRAGMENT_SHADER);
+  gl.shaderSource(fs, $("#frag").textContent);
+  gl.compileShader(fs);
+  if (!gl.getShaderParameter(fs, gl.COMPILE_STATUS)) { console.error(gl.getShaderInfoLog(fs)); return false; }
+  prog = gl.createProgram();
+  gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return false;
+  gl.useProgram(prog);
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(prog, "p");
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  for (const n of ["u_res", "u_mat", "u_seed", "u_H", "u_grain", "u_vig", "u_fin", "u_time", "u_stars", "u_sky", "u_crop", "u_tex"]) U[n] = gl.getUniformLocation(prog, n);
+  return true;
+}
+
+function loadTexture(key) {
+  if (textures[key]) return Promise.resolve();
+  return new Promise((res) => {
+    const img = new Image();
+    if (/^https?:/.test(PAINT[key].src)) img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const tex = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img); } catch (e) { return res(); }
+      for (const [k, v] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, k, v);
+      textures[key] = { tex, w: img.naturalWidth, h: img.naturalHeight };
+      res();
+    };
+    img.onerror = () => res();
+    img.src = PAINT[key].src;
+  });
+}
+// In order of appearance, so the early photo frames are the first ready.
+const loadAll = () => Promise.all([...new Set(FRAMES.filter((f) => f.tex).map((f) => f.tex))].map(loadTexture));
+
+function size(hi) {
+  // The montage renders at 1x so fast cuts never drop; the frame that stays renders sharp.
+  const dpr = hi ? Math.min(devicePixelRatio || 1, 2) : 1;
+  const w = Math.round(hero.clientWidth * dpr), h = Math.round(hero.clientHeight * dpr);
+  if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+  gl.viewport(0, 0, w, h);
+}
+
+// sky: the end card's live star field ({ time in s, stars 0..1 for the fade-in}).
+let sky = { time: 0, stars: 1 };
+function draw(f) {
+  const H = horizon() + (f.final ? 0 : ((f.seed * 7) % 3 - 1) * .006);   // a hair of jitter between cuts, like hand-made shots
+  hero.style.setProperty("--H", H);
+  if (!gl || gl.isContextLost()) return;
+  size(!!f.final);
+  gl.uniform2f(U.u_res, canvas.width, canvas.height);
+  gl.uniform1f(U.u_mat, f.m);
+  gl.uniform1f(U.u_seed, f.seed);
+  gl.uniform1f(U.u_H, H);
+  gl.uniform1f(U.u_fin, f.final ? 1 : 0);
+  gl.uniform1f(U.u_time, sky.time);
+  gl.uniform1f(U.u_stars, sky.stars);
+  gl.uniform1f(U.u_grain, .07);                  // the last shot is graded like every other shot
+  gl.uniform1f(U.u_vig, .55);
+  gl.uniform3f(U.u_sky, 0, 0, 0);
+  if (f.tex && textures[f.tex]) {
+    const P = PAINT[f.tex], T = textures[f.tex];
+    const groundAspect = (canvas.width / canvas.height) / (1 - H), imgAspect = T.w / T.h;
+    let sh = P.sh, sw = groundAspect * sh / imgAspect;
+    if (sw > .88) { sw = .88; sh = sw * imgAspect / groundAspect; }   // stay inside the image at the curved edges
+    const cy = Math.min(Math.max(P.cy, sh / 2), 1 - sh / 2);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, T.tex);
+    gl.uniform1i(U.u_tex, 0);
+    gl.uniform4f(U.u_crop, .5, cy, sw, sh);
+    gl.uniform3f(U.u_sky, ...P.sky);
+  }
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+}
+
+function setCaption(text, color, slow, asLink) {
+  cap.style.setProperty("--cap", color);
+  cap.style.setProperty("--cap-shadow", color === DARK ? 0 : .3);
+  if (cap.dataset.text === text) return;
+  cap.dataset.text = text;
+  cap.innerHTML = asLink ? `<a href="#" id="replay" title="Play the intro again">${esc(text)}</a>` : esc(text);
+  cap.classList.remove("focus", "focus-slow");
+  void cap.offsetWidth;
+  if (text) cap.classList.add(slow ? "focus-slow" : "focus");
+}
+
+let raf = 0, timers = [], playing = false;
+const later = (ms, fn) => timers.push(setTimeout(fn, ms));
+
+// The landing. The end card is just the last cut, graded like every other shot; it simply
+// stays. Then its stars fade in and keep twinkling and drifting, the name focuses in on the
+// horizon, and the page rises in.
+const STARS_IN_MS = 2600;
+const ease = (x) => 1 - Math.pow(1 - x, 3);
+let skyRaf = 0, skyT0 = 0, heroVisible = true;
+
+function reveal(instant) {
+  $("#doc").style.setProperty("--base", instant ? "0s" : ".1s");
+  document.body.classList.remove("hide-doc");
+}
+
+// Keeps the end card alive. Only runs while the hero is on screen, at most ~30 fps.
+function skyLoop(now) {
+  skyRaf = 0;
+  if (playing || !heroVisible) return;
+  if (now - (skyLoop.last || 0) > 31) {
+    skyLoop.last = now;
+    const e = now - skyT0;
+    sky.time = e / 1000 + 40;                    // start mid-drift so stars aren't all in phase
+    sky.stars = ease(Math.min(Math.max((e - 250) / STARS_IN_MS, 0), 1));
+    draw(FINAL);
+  }
+  skyRaf = requestAnimationFrame(skyLoop);
+}
+function startSky() {
+  skyT0 = performance.now();
+  if (reduced) { sky = { time: 40, stars: 1 }; draw(FINAL); return; }
+  sky.stars = 0; draw(FINAL);
+  if (!skyRaf) skyRaf = requestAnimationFrame(skyLoop);
+}
+new IntersectionObserver(([e]) => {
+  heroVisible = e.isIntersecting;
+  if (heroVisible && !playing && !skyRaf && !reduced && skyT0) skyRaf = requestAnimationFrame(skyLoop);
+}).observe(hero);
+
+function land(instant) {
+  cancelAnimationFrame(raf);
+  timers.forEach(clearTimeout); timers = [];
+  playing = false;
+  document.body.classList.remove("playing");
+  try { localStorage.setItem("zc-intro-seen", "1"); } catch (e) {}
+  startSky();
+  if (instant || reduced) {
+    setCaption(FINAL.cap, LIGHT, true, true);
+    reveal(true);
+    return;
+  }
+  setCaption("", LIGHT);
+  later(600, () => setCaption(FINAL.cap, LIGHT, true, true));
+  later(1500, () => reveal(false));
+}
+
+function play() {
+  // Durations are fixed per slot, exponential from FIRST_MS to LAST_MS.
+  const dur = FRAMES.map((_, i) => FIRST_MS * Math.pow(LAST_MS / FIRST_MS, i / (FRAMES.length - 1)));
+  const ready = (f) => !f.tex || textures[f.tex];
+  playing = true;
+  document.body.classList.add("playing", "hide-doc");
+  $("#doc").style.setProperty("--base", "0s");
+  scrollTo({ top: 0, behavior: "instant" });
+  let i = 0, shownAt = performance.now();
+  draw(FRAMES[0]); setCaption(FRAMES[0].cap || "", capColor(FRAMES[0]));
+  const tick = (now) => {
+    // Advance at most one cut per screen refresh, so even the 3ms cuts are seen.
+    if (now - shownAt >= dur[i]) {
+      do i++; while (i < FRAMES.length && !ready(FRAMES[i]));
+      shownAt = now;
+      if (i >= FRAMES.length) return land();          // the last cut is the end card, and it stays
+      draw(FRAMES[i]); setCaption(FRAMES[i].cap || "", capColor(FRAMES[i]));
+    }
+    raf = requestAnimationFrame(tick);
+  };
+  raf = requestAnimationFrame(tick);
+}
+
+async function start() {
+  const ok = initGL();
+  if (!ok) { land(true); return; }
+
+  const only = params.get("frame");
+  if (only !== null) {                                  // debug: hold one frame
+    await loadAll();
+    const f = only === "end" ? FINAL : FRAMES[+only] || FINAL;
+    draw(f); setCaption(f.cap || "", capColor(f), true, !!f.final);
+    if (f.final) document.body.classList.remove("hide-doc");
+    addEventListener("resize", () => draw(f));
+    return;
+  }
+
+  let seen = false;
+  try { seen = localStorage.getItem("zc-intro-seen") === "1"; } catch (e) {}
+  loadAll();                                            // streams in while the film plays
+  if (reduced || (seen && !params.has("intro"))) land(true);
+  else play();                                          // starts at once; never waits on images
+  addEventListener("resize", () => { if (!playing && !skyRaf) draw(FINAL); });
+}
+
+// If the GPU drops the canvas (tab in the background, back/forward cache), go straight to the page.
+canvas.addEventListener("webglcontextlost", (e) => { e.preventDefault(); if (playing) land(true); });
+canvas.addEventListener("webglcontextrestored", () => { if (initGL()) { textures = {}; loadAll(); draw(FINAL); } });
+addEventListener("pageshow", (e) => { if (e.persisted) land(true); });
+
+// Nav: external links on the right; a backdrop and the name once the hero has scrolled past.
+$("#navLinks").innerHTML = LINKS.filter((l) => l.label !== "Email").map((l) => link(l.label, l.href)).join("");
+const top_ = $("#top");
+const onScroll = () => top_.classList.toggle("scrolled", scrollY > hero.offsetHeight * .6);
+addEventListener("scroll", onScroll, { passive: true }); onScroll();
+document.querySelector(".top .me").addEventListener("click", (e) => { e.preventDefault(); scrollTo({ top: 0 }); });
+
+$("#skip").addEventListener("click", () => { if (playing) land(); });
+addEventListener("keydown", (e) => { if (playing && (e.key === "Escape" || e.key === " " || e.key === "Enter")) { e.preventDefault(); land(); } });
+cap.addEventListener("click", (e) => { if (e.target.id === "replay") { e.preventDefault(); if (!playing) play(); } });
+
+start();
+</script>
+</body>
+</html>

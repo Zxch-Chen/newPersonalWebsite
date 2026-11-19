@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>Zach Chen — paper</title>
+  <meta name="description" content="CS + philosophy at Harvard. Building Circa, ML projects, early-stage investing." />
+  <meta name="robots" content="noindex" />
+
+  <!-- Standalone, like /old: this page links no shared stylesheet, so nothing
+       from the main site's dark serif skin reaches it and nothing here leaks
+       back. Type, colour and components are Circa's — the hero scene, the
+       butterflies, the bands, the promises grid and the footer are all lifted
+       from circa/re.al/websiteWebAppReal (index.html + site.css). -->
+  <style>
+    @font-face {
+      font-family: "Switzer";
+      src: url("/fonts/Switzer-Regular.otf") format("opentype");
+      font-weight: 400; font-style: normal; font-display: swap;
+    }
+    @font-face {
+      font-family: "Switzer";
+      src: url("/fonts/Switzer-Medium.otf") format("opentype");
+      font-weight: 500; font-style: normal; font-display: swap;
+    }
+
+    :root {
+      --font-display: Georgia, "Times New Roman", serif;
+      --font-body: "Switzer", Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+      --ink: #29251f;
+      --ink-strong: #1c1712;
+      --muted: rgba(41, 37, 31, .58);
+      --paper: #f7f2ea;
+      --paper-warm: #f3ebe0;
+      --card: #fdf8f1;
+      --line: rgba(47, 37, 29, .12);
+      --terracotta: #c2653a;
+
+      /* The Circa hero still. It is the whole scene here — no video, since this
+         page is a portfolio and not a product launch. */
+      --hero-bg: url('/paper-assets/hero.jpg');
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    html, body { margin: 0; min-height: 100%; background: var(--paper); }
+
+    body {
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; transition: color .15s ease; }
+    a:hover { color: var(--terracotta); }
+
+    /* --- nav ------------------------------------------------------------- */
+    .nav {
+      z-index: 2;
+      height: 84px;
+      padding: 0 clamp(24px, 4vw, 72px);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      font-size: 13px;
+      letter-spacing: -.01em;
+      color: rgba(41, 37, 31, .66);
+    }
+    /* on the hero the nav floats over the scene */
+    .page > .nav { position: absolute; top: 0; left: 0; right: 0; }
+    .nav-left, .nav-right { display: flex; align-items: center; gap: 24px; }
+    .nav-right { justify-content: flex-end; }
+    .nav a:hover { color: var(--ink); }
+    .wordmark { font-family: var(--font-display); font-size: 23px; color: rgba(41, 37, 31, .82); }
+    .nav a:not(.wordmark), .site-foot a { padding: 14px 0; margin: -14px 0; }
+    .wordmark { padding: 9px 0; margin: -9px 0; }
+
+    /* --- hero scene ------------------------------------------------------ */
+    .page {
+      min-height: 100svh;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      background-image: var(--hero-bg);
+      background-size: cover;
+      background-position: center;
+    }
+    /* wash: lifts the sky at the top, weights the dune at the bottom */
+    .page::after {
+      content: "";
+      position: absolute; inset: 0;
+      z-index: -1;
+      background: linear-gradient(180deg, rgba(255,255,255,.20), transparent 42%, rgba(20,12,7,.10));
+      pointer-events: none;
+    }
+    /* cream halo behind the copy, so ink type holds against the bright sky */
+    .page::before {
+      content: "";
+      position: absolute; inset: 0;
+      z-index: 0;
+      background: radial-gradient(62% 44% at 50% 38%, rgba(255,250,240,.50), rgba(255,250,240,0) 72%);
+      pointer-events: none;
+    }
+    .hero {
+      position: relative;
+      z-index: 1;
+      min-height: 100svh;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      justify-items: center;
+      align-items: start;
+      text-align: center;
+      padding: clamp(96px, 12vh, 118px) 24px 110px;
+    }
+    .hero-inner { width: min(820px, 100%); }
+    .hero .portrait {
+      width: 78px; height: 96px;
+      margin: 0 auto 26px;
+      display: block;
+      object-fit: cover;
+      border-radius: 3px;
+      filter: saturate(.85);
+      box-shadow: 0 2px 24px rgba(74, 30, 12, .18);
+    }
+    .hero h1 {
+      margin: 0 auto;
+      max-width: 780px;
+      font-family: var(--font-display);
+      font-size: clamp(40px, 4.8vw, 66px);
+      line-height: .92;
+      letter-spacing: -.045em;
+      font-weight: 400;
+      color: #29231d;
+      /* soft cream halo instead of a drop shadow */
+      text-shadow: 0 1px 22px rgba(255,250,240,.62), 0 0 2px rgba(255,250,240,.5);
+    }
+    .sub {
+      margin: 24px auto 0;
+      max-width: 660px;
+      color: rgba(41,35,29,.82);
+      font-size: clamp(16px, 1.35vw, 19px);
+      line-height: 1.5;
+      letter-spacing: -.015em;
+      text-shadow: 0 1px 16px rgba(255,250,240,.7);
+    }
+    .sub a { border-bottom: 1px solid rgba(41,35,29,.32); }
+    .hero .actions { margin-top: 32px; justify-content: center; }
+
+    /* --- buttons: a quiet outlined rectangle, not a pill ------------------ */
+    .actions { display: flex; gap: 28px; flex-wrap: wrap; align-items: center; }
+    .button {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 14px 22px;
+      border: 1px solid var(--terracotta);
+      border-radius: 4px;
+      background: var(--terracotta);
+      color: #fdf8f1;
+      font-size: 14px;
+      letter-spacing: -.01em;
+      transition: opacity .15s ease;
+    }
+    .button:hover { opacity: .88; color: #fdf8f1; }
+    .button.secondary {
+      border-color: transparent; background: none;
+      color: var(--ink); padding: 13px 0;
+    }
+    .button.secondary:hover { color: var(--terracotta); opacity: 1; }
+    .arrow { transition: transform .15s ease; }
+    .button:hover .arrow { transform: translateX(3px); }
+
+    /* --- butterflies ------------------------------------------------------ *
+     * Four independent layers, as on the Circa hero:
+     *   .butterfly  entrance — flies in from its own edge, once
+     *   .bf-roam    the tethered wander, infinite, home at 0,0
+     *   .bf-bob     rise/fall and tilt
+     *   .bf-art     depth scale
+     *   .bf-wing    the flap
+     * The periods are deliberately unrelated (23/31s roam, 8.6/10.3s bob,
+     * .26/.3s flap) so the pair never falls into step with each other.       */
+    .butterfly {
+      position: absolute;
+      z-index: 1;
+      width: clamp(20px, 2.2vw, 32px);
+      pointer-events: none;
+    }
+    .bf-left  { left: 7%;  top: max(46%, 430px); }
+    .bf-right { right: 9%; bottom: clamp(90px, 14%, 190px); }
+
+    /* Entrance, staggered so they don't arrive as a pair. `both` holds the
+       final frame, which is home with the roam layered on top. */
+    .bf-left  { animation: bf-in-left 3.6s cubic-bezier(.22,.72,.3,1) .4s both; }
+    .bf-right { animation: bf-in-right 4.2s cubic-bezier(.22,.72,.3,1) 2s both; }
+
+    .bf-roam { animation: bf-roam-left 23s ease-in-out infinite; }
+    .bf-right .bf-roam { animation: bf-roam-right 31s ease-in-out infinite; }
+    .bf-bob { animation: bf-bob 8.6s ease-in-out infinite; }
+    .bf-right .bf-bob { animation-duration: 10.3s; }
+    .bf-art { display: block; width: 100%; height: auto; animation: bf-depth 19s ease-in-out infinite alternate; }
+    .bf-right .bf-art { animation-duration: 27s; }
+    .bf-stroke { fill: none; stroke: rgba(41,35,29,.66); stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+    .bf-body { fill: rgba(41,35,29,.10); }
+    .bf-wing { transform-box: fill-box; }
+    .bf-l { transform-origin: 100% 50%; animation: bf-flap .26s ease-in-out infinite alternate; }
+    .bf-r { transform-origin: 0% 50%; animation: bf-flap .26s ease-in-out infinite alternate; }
+    .bf-right .bf-wing { animation-duration: .3s; }
+
+    @keyframes bf-in-left {
+      0%   { opacity: 0; transform: translate(-32vw, 7vh); }
+      22%  { opacity: 1; }
+      100% { opacity: 1; transform: translate(0, 0); }
+    }
+    @keyframes bf-in-right {
+      0%   { opacity: 0; transform: translate(28vw, -6vh); }
+      22%  { opacity: 1; }
+      100% { opacity: 1; transform: translate(0, 0); }
+    }
+    /* Tethered wander: starts and ends at 0,0 so it loops seamlessly. Nothing
+       here reaches past ~15vw from home. */
+    @keyframes bf-roam-left {
+      0%, 100% { transform: translate(0, 0); }
+      14%      { transform: translate(-4vw, -3.4vh); }
+      30%      { transform: translate(-9vw, 1.2vh); }
+      44%      { transform: translate(-11vw, -2vh); }
+      58%      { transform: translate(-3vw, 3.6vh); }
+      72%      { transform: translate(4.5vw, -1.4vh); }
+      86%      { transform: translate(1.5vw, 2.4vh); }
+    }
+    @keyframes bf-roam-right {
+      0%, 100% { transform: translate(0, 0); }
+      16%      { transform: translate(3.4vw, -4vh); }
+      32%      { transform: translate(-4.5vw, -1.6vh); }
+      52%      { transform: translate(10vw, -3vh); }
+      68%      { transform: translate(2vw, 2.2vh); }
+      84%      { transform: translate(-3vw, -2.6vh); }
+    }
+    @keyframes bf-bob {
+      0%   { transform: translateY(0) rotate(-7deg); }
+      25%  { transform: translateY(-22px) rotate(5deg); }
+      50%  { transform: translateY(-6px) rotate(-4deg); }
+      75%  { transform: translateY(-29px) rotate(8deg); }
+      100% { transform: translateY(0) rotate(-7deg); }
+    }
+    @keyframes bf-depth { from { transform: scale(.84); } to { transform: scale(1.12); } }
+    @keyframes bf-flap  { from { transform: scaleX(1); }   to { transform: scaleX(.28); } }
+
+    /* Parked at home, not hidden — they are part of the scene, just still. */
+    @media (prefers-reduced-motion: reduce) {
+      .butterfly { opacity: 1; }
+      .butterfly, .bf-roam, .bf-bob, .bf-art, .bf-wing { animation: none; }
+    }
+
+    /* --- bands ------------------------------------------------------------ */
+    .band {
+      padding: clamp(72px, 9vw, 128px) clamp(24px, 4vw, 72px);
+      border-top: 1px solid var(--line);
+    }
+    /* the dune reaches the bottom of the hero, so the first band needs no rule */
+    .band:first-of-type { border-top: 0; }
+    .band-inner { width: min(880px, 100%); margin: 0 auto; }
+    .band.tint { background: var(--paper-warm); }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .band h2 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(28px, 3.4vw, 44px);
+      line-height: 1.04;
+      letter-spacing: -.035em;
+      font-weight: 400;
+      color: var(--ink-strong);
+      max-width: 22ch;
+    }
+    .band-intro {
+      margin: 20px 0 0;
+      max-width: 62ch;
+      font-size: clamp(16px, 1.3vw, 18px);
+      line-height: 1.6;
+      letter-spacing: -.012em;
+      color: rgba(41, 35, 29, .8);
+    }
+    .band-note { margin: 24px 0 0; max-width: 66ch; font-size: 14px; line-height: 1.6; color: var(--muted); }
+    .band-note a { border-bottom: 1px solid rgba(41, 37, 31, .3); }
+
+    /* --- the promises grid, reused as the entry list ---------------------- */
+    .entries {
+      margin: 44px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .entries li { padding: 22px 24px; background: var(--card); display: grid; gap: 6px; }
+    .entries .row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 16px; flex-wrap: wrap;
+    }
+    .entries strong {
+      font-weight: 500; font-size: 15.5px;
+      letter-spacing: -.015em; color: var(--ink-strong);
+    }
+    .entries strong a { border-bottom: 1px solid rgba(194, 101, 58, .45); }
+    .entries .when { font-size: 12px; color: var(--muted); white-space: nowrap; }
+    .entries .meta { font-size: 12.5px; color: var(--muted); }
+    .entries p { margin: 0; font-size: 14.5px; line-height: 1.55; color: rgba(41, 35, 29, .8); }
+
+    /* --- writing list ----------------------------------------------------- */
+    .posts { margin: 40px 0 0; padding: 0; list-style: none; }
+    .posts li {
+      display: flex; gap: 16px; align-items: baseline;
+      padding: 14px 0; border-top: 1px solid var(--line);
+    }
+    .posts .date { font-size: 12px; color: var(--muted); min-width: 62px; }
+    .posts a { border-bottom: 1px solid rgba(47, 37, 29, .18); }
+    .posts a:hover { border-bottom-color: var(--terracotta); }
+
+    /* closing band */
+    .band.closing { text-align: center; }
+    .band.closing h2, .band.closing .band-intro { margin-left: auto; margin-right: auto; }
+    .band.closing .actions { margin-top: 32px; justify-content: center; }
+
+    /* --- footer ----------------------------------------------------------- */
+    .site-foot {
+      padding: 34px clamp(24px, 4vw, 72px) 40px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 20px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: rgba(41, 37, 31, .62);
+    }
+    .site-foot nav { display: flex; gap: 16px; flex-wrap: wrap; }
+    .site-foot a:hover { color: var(--ink); }
+    .site-foot .availability { text-align: right; line-height: 1.5; }
+
+    @media (max-width: 640px) {
+      .nav { grid-template-columns: auto 1fr; height: 68px; }
+      .nav-right { display: none; }
+      .butterfly { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── hero scene ──────────────────────────────────────────────────────── -->
+  <div class="page">
+    <header class="nav">
+      <nav class="nav-left">
+        <a href="/">← main site</a>
+      </nav>
+      <a class="wordmark" href="/paper">Zach Chen</a>
+      <nav class="nav-right">
+        <a href="https://zachchen.substack.com/">Writing</a>
+        <a href="mailto:zach.chen101@gmail.com">Contact</a>
+      </nav>
+    </header>
+
+    <div class="butterfly bf-left" aria-hidden="true">
+      <div class="bf-roam"><div class="bf-bob">
+        <svg class="bf-art" viewBox="0 0 44 36" fill="none">
+          <g class="bf-wing bf-l">
+            <path class="bf-stroke" d="M21 13.5C16.4 4.6 6.6 2.4 3.6 7.9 1.2 12.4 7.4 17.4 13.6 17.9c3.4.3 6.2-1 7.4-3.1Z" />
+            <path class="bf-stroke" d="M21 17.4c-3.9 2.4-11.4 3.4-12.6 7.9-1 3.8 4.6 5.8 8.4 2.9 2.6-2 4-5.4 4.2-8.2Z" />
+          </g>
+          <g class="bf-wing bf-r">
+            <path class="bf-stroke" transform="translate(44 0) scale(-1 1)" d="M21 13.5C16.4 4.6 6.6 2.4 3.6 7.9 1.2 12.4 7.4 17.4 13.6 17.9c3.4.3 6.2-1 7.4-3.1Z" />
+            <path class="bf-stroke" transform="translate(44 0) scale(-1 1)" d="M21 17.4c-3.9 2.4-11.4 3.4-12.6 7.9-1 3.8 4.6 5.8 8.4 2.9 2.6-2 4-5.4 4.2-8.2Z" />
+          </g>
+          <path class="bf-stroke bf-body" d="M22 11.2c1.3 3 1.3 11.4 0 15.4-1.3-4-1.3-12.4 0-15.4Z" />
+          <path class="bf-stroke" d="M21.3 11.3C19.4 8 17.6 6.6 16 6.1" />
+          <path class="bf-stroke" d="M22.7 11.3C24.6 8 26.4 6.6 28 6.1" />
+        </svg>
+      </div></div>
+    </div>
+
+    <div class="butterfly bf-right" aria-hidden="true">
+      <div class="bf-roam"><div class="bf-bob">
+        <svg class="bf-art" viewBox="0 0 44 36" fill="none">
+          <g class="bf-wing bf-l">
+            <path class="bf-stroke" d="M21 13.5C16.4 4.6 6.6 2.4 3.6 7.9 1.2 12.4 7.4 17.4 13.6 17.9c3.4.3 6.2-1 7.4-3.1Z" />
+            <path class="bf-stroke" d="M21 17.4c-3.9 2.4-11.4 3.4-12.6 7.9-1 3.8 4.6 5.8 8.4 2.9 2.6-2 4-5.4 4.2-8.2Z" />
+          </g>
+          <g class="bf-wing bf-r">
+            <path class="bf-stroke" transform="translate(44 0) scale(-1 1)" d="M21 13.5C16.4 4.6 6.6 2.4 3.6 7.9 1.2 12.4 7.4 17.4 13.6 17.9c3.4.3 6.2-1 7.4-3.1Z" />
+            <path class="bf-stroke" transform="translate(44 0) scale(-1 1)" d="M21 17.4c-3.9 2.4-11.4 3.4-12.6 7.9-1 3.8 4.6 5.8 8.4 2.9 2.6-2 4-5.4 4.2-8.2Z" />
+          </g>
+          <path class="bf-stroke bf-body" d="M22 11.2c1.3 3 1.3 11.4 0 15.4-1.3-4-1.3-12.4 0-15.4Z" />
+          <path class="bf-stroke" d="M21.3 11.3C19.4 8 17.6 6.6 16 6.1" />
+          <path class="bf-stroke" d="M22.7 11.3C24.6 8 26.4 6.6 28 6.1" />
+        </svg>
+      </div></div>
+    </div>
+
+    <main class="hero">
+      <div class="hero-inner">
+        <img class="portrait" src="/zach/zach-intro.jpg" alt="Zach Chen" />
+        <h1>Philosopher builder.</h1>
+        <p class="sub">
+          I study CS with a secondary in philosophy at
+          <a href="https://www.harvard.edu/">Harvard</a>. Right now I'm building
+          <a href="https://trycirca.org">Circa</a>, working on ML projects, investing at
+          the earliest stage, and thinking about the future and human flourishing.
+        </p>
+        <p class="actions">
+          <a class="button" href="#now">
+            <span class="label">What I'm working on</span>
+            <span class="arrow" aria-hidden="true">→</span>
+          </a>
+          <a class="button secondary" href="https://zachchen.substack.com/">
+            <span class="label">Read the writing</span>
+          </a>
+        </p>
+      </div>
+    </main>
+  </div>
+
+  <!-- ── now ─────────────────────────────────────────────────────────────── -->
+  <section class="band" id="now">
+    <div class="band-inner">
+      <p class="eyebrow">Now</p>
+      <h2>The things I'm actually spending time on.</h2>
+      <p class="band-intro">
+        A short list on purpose. Everything here is current; everything that isn't is
+        further down.
+      </p>
+
+      <ul class="entries">
+        <li>
+          <div class="row">
+            <strong><a href="https://trycirca.org">Circa</a> — Cofounder</strong>
+            <span class="when">2026 —</span>
+          </div>
+          <p>
+            A more authentic space for close friends: a friends-first mobile network built
+            around relational depth rather than engagement metrics.
+          </p>
+        </li>
+        <li>
+          <div class="row">
+            <strong>ML Projects</strong>
+            <span class="when">Ongoing</span>
+          </div>
+          <p>
+            Mechanistic interpretability, sparse autoencoders, representation steering, LLM
+            evaluation, and supervised fine-tuning of small models.
+          </p>
+        </li>
+        <li>
+          <div class="row">
+            <strong>Thinking about the future and human flourishing</strong>
+            <span class="when">Ongoing</span>
+          </div>
+          <p>
+            Reading and writing on where technology is taking us and what a good life looks
+            like inside it — ambition, friendship, morality, and agency.
+          </p>
+        </li>
+        <li>
+          <div class="row">
+            <strong>AI Safety Student Team — Member</strong>
+            <span class="when">Feb 2026 —</span>
+          </div>
+          <p>Technical AI safety workshop at Harvard.</p>
+        </li>
+        <li>
+          <div class="row">
+            <strong>SpaceXAI — Campus Lead</strong>
+            <span class="when">Sep 2025 —</span>
+          </div>
+          <p>
+            Growing SpaceXAI at Harvard: developer adoption, product feedback, and
+            programming for technical students.
+          </p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── investing ───────────────────────────────────────────────────────── -->
+  <section class="band tint">
+    <div class="band-inner">
+      <p class="eyebrow">Early-stage investing</p>
+      <h2>Technical diligence, at pre-seed and seed.</h2>
+      <p class="band-intro">
+        Model architecture, infrastructure, data advantages, and whether the product has a
+        reason to stay defensible once the obvious version is easy to build.
+      </p>
+
+      <ul class="entries">
+        <li>
+          <div class="row">
+            <strong><a href="https://embedding.vc/">Embedding VC</a> — Scout</strong>
+            <span class="when">Sep 2025 —</span>
+          </div>
+          <p>Sourcing and evaluating early-stage AI and deep-tech companies.</p>
+        </li>
+        <li>
+          <div class="row">
+            <strong>V11 — Venture Partner</strong>
+            <span class="when">Mar 2026 —</span>
+          </div>
+          <p>
+            A selective network of operators, founders, and researchers surfacing
+            high-potential companies for leading venture firms.
+          </p>
+        </li>
+        <li>
+          <div class="row">
+            <strong><a href="https://tnt.so">TNT</a> — Operator</strong>
+            <span class="when">2026 —</span>
+          </div>
+          <p>
+            Operations for a Harvard/MIT accelerator: formation, product strategy,
+            fundraising, and GTM alongside technical founders.
+          </p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── selected work ───────────────────────────────────────────────────── -->
+  <section class="band">
+    <div class="band-inner">
+      <p class="eyebrow">Selected work</p>
+      <h2>Things I built, and what they were for.</h2>
+
+      <ul class="entries">
+        <li>
+          <div class="row">
+            <strong>
+              <a href="https://github.com/Zxch-Chen/cua-privacy-layer">PLVA — Privacy Layer for Visual Agents</a>
+            </strong>
+            <span class="when">Jul 2026</span>
+          </div>
+          <p class="meta">Python · ONNX · RapidOCR · MiniLM · Playwright</p>
+          <p>
+            1st place at the H Company Computer Use Agent Hackathon. A local, fail-closed
+            privacy layer for browser agents: a loopback proxy rewrites screenshots and
+            actions with session-scoped placeholders, so passwords, CVCs, and card numbers
+            are masked before a frame ever reaches the model.
+          </p>
+        </li>
+        <li>
+          <div class="row">
+            <strong><a href="https://sapentia.ai">Sapentia AI</a> — Cofounder</strong>
+            <span class="when">Jan 2026 — 2026</span>
+          </div>
+          <p>
+            A multi-agent admissions platform: Next.js, the OpenAI Agent SDK, LangChain,
+            Postgres and pgvector, deployed on AWS ECS/Fargate. 750+ waitlist users; led a
+            40+ person team.
+          </p>
+        </li>
+        <li>
+          <div class="row">
+            <strong>Alex AI — GTM</strong>
+            <span class="when">Jun — Aug 2026</span>
+          </div>
+          <p>
+            A Python content-orchestration pipeline with an automated brand-QA loop, a
+            Remotion/React render system for branded video, and
+            <a href="https://ta20awards.com">ta20awards.com</a>.
+          </p>
+        </li>
+        <li>
+          <div class="row">
+            <strong>
+              <a href="https://www.howtowantbetterthings.org/">How to Want Better Things</a> — Co-Author
+            </strong>
+            <span class="when">Sep 2025 — Apr 2026</span>
+          </div>
+          <p>
+            A book on career choice and moral ambition. Led launch strategy; presented at
+            Brown, Yale, and Tufts.
+          </p>
+        </li>
+        <li>
+          <div class="row">
+            <strong><a href="https://www.mgh.harvard.edu">MGH</a> / Harvard Medical School</strong>
+            <span class="when">2021 — 2025</span>
+          </div>
+          <p>
+            Computational genomics. Python and R pipelines across 1,000+ patient profiles;
+            markers of Alzheimer's risk. Co-authored work accepted at AAIC 2024.
+          </p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── writing ─────────────────────────────────────────────────────────── -->
+  <section class="band tint">
+    <div class="band-inner">
+      <p class="eyebrow">Writing</p>
+      <h2>Towards the North Star.</h2>
+      <p class="band-intro">
+        Essays on technology, history, ambition, and individual agency in a world shaped by
+        rapidly changing social and technical systems.
+      </p>
+
+      <ul class="posts">
+        <li><span class="date">Aug '26</span><a href="https://zachchen.substack.com/p/what-i-learned-this-summer">What I learned this summer</a></li>
+        <li><span class="date">Aug '26</span><a href="https://zachchen.substack.com/p/spiderman-grew-up-with-us">Spiderman grew up with us</a></li>
+        <li><span class="date">Jun '26</span><a href="https://zachchen.substack.com/p/the-curse-of-ambition">the curse of ambition</a></li>
+        <li><span class="date">May '26</span><a href="https://zachchen.substack.com/p/what-harvard-feels-like-from-each">what harvard feels like from each year</a></li>
+        <li><span class="date">Apr '26</span><a href="https://zachchen.substack.com/p/diminished-personhood">Diminished Personhood</a></li>
+      </ul>
+      <p class="band-note">
+        Everything is at <a href="https://zachchen.substack.com/">zachchen.substack.com</a>.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── closing ─────────────────────────────────────────────────────────── -->
+  <section class="band closing">
+    <div class="band-inner">
+      <h2>Get in touch.</h2>
+      <p class="band-intro">
+        I'm based between Harvard and wherever the next good idea needs me.
+      </p>
+      <p class="actions">
+        <a class="button" href="mailto:zach.chen101@gmail.com">
+          <span class="label">zach.chen101@gmail.com</span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="button secondary" href="/">
+          <span class="label">The main site</span>
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <footer class="site-foot">
+    <nav aria-label="Elsewhere">
+      <a href="/">Main site</a>
+      <a href="https://github.com/Zxch-Chen">GitHub</a>
+      <a href="https://www.linkedin.com/in/zachary-chen31415/">LinkedIn</a>
+      <a href="https://zachchen.substack.com/">Substack</a>
+      <a href="https://x.com/theZachChen">X</a>
+    </nav>
+    <div class="availability">Cambridge, MA</div>
+  </footer>
+
+</body>
+</html>

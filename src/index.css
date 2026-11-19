@@ -6,3 +6,11 @@
   flex-direction: column;
   min-height: 100vh;
 }
+
+/* Painting process videos share the image lightbox */
+.lightbox video {
+  max-width: 90vw;
+  max-height: 90vh;
+  border-radius: 8px;
+  cursor: default;
+}
