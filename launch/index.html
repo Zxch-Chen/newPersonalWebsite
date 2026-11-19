@@ -649,9 +649,9 @@ const NOW = [
   { name: "Orbit[s]", meta: "Pre-seed / seed fund",
     text: "Partners with exceptional young founders to invest in their friends and network. They are capital constrained, not network constrained." },
   { name: "Long-horizon agents and reasoning", meta: "Research at Stanford AI Lab (SAIL), with Yuzhen Mao", href: "https://yuzhenmao.github.io/",
-    text: "Research on LLM agents for long-horizon tasks and reasoning, in Azalia Mirhoseini's group." },
+    text: "Research on LLM agents for long-horizon tasks and reasoning." },
   { name: "Persona vs. math in post-training", meta: "CS 2881R",
-    text: "Post-trained Qwen2.5-3B into Sheldon Cooper with SFT, RLAIF, and RLVR, then looked inside. A paired persona direction converges by 50 examples (cosine 0.93), and steering with it alone matches the system prompt. Most of the fine-tune's activation shift is shared with a no-persona control fine-tune and does nothing; subtracting the control isolates the persona.",
+    text: "We taught a small model to talk like Sheldon Cooper while getting better at math, then looked inside to see what fine-tuning actually changed. The persona turns out to be a single direction in the model's activations, findable from a few dozen examples, and most of what fine-tuning changes has nothing to do with the persona.",
     href: "https://huggingface.co/zachchxn/Qwen2.5-3B-Instruct-Sheldon-SFT-v2" },
   { name: "Are neural networks already clean?", meta: "Interpretability",
     text: "Replicating Goodfire's neuron-level interpretability claims on Qwen3-1.7B and Pythia-160m, on one laptop." },
@@ -666,7 +666,7 @@ const PAST = [
     text: "A multi-agent admissions platform: OpenAI Agents SDK, pgvector retrieval, and persistent memory on AWS ECS/Fargate, with evals for factuality, safety, and prompt injection. 750+ on the waitlist, a 40+ person team." },
   { name: "Alex AI", meta: "First intern and youngest employee, summer 2026",
     text: "Built semi-automated LinkedIn content pipelines and created ta20awards.com, a competition for TA leaders and recruiters. It grew the company page from 8,000 to 10,000 followers organically and kept producing content for two months after I left.",
-    href: "https://ta20awards.com" },
+    inlink: { t: "ta20awards.com", href: "https://ta20awards.com" } },
   { name: "How to Want Better Things", meta: "Co-author", href: "https://www.howtowantbetterthings.org/",
     text: "A book on career choice and moral ambition, presented at Brown, Yale, and Tufts. It ended for lack of momentum and distribution. Still a good idea; the School for Moral Ambition is doing the work we hoped to." },
 ];
@@ -678,7 +678,6 @@ const THOUGHTS = [
   { text: "Use a north star as a heuristic. Will doing this make me more free?", src: "Naval" },
   { text: "If all external metrics disappeared tomorrow — no salary, no recognition, no one watching — would you still do this? With the same intensity?" },
   { text: "Am I on the exponential? If not, what can I do to get on it?" },
-  { text: "Will doing this help the customer?", src: "Jeff Bezos" },
 ];
 
 const BLOB = "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/";
@@ -713,7 +712,7 @@ const link = (text, href) => href
   ? `<a href="${esc(href)}"${/^https?:/.test(href) ? ' target="_blank" rel="noopener"' : ""}>${esc(text)}</a>`
   : esc(text);
 const items = (list) => list.map((p) =>
-  `<li><span class="n">${link(p.name, p.href)}</span>${p.meta ? `<span class="m">${esc(p.meta)}</span>` : ""}<span class="s">${esc(p.text)}</span></li>`).join("");
+  `<li><span class="n">${link(p.name, p.href)}</span>${p.meta ? `<span class="m">${esc(p.meta)}</span>` : ""}<span class="s">${p.inlink ? esc(p.text).replace(esc(p.inlink.t), link(p.inlink.t, p.inlink.href)) : esc(p.text)}</span></li>`).join("");
 
 $("#bio").innerHTML = BIO.map((para) => "<p>" + para.map((b) => typeof b === "string" ? esc(b) : link(b.t, b.href)).join("") + "</p>").join("");
 $("#now").innerHTML = items(NOW);
