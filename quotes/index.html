@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quotes · Zach Chen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..600;1,8..60,300..500&display=swap" rel="stylesheet" />
+  <style>
+    :root { --night: #070b12; --text: #eef0f2; --dim: #8a94a2; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: var(--night); }
+    body { color: var(--dim); font-family: "Source Serif 4", Georgia, serif; font-size: 18px; line-height: 1.62;
+      -webkit-font-smoothing: antialiased; max-width: 1320px; margin: 0 auto; padding: 40px clamp(20px, 5vw, 72px) 120px; }
+    a { color: var(--dim); text-decoration: none; }
+    a:hover { color: var(--text); }
+    h1 { color: var(--text); font-weight: 400; font-size: 26px; margin: 72px 0 12px; }
+    .lede { margin-bottom: 48px; max-width: 34em; }
+    .q { columns: 3 300px; column-gap: 48px; }
+    .q p { break-inside: avoid; margin-bottom: 30px; }
+    .q span { font-style: italic; }
+  </style>
+</head>
+<body>
+  <a href="/">← Zach Chen</a>
+  <h1>[Quotes]</h1>
+  <p class="lede">A small commonplace book of ideas, scripture, and fragments worth returning to.</p>
+  <div class="q" id="q"></div>
+<script>
+const QUOTES = [
+  { text: "Don't ask what the world needs. Ask what makes you come alive, and go do it. Because what the world needs is people who have come alive." },
+  { text: "If all external metrics disappeared tomorrow — no salary, no recognition, no one watching — would you still do this? With the same intensity?" },
+  { text: "Use a north star as a heuristic. Will doing this make me more free?", source: "Naval" },
+  { text: "Will doing this help the customer?", source: "Jeff Bezos" },
+  { text: "Am I on the exponential? If not, what can I do to get on it?" },
+  { text: "I often get the question from entrepreneurs or executives, \"What should I do next?\" My answer has always been \"become deeply self aware and when the right thing comes, you will know it. If you know yourself, your next thing, your new idea, your work soulmate will reveal itself.\" When I told my friends, family and colleagues about my plans for what was next, they were really excited that I was \"coming back.\" The thing is, I never left.", source: "Travis Kalanick" },
+  { text: "It is challenging to really reason as if you believe in continued capability progress, even when you do. It is challenging to reason about the pace of change. These winning companies may not be the first ones." },
+  { text: "Do not be deceived: God is not mocked, for whatever one sows, that will he also reap. For the one who sows to his own flesh will from the flesh reap corruption, but the one who sows to the Spirit will from the Spirit reap eternal life.", source: "Galatians 6:7-8" },
+  { text: "If we deliberately keep on sinning after we have received the knowledge of the truth, no sacrifice for sins is left, but only a fearful expectation of judgment and of raging fire that will consume the enemies of God. Anyone who rejected the law of Moses died without mercy on the testimony of two or three witnesses. How much more severely do you think someone deserves to be punished who has trampled the Son of God underfoot, who has treated as an unholy thing the blood of the covenant that sanctified them, and who has insulted the Spirit of grace? For we know him who said, \"It is mine to avenge; I will repay,\" and again, \"The Lord will judge his people.\" It is a dreadful thing to fall into the hands of the living God.", source: "Hebrews 10:26-31" },
+  { text: "There are many places that a company can choose to allocate its limited time and resources. There is never enough time to do everything, so companies need to choose what change they want to see in the world and focus there. It can take decades to move the needle on large global challenges.", source: "Coinbase" },
+  { text: "The deeper insight is about selection, not education. The research found that 62% of unicorn founders held post-graduate degrees, and founders with at least three years of prior work experience in their startup's specific industry were 85% more likely to launch a highly successful venture. Even VCs who are enthusiastic about dropouts note that founders still get \"a lot of the social value\" from elite universities even without a diploma — because what really matters is the network and brand signal, not the degree itself." },
+  { text: "Thiel's actual argument isn't really \"ignore Kelly and bet everything on moonshots.\" It's closer to: develop such deep understanding of something that you genuinely have edge, then bet accordingly. That's actually consistent with everything in the essay. The problem is most people hear \"Thiel made a 1000x return on Facebook\" and conclude \"concentrated moonshots work\" without doing the harder work of actually developing genuine edge first. The question to ask yourself isn't \"should I do moonshots like Thiel?\" but \"do I actually have the edge that would make a concentrated bet Kelly-rational?\"" },
+  { text: "A person acts with their own body, while an institution acts through distributed layers of authorized execution, role structure, process, and enforcement. This difference explains why scale has always depended on delegation rather than on intelligence or will in isolation. No city, state, empire, firm, or administrative order ever scaled through direct presence alone. Scale begins when intent no longer needs to remain physically attached to the person who initiated it, and when action can continue elsewhere under recognizable authority. Delegation extends reach, increases continuity, and enlarges the effective surface through which power can be exercised across distance, time, and complexity." },
+  { text: "In short, imitation is good and you have to do it initially. But once you're bootstrapped enough, if you want to beat the teacher you must do on-policy RL and play to your own strengths and weaknesses. The lesson of doing RL on policy is that beating the teacher requires walking your own path and taking risks and rewards from the environment." },
+  { text: "The disciplined life looks impressive, but the well-designed life lasts longer. Before you try to find more willpower, design your environment and arrange your day so you're more likely to follow through." },
+  { text: "No one tells you running is 10 percent cardio and 90 percent negotiating with the voice begging you to quit.", source: "David Dack" },
+  { text: "If you only wished to be happy, this could be easily accomplished; but we wish to be happier than other people, and this is always difficult, for we believe others to be happier than they are.", source: "Montesquieu" },
+]
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+document.getElementById("q").innerHTML = QUOTES.map((t) =>
+  `<p>${esc(t.text)}${t.source ? ` <span>— ${esc(t.source)}</span>` : ""}</p>`).join("");
+</script>
+</body>
+</html>

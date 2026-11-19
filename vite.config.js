@@ -7,7 +7,7 @@ import { vitePluginSubstackApi } from './vite-plugin-substack-api.js'
 // Standalone alternate versions of the site: each is its own index.html at the
 // repo root, served at /<name>. Dev needs the extension spelled out; Vercel
 // does the same job through the rewrites in vercel.json.
-const STANDALONE_PAGES = ['old', 'paper', 'launch']
+const STANDALONE_PAGES = ['old', 'paper', 'launch', 'quotes']
 
 function standalonePageRedirect() {
   const middleware = (req, res, next) => {
@@ -55,6 +55,7 @@ export default defineConfig({
         old: resolve(__dirname, 'old/index.html'),
         paper: resolve(__dirname, 'paper/index.html'),
         launch: resolve(__dirname, 'launch/index.html'),
+        quotes: resolve(__dirname, 'quotes/index.html'),
       },
     },
   },

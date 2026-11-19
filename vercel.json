@@ -8,10 +8,11 @@
     { "source": "/old", "destination": "/old/index.html" },
     { "source": "/paper", "destination": "/paper/index.html" },
     { "source": "/launch", "destination": "/launch/index.html" },
+    { "source": "/quotes", "destination": "/quotes/index.html" },
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/old/(.*)", "destination": "/old/$1" },
     { "source": "/paper/(.*)", "destination": "/paper/$1" },
     { "source": "/launch/(.*)", "destination": "/launch/$1" },
-    { "source": "/((?!assets|styles|js|css|zach|art|fonts|paper-assets|favicon|old|paper|launch).*)", "destination": "/app.html" }
+    { "source": "/((?!assets|styles|js|css|zach|art|fonts|paper-assets|favicon|old|paper|launch|quotes).*)", "destination": "/app.html" }
   ]
 }

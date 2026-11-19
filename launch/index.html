@@ -63,6 +63,12 @@
     .cap.focus-slow { animation: focus 1.6s var(--ease) both; }
     @keyframes focus { from { opacity: 0; filter: blur(12px); } to { opacity: 1; filter: blur(0); } }
     .cap a { color: inherit; pointer-events: auto; }
+    /* The film's title builds a word (or a letter) at a time and holds, bigger, along the curve. */
+    .cap.title { font-size: clamp(40px, 6.6vw, 108px); letter-spacing: -.015em; transition: opacity .7s var(--ease), filter .7s var(--ease); }
+    .cap .u { display: inline-block; opacity: 0; }
+    .cap .u.on { animation: focus .7s var(--ease) both; }
+    .cap.letters .u.on { animation-duration: .45s; }
+    .cap.gone { opacity: 0; filter: blur(10px); }
     .cap a:hover { text-decoration: none; }
     .skip {
       position: absolute; right: 22px; bottom: 20px; z-index: 5; font: inherit; font-size: 14px;
@@ -73,20 +79,22 @@
 
     /* ── Everything else: a wide page inside the planet ─── */
     .doc {
-      position: relative; z-index: 2; max-width: 1560px; margin: 0 auto;
-      margin-top: calc((var(--H) - 1) * 100svh + clamp(44px, 6vh, 72px));
+      position: relative; z-index: 2; max-width: 1320px; margin: 0 auto;
+      margin-top: calc((var(--H) - 1) * 100svh + clamp(44px, 6vh, 72px) + var(--sag, 0px));
       padding: 0 clamp(24px, 5vw, 72px) 120px;
     }
     .doc > * { transition: opacity 1.3s var(--ease), filter 1.3s var(--ease); transition-delay: calc(var(--base, 0s) + var(--i, 0) * 110ms); }
     body.hide-doc .doc > * { opacity: 0; filter: blur(6px); }
     body.hide-doc .doc { pointer-events: none; }
 
-    .doc .bio { max-width: 52em; font-size: 1.08em; }
+    .doc .bio { max-width: 52em; font-size: 1.08em; margin: 0 auto; }
     .doc .bio p + p { margin-top: 1em; }
     .sec { display: grid; grid-template-columns: 200px 1fr; gap: 24px 56px; margin-top: 104px; scroll-margin-top: 80px; }
-    .doc h2 { color: var(--text); font: inherit; font-size: 17px; letter-spacing: .01em; }
+    .doc h2 { color: var(--text); font: inherit; font-size: 26px; line-height: 1.25; letter-spacing: -.005em; }
     .list { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 34px 48px; }
     .list .n { color: var(--text); }
+    .more { display: inline-block; margin-top: 4px; color: var(--dim); }
+    .more:hover { color: var(--text); }
     .list .m { color: var(--dim); font-style: italic; font-size: .88em; display: block; margin-top: 2px; }
     .list .s { display: block; margin-top: 6px; }
     .thoughts { columns: 3 280px; column-gap: 48px; }
@@ -150,7 +158,7 @@
 <body class="hide-doc">
 
   <nav class="top" id="top" aria-label="Site">
-    <span><a class="me" href="#hero">Zach Chen</a><a href="#s-now">Now</a><a href="#s-former">Projects</a><a href="#s-thoughts">Thoughts</a><a href="#s-investments">Investments</a><a href="#s-aesthetics">Aesthetics</a></span>
+    <span><a class="me" href="#hero">Zach Chen</a><a href="#s-now">Tinkering</a><a href="#s-former">Past</a><a href="#s-thoughts">Thoughts</a><a href="#s-investments">Investments</a><a href="#s-aesthetics">Aesthetics</a></span>
     <span class="ext" id="navLinks"></span>
   </nav>
 
@@ -164,18 +172,21 @@
     <div class="bio" id="bio"></div>
 
     <section class="sec" id="s-now">
-      <h2>[Currently working on]</h2>
+      <h2>[Tinkering]</h2>
       <ul class="list" id="now"></ul>
     </section>
 
     <section class="sec" id="s-former">
-      <h2>[Former projects]</h2>
+      <h2>[Past]</h2>
       <ul class="list" id="former"></ul>
     </section>
 
     <section class="sec" id="s-thoughts">
       <h2>[Thoughts]</h2>
-      <div class="thoughts" id="thoughts"></div>
+      <div>
+        <div class="thoughts" id="thoughts"></div>
+        <a class="more" href="/quotes">All quotes →</a>
+      </div>
     </section>
 
     <section class="sec" id="s-investments">
@@ -634,54 +645,38 @@ const BIO = [
 
 const NOW = [
   { name: "Circa", meta: "Cofounder", href: "https://trycirca.org",
-    text: "The app to help your closest friends stay in touch." },
+    text: "An iOS app that helps your closest friends stay in touch. It learns the rhythm of each friendship, nudges you when it's been too long since you saw someone, and orders the feed by closeness rather than engagement. Built on AWS and Cloudflare Workers." },
   { name: "Orbit[s]", meta: "Pre-seed / seed fund",
     text: "Partners with exceptional young founders to invest in their friends and network. They are capital constrained, not network constrained." },
-  { name: "Persona vs. math in post-training", meta: "CS 2881R, with Jeffrey Zhou and Benedikt Koch",
-    text: "We post-trained Qwen2.5-3B to talk like Sheldon Cooper while getting better at math, through SFT, RLAIF, and RLVR, and tracked whether the two trade off.",
+  { name: "Persona vs. math in post-training", meta: "CS 2881R",
+    text: "Post-trained Qwen2.5-3B into Sheldon Cooper with SFT, RLAIF, and RLVR, then looked inside. A paired persona direction converges by 50 examples (cosine 0.93), and steering with it alone matches the system prompt. Most of the fine-tune's activation shift is shared with a no-persona control fine-tune and does nothing; subtracting the control isolates the persona.",
     href: "https://huggingface.co/zachchxn/Qwen2.5-3B-Instruct-Sheldon-SFT-v2" },
-  { name: "Factual sycophancy in Qwen2.5-7B", meta: "CS 2881R, with Jeffrey Zhou",
-    text: "How often the model adopts a user's wrong answer to a trivia question, and whether a linear probe on its activations can catch it on questions it hasn't seen." },
-  { name: "One neuron that bypasses safety", meta: "CS 2881R, with Radha Munver, Raj Saha, and Sam Chen",
-    text: "A reproduction of “A Single Neuron Is Sufficient to Bypass Safety Alignment” across seven models and 1,400 judged responses." },
-  { name: "Are neural networks already clean?", meta: "Interpretability, independent",
+  { name: "Are neural networks already clean?", meta: "Interpretability",
     text: "Replicating Goodfire's neuron-level interpretability claims on Qwen3-1.7B and Pythia-160m, on one laptop." },
-  { name: "Dropping small activations", meta: "Interpretability, pilot",
-    text: "When the smallest activations in an LLM are zeroed, do facts break before the averages show it?" },
+  { name: "Dropping small activations", meta: "Interpretability",
+    text: "Zeroing an LLM's smallest activations to see whether facts break before perplexity and other averages show it." },
 ];
 
-const FORMER = [
-  { name: "PLVA", meta: "First place, H Company hackathon", href: "https://github.com/Zxch-Chen/cua-privacy-layer",
-    text: "A privacy layer for computer-use agents that hides passwords, card numbers, and personal data before the model sees the screen." },
-  { name: "Paper Radar", meta: "Side project",
-    text: "Reads new preprints every morning and uses Claude to flag the rare paper that could change its field." },
+const PAST = [
+  { name: "PLVA", meta: "1st place ($1,500), H Company Computer Use Agent Hackathon", href: "https://github.com/Zxch-Chen/cua-privacy-layer",
+    text: "A local, fail-closed privacy proxy for computer-use agents. An ONNX visual detector, OCR, credential rules, and an INT8 MiniLM PII tagger mask passwords, card numbers, and personal data in screenshots before the model sees them, and swap placeholders back into its actions." },
   { name: "Sapentia AI", meta: "Cofounder", href: "https://sapentia.ai",
-    text: "A multi-agent admissions platform with retrieval, memory, and safety evals. 750 people joined the waitlist." },
-  { name: "Alex AI", meta: "GTM, summer 2026",
-    text: "A content pipeline that drafts with Claude and checks itself against brand rules before anything is published." },
-  { name: "How to Want Better Things", meta: "Co-author",
-    text: "A book on career choice and moral ambition, presented at Brown, Yale, and Tufts." },
+    text: "A multi-agent admissions platform: OpenAI Agents SDK, pgvector retrieval, and persistent memory on AWS ECS/Fargate, with evals for factuality, safety, and prompt injection. 750+ on the waitlist, a 40+ person team." },
+  { name: "Alex AI", meta: "First intern and youngest employee, summer 2026",
+    text: "Built semi-automated LinkedIn content pipelines and created ta20awards.com, a competition for TA leaders and recruiters. It grew the company page from 8,000 to 10,000 followers organically and kept producing content for two months after I left.",
+    href: "https://ta20awards.com" },
+  { name: "How to Want Better Things", meta: "Co-author", href: "https://www.howtowantbetterthings.org/",
+    text: "A book on career choice and moral ambition, presented at Brown, Yale, and Tufts. It ended for lack of momentum and distribution. Still a good idea; the School for Moral Ambition is doing the work we hoped to." },
 ];
 
-// A commonplace book, carried over from the previous site.
+// The short list. Every quote lives on /quotes.
 const THOUGHTS = [
   { text: "Don't ask what the world needs. Ask what makes you come alive, and go do it. Because what the world needs is people who have come alive." },
-  { text: "If all external metrics disappeared tomorrow — no salary, no recognition, no one watching — would you still do this? With the same intensity?" },
-  { text: "Use a north star as a heuristic. Will doing this make me more free?", src: "Naval" },
-  { text: "Will doing this help the customer?", src: "Jeff Bezos" },
-  { text: "Am I on the exponential? If not, what can I do to get on it?" },
-  { text: "I often get the question from entrepreneurs or executives, \"What should I do next?\" My answer has always been \"become deeply self aware and when the right thing comes, you will know it. If you know yourself, your next thing, your new idea, your work soulmate will reveal itself.\" When I told my friends, family and colleagues about my plans for what was next, they were really excited that I was \"coming back.\" The thing is, I never left.", src: "Travis Kalanick" },
-  { text: "It is challenging to really reason as if you believe in continued capability progress, even when you do. It is challenging to reason about the pace of change. These winning companies may not be the first ones." },
-  { text: "Do not be deceived: God is not mocked, for whatever one sows, that will he also reap. For the one who sows to his own flesh will from the flesh reap corruption, but the one who sows to the Spirit will from the Spirit reap eternal life.", src: "Galatians 6:7-8" },
-  { text: "If we deliberately keep on sinning after we have received the knowledge of the truth, no sacrifice for sins is left, but only a fearful expectation of judgment and of raging fire that will consume the enemies of God. Anyone who rejected the law of Moses died without mercy on the testimony of two or three witnesses. How much more severely do you think someone deserves to be punished who has trampled the Son of God underfoot, who has treated as an unholy thing the blood of the covenant that sanctified them, and who has insulted the Spirit of grace? For we know him who said, \"It is mine to avenge; I will repay,\" and again, \"The Lord will judge his people.\" It is a dreadful thing to fall into the hands of the living God.", src: "Hebrews 10:26-31" },
-  { text: "There are many places that a company can choose to allocate its limited time and resources. There is never enough time to do everything, so companies need to choose what change they want to see in the world and focus there. It can take decades to move the needle on large global challenges.", src: "Coinbase" },
-  { text: "The deeper insight is about selection, not education. The research found that 62% of unicorn founders held post-graduate degrees, and founders with at least three years of prior work experience in their startup's specific industry were 85% more likely to launch a highly successful venture. Even VCs who are enthusiastic about dropouts note that founders still get \"a lot of the social value\" from elite universities even without a diploma — because what really matters is the network and brand signal, not the degree itself." },
-  { text: "Thiel's actual argument isn't really \"ignore Kelly and bet everything on moonshots.\" It's closer to: develop such deep understanding of something that you genuinely have edge, then bet accordingly. That's actually consistent with everything in the essay. The problem is most people hear \"Thiel made a 1000x return on Facebook\" and conclude \"concentrated moonshots work\" without doing the harder work of actually developing genuine edge first. The question to ask yourself isn't \"should I do moonshots like Thiel?\" but \"do I actually have the edge that would make a concentrated bet Kelly-rational?\"" },
-  { text: "A person acts with their own body, while an institution acts through distributed layers of authorized execution, role structure, process, and enforcement. This difference explains why scale has always depended on delegation rather than on intelligence or will in isolation. No city, state, empire, firm, or administrative order ever scaled through direct presence alone. Scale begins when intent no longer needs to remain physically attached to the person who initiated it, and when action can continue elsewhere under recognizable authority. Delegation extends reach, increases continuity, and enlarges the effective surface through which power can be exercised across distance, time, and complexity." },
-  { text: "In short, imitation is good and you have to do it initially. But once you're bootstrapped enough, if you want to beat the teacher you must do on-policy RL and play to your own strengths and weaknesses. The lesson of doing RL on policy is that beating the teacher requires walking your own path and taking risks and rewards from the environment." },
-  { text: "The disciplined life looks impressive, but the well-designed life lasts longer. Before you try to find more willpower, design your environment and arrange your day so you're more likely to follow through." },
-  { text: "No one tells you running is 10 percent cardio and 90 percent negotiating with the voice begging you to quit.", src: "David Dack" },
   { text: "If you only wished to be happy, this could be easily accomplished; but we wish to be happier than other people, and this is always difficult, for we believe others to be happier than they are.", src: "Montesquieu" },
+  { text: "Use a north star as a heuristic. Will doing this make me more free?", src: "Naval" },
+  { text: "If all external metrics disappeared tomorrow — no salary, no recognition, no one watching — would you still do this? With the same intensity?" },
+  { text: "Am I on the exponential? If not, what can I do to get on it?" },
+  { text: "Will doing this help the customer?", src: "Jeff Bezos" },
 ];
 
 const BLOB = "https://dulqbfqncy2gjzfj.public.blob.vercel-storage.com/";
@@ -720,7 +715,7 @@ const items = (list) => list.map((p) =>
 
 $("#bio").innerHTML = BIO.map((para) => "<p>" + para.map((b) => typeof b === "string" ? esc(b) : link(b.t, b.href)).join("") + "</p>").join("");
 $("#now").innerHTML = items(NOW);
-$("#former").innerHTML = items(FORMER);
+$("#former").innerHTML = items(PAST);
 $("#thoughts").innerHTML = THOUGHTS.map((t) => `<p>${esc(t.text)}${t.src ? ` <span class="src">— ${esc(t.src)}</span>` : ""}</p>`).join("");
 $("#links").innerHTML = LINKS.map((l) => link(l.label, l.href)).join("");
 
@@ -765,12 +760,12 @@ const LIGHT = "#f4ede4", DARK = "#231b14";
 // Every frame shares the same horizon, so the landing on the final shot doesn't jump.
 // A photo frame whose image hasn't loaded yet is skipped, so the film never waits.
 const FRAMES = [
-  { m: M.orbit,    seed: 1,  cap: "Towards the" },
-  { m: M.honey,    seed: 2,  cap: "Towards the" },
-  { m: M.oil,      seed: 3,  cap: "North Star" },
-  { m: M.ocean,    seed: 4,  cap: "North Star" },
-  { m: M.agate,    seed: 5,  cap: "North Star" },
-  { m: M.paint,    seed: 6,  cap: "North Star", tex: "rowers" },
+  { m: M.orbit,    seed: 1 },
+  { m: M.honey,    seed: 2 },
+  { m: M.oil,      seed: 3 },
+  { m: M.ocean,    seed: 4 },
+  { m: M.agate,    seed: 5 },
+  { m: M.paint,    seed: 6, tex: "rowers" },
   { m: M.marble,   seed: 7 },
   { m: M.soil,     seed: 8 },
   { m: M.paint,    seed: 9,  tex: "boat" },
@@ -799,8 +794,13 @@ const FINAL = { m: M.end, seed: 40, cap: "Zach Chen", final: true };
 const ON_PAPER = new Set([M.ink, M.topo, M.halftone, M.dunes, M.moss]);
 const capColor = (f) => ON_PAPER.has(f.m) ? DARK : LIGHT;
 
-// Exponential cut lengths: 1.5s for the first shot down to ~3ms for the last.
-const FIRST_MS = 1500, LAST_MS = 3;
+// Cut lengths: exponential from 1.5s down to ~3ms, then the last TAIL cuts slow back
+// down (35ms to 640ms) so the film eases into the shot that stays instead of slamming into it.
+const FIRST_MS = 1500, LAST_MS = 3, TAIL = [35, 80, 160, 320, 640];
+
+// The title. ?title=letters types it a letter at a time; the default builds it word by word.
+const TITLE = "Towards the North Star";
+const TITLE_MODE = new URLSearchParams(location.search).get("title") === "letters" ? "letters" : "words";
 
 const hero = $("#hero"), canvas = $("#film"), cap = $("#cap");
 const params = new URLSearchParams(location.search);
@@ -861,10 +861,10 @@ function size(hi) {
 }
 
 // sky: the end card's live star field ({ time in s, stars 0..1 for the fade-in}).
-let sky = { time: 0, stars: 1 };
+let sky = { time: 0, stars: 1, settle: 0 };
 function draw(f) {
-  const H = horizon() + (f.final ? 0 : ((f.seed * 7) % 3 - 1) * .006);   // a hair of jitter between cuts, like hand-made shots
-  hero.style.setProperty("--H", H);
+  // Cuts get a hair of jitter, like hand-made shots; the shot that stays drifts gently into place.
+  const H = horizon() + (f.final ? sky.settle : ((f.seed * 7) % 3 - 1) * .006);   // a hair of jitter between cuts, like hand-made shots
   if (!gl || gl.isContextLost()) return;
   size(!!f.final);
   gl.uniform2f(U.u_res, canvas.width, canvas.height);
@@ -892,7 +892,23 @@ function draw(f) {
   gl.drawArrays(gl.TRIANGLES, 0, 3);
 }
 
+function setColor(color) {
+  cap.style.setProperty("--cap", color);
+  cap.style.setProperty("--cap-shadow", color === DARK ? 0 : .3);
+}
+// Lays the title out invisibly, one span per unit, so revealing a unit never moves the others.
+function buildTitle() {
+  cap.dataset.text = "__title";
+  cap.classList.remove("focus", "focus-slow", "gone");
+  cap.classList.add("title");
+  cap.classList.toggle("letters", TITLE_MODE === "letters");
+  cap.innerHTML = TITLE_MODE === "letters"
+    ? TITLE.split(" ").map((w) => `<span style="white-space:nowrap">${[...w].map((c) => `<span class="u">${esc(c)}</span>`).join("")}</span>`).join(" ")
+    : TITLE.split(" ").map((w) => `<span class="u">${esc(w)}</span>`).join(" ");
+  return [...cap.querySelectorAll(".u")];
+}
 function setCaption(text, color, slow, asLink) {
+  cap.classList.remove("title", "letters", "gone");
   cap.style.setProperty("--cap", color);
   cap.style.setProperty("--cap-shadow", color === DARK ? 0 : .3);
   if (cap.dataset.text === text) return;
@@ -911,7 +927,7 @@ const later = (ms, fn) => timers.push(setTimeout(fn, ms));
 // horizon, and the page rises in.
 const STARS_IN_MS = 2600;
 const ease = (x) => 1 - Math.pow(1 - x, 3);
-let skyRaf = 0, skyT0 = 0, heroVisible = true;
+let skyRaf = 0, skyT0 = 0, heroVisible = true, skyDrift = 0;
 
 function reveal(instant) {
   $("#doc").style.setProperty("--base", instant ? "0s" : ".1s");
@@ -927,14 +943,16 @@ function skyLoop(now) {
     const e = now - skyT0;
     sky.time = e / 1000 + 40;                    // start mid-drift so stars aren't all in phase
     sky.stars = ease(Math.min(Math.max((e - 250) / STARS_IN_MS, 0), 1));
+    sky.settle = skyDrift * (1 - ease(Math.min(e / 3200, 1)));
     draw(FINAL);
   }
   skyRaf = requestAnimationFrame(skyLoop);
 }
-function startSky() {
+function startSky(drift) {
   skyT0 = performance.now();
-  if (reduced) { sky = { time: 40, stars: 1 }; draw(FINAL); return; }
-  sky.stars = 0; draw(FINAL);
+  skyDrift = 0;   // the shot that stays stays: no drift, so the name never moves
+  if (reduced) { sky = { time: 40, stars: 1, settle: 0 }; draw(FINAL); return; }
+  sky.stars = 0; sky.settle = skyDrift; draw(FINAL);
   if (!skyRaf) skyRaf = requestAnimationFrame(skyLoop);
 }
 new IntersectionObserver(([e]) => {
@@ -948,34 +966,50 @@ function land(instant) {
   playing = false;
   document.body.classList.remove("playing");
   try { localStorage.setItem("zc-intro-seen", "1"); } catch (e) {}
-  startSky();
+  startSky(!instant);
   if (instant || reduced) {
     setCaption(FINAL.cap, LIGHT, true, true);
     reveal(true);
     return;
   }
   setCaption("", LIGHT);
-  later(600, () => setCaption(FINAL.cap, LIGHT, true, true));
+  later(700, () => setCaption(FINAL.cap, LIGHT, true, true));
   later(1500, () => reveal(false));
 }
 
 function play() {
-  // Durations are fixed per slot, exponential from FIRST_MS to LAST_MS.
-  const dur = FRAMES.map((_, i) => FIRST_MS * Math.pow(LAST_MS / FIRST_MS, i / (FRAMES.length - 1)));
+  const n = FRAMES.length, fast = n - TAIL.length;
+  const dur = FRAMES.map((_, i) => i < fast
+    ? FIRST_MS * Math.pow(LAST_MS / FIRST_MS, i / (fast - 1))
+    : TAIL[i - fast]);
   const ready = (f) => !f.tex || textures[f.tex];
   playing = true;
   document.body.classList.add("playing", "hide-doc");
   $("#doc").style.setProperty("--base", "0s");
   scrollTo({ top: 0, behavior: "instant" });
+
+  // Title: one word lands on each of the first four cuts, on the frame the cut happens.
+  // Letter mode types that word out over its cut instead.
+  const units = buildTitle(), words = TITLE.split(" ");
+  let cut = 0;
+  const showWord = (k) => {
+    if (k >= words.length) return;
+    const start = words.slice(0, k).join("").length;
+    const mine = TITLE_MODE === "letters" ? units.slice(start, start + words[k].length) : [units[k]];
+    const step = Math.min(70, dur[k] * .6 / mine.length);
+    mine.forEach((u, j) => j === 0 ? u.classList.add("on") : later(j * step, () => u.classList.add("on")));
+  };
+
   let i = 0, shownAt = performance.now();
-  draw(FRAMES[0]); setCaption(FRAMES[0].cap || "", capColor(FRAMES[0]));
+  draw(FRAMES[0]); setColor(capColor(FRAMES[0])); showWord(0);
   const tick = (now) => {
     // Advance at most one cut per screen refresh, so even the 3ms cuts are seen.
     if (now - shownAt >= dur[i]) {
-      do i++; while (i < FRAMES.length && !ready(FRAMES[i]));
+      do i++; while (i < n && !ready(FRAMES[i]));
       shownAt = now;
-      if (i >= FRAMES.length) return land();          // the last cut is the end card, and it stays
-      draw(FRAMES[i]); setCaption(FRAMES[i].cap || "", capColor(FRAMES[i]));
+      if (i >= n) return land();                       // the last cut is the end card, and it stays
+      if (i >= fast) cap.classList.add("gone");         // the title lets go as the cuts slow
+      draw(FRAMES[i]); setColor(capColor(FRAMES[i])); showWord(++cut);
     }
     raf = requestAnimationFrame(tick);
   };
@@ -990,13 +1024,14 @@ async function start() {
   if (only !== null) {                                  // debug: hold one frame
     await loadAll();
     const f = only === "end" ? FINAL : FRAMES[+only] || FINAL;
-    draw(f); setCaption(f.cap || "", capColor(f), true, !!f.final);
+    draw(f); if (f.final) setCaption(f.cap, LIGHT, true, true); else { buildTitle().forEach((u) => u.classList.add("on")); setColor(capColor(f)); }
     if (f.final) document.body.classList.remove("hide-doc");
     addEventListener("resize", () => draw(f));
     return;
   }
 
   let seen = false;
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
   try { seen = localStorage.getItem("zc-intro-seen") === "1"; } catch (e) {}
   loadAll();                                            // streams in while the film plays
   if (reduced || (seen && !params.has("intro"))) land(true);
@@ -1019,6 +1054,19 @@ document.querySelector(".top .me").addEventListener("click", (e) => { e.preventD
 $("#skip").addEventListener("click", () => { if (playing) land(); });
 addEventListener("keydown", (e) => { if (playing && (e.key === "Escape" || e.key === " " || e.key === "Enter")) { e.preventDefault(); land(); } });
 cap.addEventListener("click", (e) => { if (e.target.id === "replay") { e.preventDefault(); if (!playing) play(); } });
+
+// The curve drops toward the screen edges, so the page starts low enough that the
+// left end of its first line still sits below the planet's rim. Same circle as the shader.
+function fitDoc() {
+  const W = innerWidth, Hh = hero.clientHeight, bio = $("#bio");
+  const doc = $("#doc");
+  doc.style.setProperty("--sag", "0px");
+  const x = Math.max(0, W / 2 - bio.getBoundingClientRect().left) / Hh;
+  const R = Math.max(W / Hh, .8) * 1.7;
+  doc.style.setProperty("--sag", Math.round((R - Math.sqrt(Math.max(R * R - x * x, 0))) * Hh) + "px");
+}
+fitDoc();
+addEventListener("resize", fitDoc);
 
 start();
 </script>
