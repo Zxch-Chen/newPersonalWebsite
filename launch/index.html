@@ -53,6 +53,11 @@
       background: radial-gradient(120% 60% at 50% calc(var(--H) * 100%), #1d3346 0%, #0c1320 45%, #0a1019 100%); }
     .hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
     .hero #fade { opacity: 0; pointer-events: none; }
+    /* The frame melts into the page: no edge where the film ends and the page begins. */
+    .hero::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 32%; z-index: 1; pointer-events: none;
+      background: linear-gradient(to bottom, rgba(7, 11, 18, 0), rgba(7, 11, 18, .55) 55%, var(--night));
+    }
     body.sub { --heroH: 64svh; }
     body.sub .doc .bio { margin: 0; }
     .writing { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 22px 48px; }
