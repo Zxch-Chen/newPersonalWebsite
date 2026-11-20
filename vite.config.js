@@ -7,13 +7,15 @@ import { vitePluginSubstackApi } from './vite-plugin-substack-api.js'
 // Standalone alternate versions of the site: each is its own index.html at the
 // repo root, served at /<name>. Dev needs the extension spelled out; Vercel
 // does the same job through the rewrites in vercel.json.
-const STANDALONE_PAGES = ['old', 'paper', 'launch', 'quotes']
+const STANDALONE_PAGES = ['old', 'paper', 'launch']
+// Served by the launch page, which reads its own path.
+const LAUNCH_PATHS = ['/', '/writing', '/quotes', '/resume']
 
 function standalonePageRedirect() {
   const middleware = (req, res, next) => {
     const [path, query] = req.url.split('?')
     // The launch page is the homepage; the React app keeps its other routes.
-    if (path === '/') req.url = '/launch/index.html' + (query ? `?${query}` : '')
+    if (LAUNCH_PATHS.includes(path.replace(/\/+$/, '') || '/')) req.url = '/launch/index.html' + (query ? `?${query}` : '')
     for (const page of STANDALONE_PAGES) {
       if (path === `/${page}` || path === `/${page}/`) {
         req.url = `/${page}/index.html` + (query ? `?${query}` : '')
@@ -55,7 +57,6 @@ export default defineConfig({
         old: resolve(__dirname, 'old/index.html'),
         paper: resolve(__dirname, 'paper/index.html'),
         launch: resolve(__dirname, 'launch/index.html'),
-        quotes: resolve(__dirname, 'quotes/index.html'),
       },
     },
   },

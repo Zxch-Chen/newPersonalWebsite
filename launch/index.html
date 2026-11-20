@@ -49,9 +49,14 @@
     }
 
     /* ── Hero: the film frame ─────────────────────────────── */
-    .hero { position: relative; height: 100svh; min-height: 480px; overflow: hidden;
+    .hero { position: relative; height: var(--heroH, 100svh); min-height: 480px; overflow: hidden;
       background: radial-gradient(120% 60% at 50% calc(var(--H) * 100%), #1d3346 0%, #0c1320 45%, #0a1019 100%); }
     .hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    .hero #fade { opacity: 0; pointer-events: none; }
+    body.sub { --heroH: 64svh; }
+    body.sub .doc .bio { margin: 0; }
+    .writing { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 22px 48px; }
+    .writing .d { display: block; color: var(--dim); font-size: .86em; font-style: italic; }
     .cap {
       position: absolute; left: 0; right: 0; bottom: calc((1 - var(--H)) * 100% + clamp(10px, 1.4vw, 18px));
       text-align: center; color: var(--cap, var(--text));
@@ -80,7 +85,7 @@
     /* ── Everything else: a wide page inside the planet ─── */
     .doc {
       position: relative; z-index: 2; max-width: 1320px; margin: 0 auto;
-      margin-top: calc((var(--H) - 1) * 100svh + clamp(44px, 6vh, 72px) + var(--sag, 0px));
+      margin-top: calc((var(--H) - 1) * max(var(--heroH, 100svh), 480px) + clamp(44px, 6vh, 72px) + var(--sag, 0px));
       padding: 0 clamp(24px, 5vw, 72px) 120px;
     }
     .doc > * { transition: opacity 1.3s var(--ease), filter 1.3s var(--ease); transition-delay: calc(var(--base, 0s) + var(--i, 0) * 110ms); }
@@ -151,7 +156,7 @@
 
     @media (max-width: 600px) {
       .top { padding: 14px 16px; font-size: 14px; }
-      .top .ext, .top.scrolled .me { display: none; }
+      .top .out, .top.scrolled .me { display: none; }
       .top span { gap: 6px 16px; }
       body { font-size: 17.5px; }
       :root { --H: .5; }
@@ -169,12 +174,13 @@
 <body class="hide-doc">
 
   <nav class="top" id="top" aria-label="Site">
-    <span><a class="me" href="#hero">Zach Chen</a><a href="#s-now">Tinkering</a><a href="#s-former">Past</a><a href="#s-thoughts">Thoughts</a><a href="#s-investments">Investments</a><a href="#s-aesthetics">Aesthetics</a></span>
+    <span><a class="me" href="/">Zach Chen</a><a href="/#s-now">Tinkering</a><a href="/#s-research">Research</a><a href="/#s-former">Past</a><a href="/#s-thoughts">Thoughts</a><a href="/#s-investments">Investments</a><a href="/#s-aesthetics">Aesthetics</a></span>
     <span class="ext" id="navLinks"></span>
   </nav>
 
   <header class="hero" id="hero">
     <canvas id="film" aria-hidden="true"></canvas>
+    <canvas id="fade" aria-hidden="true"></canvas>
     <h1 class="cap" id="cap" aria-label="Zach Chen"></h1>
     <button class="skip" id="skip" type="button">skip</button>
   </header>
@@ -185,6 +191,11 @@
     <section class="sec" id="s-now">
       <h2>[Tinkering]</h2>
       <ul class="list" id="now"></ul>
+    </section>
+
+    <section class="sec" id="s-research">
+      <h2>[Research]</h2>
+      <ul class="list" id="research"></ul>
     </section>
 
     <section class="sec" id="s-former">
@@ -225,7 +236,8 @@
 <script id="frag" type="x-shader/x-fragment">
 precision highp float;
 uniform vec2  u_res;
-uniform float u_mat, u_seed, u_H, u_grain, u_vig, u_fin, u_time, u_stars;
+uniform float u_mat, u_seed, u_H, u_grain, u_vig, u_fin, u_time, u_stars, u_fade, u_tint;
+uniform vec3 u_tw, u_tc;
 uniform vec3  u_sky;
 uniform vec4  u_crop;
 uniform sampler2D u_tex;
@@ -292,6 +304,7 @@ vec3 orbit(vec2 q, float a, float t, float d, float asp, float px, float fin) {
   float cen = exp(-a * a * mix(1.1, 2.4, fin));
   vec3 warm = mix(vec3(1., .5, .16), vec3(.95, .72, .58), fin);
   vec3 cool = mix(vec3(.33, .43, .58), vec3(.48, .72, .86), fin);
+  if (u_tint > .5) { warm = u_tw; cool = u_tc; }   // each subpage gets its own glow
   vec3 sky = mix(mix(vec3(.03, .033, .04), vec3(.045, .07, .12), fin),
                  mix(vec3(.2, .23, .28), vec3(.11, .19, .28), fin), exp(-sd * 5.));
   sky += cool * exp(-sd * mix(18., 26., fin)) * mix(.5, .9, fin);
@@ -635,6 +648,8 @@ void main() {
   else if (m == 18) col = halftone(q, a, t, d, asp, px);
   else              col = orbit(q, a, t, d, asp, px, u_fin);   // 10: the end card; u_fin runs 0 → 1 as it settles
   vec2 vq = (q - vec2(asp * .5, .5)) / vec2(asp, 1.);
+  // Behind the page, a shot keeps its material at the rim and fades to night where the text sits.
+  col = mix(col, vec3(7., 11., 18.) / 255., u_fade * smoothstep(.006, .055, max(t, 0.)));
   col *= 1. - u_vig * dot(vq, vq) * 1.6;
   col += (hash(gl_FragCoord.xy * .731 + 17.) - .5) * u_grain;
   gl_FragColor = vec4(max(col, 0.), 1.);
@@ -661,6 +676,11 @@ const NOW = [
     text: "Partners with exceptional young founders to invest in their friends and network. They are capital constrained, not network constrained." },
   { name: "Long-horizon agents and reasoning", meta: "Research at Stanford AI Lab (SAIL), with Yuzhen Mao", href: "https://yuzhenmao.github.io/",
     text: "Research on LLM agents for long-horizon tasks and reasoning." },
+  { name: "The Geometry of Safety Failures in Reasoning Models", meta: "CS 2881R",
+    text: "Building on Goodfire's manifold steering: do a reasoning model's unsafe decisions run along a lower-dimensional manifold, where it still represents the danger but stops acting on it? If so, steering along that manifold could prevent the failure." },
+];
+
+const RESEARCH = [
   { name: "Persona vs. math in post-training", meta: "CS 2881R",
     text: "We taught a small model to talk like Sheldon Cooper while getting better at math, then looked inside to see what fine-tuning actually changed. The persona turns out to be a single direction in the model's activations, findable from a few dozen examples, and most of what fine-tuning changes has nothing to do with the persona.",
     href: "https://huggingface.co/zachchxn/Qwen2.5-3B-Instruct-Sheldon-SFT-v2" },
@@ -674,9 +694,9 @@ const PAST = [
   { name: "PLVA", meta: "1st place ($1,500), H Company Computer Use Agent Hackathon", href: "https://github.com/Zxch-Chen/cua-privacy-layer",
     text: "A local, fail-closed privacy proxy for computer-use agents. An ONNX visual detector, OCR, credential rules, and an INT8 MiniLM PII tagger mask passwords, card numbers, and personal data in screenshots before the model sees them, and swap placeholders back into its actions." },
   { name: "Sapentia AI", meta: "Cofounder", href: "https://sapentia.ai",
-    text: "A multi-agent admissions platform: OpenAI Agents SDK, pgvector retrieval, and persistent memory on AWS ECS/Fargate, with evals for factuality, safety, and prompt injection. 750+ on the waitlist, a 40+ person team." },
-  { name: "Alex AI", meta: "First intern and youngest employee, summer 2026",
-    text: "Built semi-automated LinkedIn content pipelines and created ta20awards.com, a competition for TA leaders and recruiters. It grew the company page from 8,000 to 10,000 followers organically and kept producing content for two months after I left.",
+    text: "A multi-agent admissions platform: OpenAI Agents SDK, pgvector retrieval, and persistent memory on AWS ECS/Fargate, with evals for factuality, safety, and prompt injection. 750+ on the waitlist." },
+  { name: "Alex AI", meta: "GTM, summer 2026",
+    text: "First intern and youngest employee. Built semi-automated LinkedIn content pipelines and created ta20awards.com, a competition for TA leaders and recruiters. It grew the company page from 8,000 to 10,000 followers organically and kept producing content for two months after I left.",
     inlink: { t: "ta20awards.com", href: "https://ta20awards.com" } },
   { name: "How to Want Better Things", meta: "Co-author", href: "https://www.howtowantbetterthings.org/",
     text: "A book on career choice and moral ambition, presented at Brown, Yale, and Tufts. It ended for lack of momentum and distribution. Still a good idea; the School for Moral Ambition is doing the work we hoped to." },
@@ -715,6 +735,105 @@ const LINKS = [
   { label: "Resume", href: "/resume" },
 ];
 
+// Every quote, for /quotes.
+const ALL_QUOTES = [
+  { text: "Don't ask what the world needs. Ask what makes you come alive, and go do it. Because what the world needs is people who have come alive." },
+  { text: "If all external metrics disappeared tomorrow — no salary, no recognition, no one watching — would you still do this? With the same intensity?" },
+  { text: "Use a north star as a heuristic. Will doing this make me more free?", src: "Naval" },
+  { text: "Will doing this help the customer?", src: "Jeff Bezos" },
+  { text: "Am I on the exponential? If not, what can I do to get on it?" },
+  { text: "I often get the question from entrepreneurs or executives, \"What should I do next?\" My answer has always been \"become deeply self aware and when the right thing comes, you will know it. If you know yourself, your next thing, your new idea, your work soulmate will reveal itself.\" When I told my friends, family and colleagues about my plans for what was next, they were really excited that I was \"coming back.\" The thing is, I never left.", src: "Travis Kalanick" },
+  { text: "It is challenging to really reason as if you believe in continued capability progress, even when you do. It is challenging to reason about the pace of change. These winning companies may not be the first ones." },
+  { text: "Do not be deceived: God is not mocked, for whatever one sows, that will he also reap. For the one who sows to his own flesh will from the flesh reap corruption, but the one who sows to the Spirit will from the Spirit reap eternal life.", src: "Galatians 6:7-8" },
+  { text: "If we deliberately keep on sinning after we have received the knowledge of the truth, no sacrifice for sins is left, but only a fearful expectation of judgment and of raging fire that will consume the enemies of God. Anyone who rejected the law of Moses died without mercy on the testimony of two or three witnesses. How much more severely do you think someone deserves to be punished who has trampled the Son of God underfoot, who has treated as an unholy thing the blood of the covenant that sanctified them, and who has insulted the Spirit of grace? For we know him who said, \"It is mine to avenge; I will repay,\" and again, \"The Lord will judge his people.\" It is a dreadful thing to fall into the hands of the living God.", src: "Hebrews 10:26-31" },
+  { text: "There are many places that a company can choose to allocate its limited time and resources. There is never enough time to do everything, so companies need to choose what change they want to see in the world and focus there. It can take decades to move the needle on large global challenges.", src: "Coinbase" },
+  { text: "The deeper insight is about selection, not education. The research found that 62% of unicorn founders held post-graduate degrees, and founders with at least three years of prior work experience in their startup's specific industry were 85% more likely to launch a highly successful venture. Even VCs who are enthusiastic about dropouts note that founders still get \"a lot of the social value\" from elite universities even without a diploma — because what really matters is the network and brand signal, not the degree itself." },
+  { text: "Thiel's actual argument isn't really \"ignore Kelly and bet everything on moonshots.\" It's closer to: develop such deep understanding of something that you genuinely have edge, then bet accordingly. That's actually consistent with everything in the essay. The problem is most people hear \"Thiel made a 1000x return on Facebook\" and conclude \"concentrated moonshots work\" without doing the harder work of actually developing genuine edge first. The question to ask yourself isn't \"should I do moonshots like Thiel?\" but \"do I actually have the edge that would make a concentrated bet Kelly-rational?\"" },
+  { text: "A person acts with their own body, while an institution acts through distributed layers of authorized execution, role structure, process, and enforcement. This difference explains why scale has always depended on delegation rather than on intelligence or will in isolation. No city, state, empire, firm, or administrative order ever scaled through direct presence alone. Scale begins when intent no longer needs to remain physically attached to the person who initiated it, and when action can continue elsewhere under recognizable authority. Delegation extends reach, increases continuity, and enlarges the effective surface through which power can be exercised across distance, time, and complexity." },
+  { text: "In short, imitation is good and you have to do it initially. But once you're bootstrapped enough, if you want to beat the teacher you must do on-policy RL and play to your own strengths and weaknesses. The lesson of doing RL on policy is that beating the teacher requires walking your own path and taking risks and rewards from the environment." },
+  { text: "The disciplined life looks impressive, but the well-designed life lasts longer. Before you try to find more willpower, design your environment and arrange your day so you're more likely to follow through." },
+  { text: "No one tells you running is 10 percent cardio and 90 percent negotiating with the voice begging you to quit.", src: "David Dack" },
+  { text: "If you only wished to be happy, this could be easily accomplished; but we wish to be happier than other people, and this is always difficult, for we believe others to be happier than they are.", src: "Montesquieu" },
+]
+
+// Shown on /writing if the live Substack feed can't be reached.
+const WRITING_FALLBACK = [
+  { title: 'What I learned this summer', link: 'https://zachchen.substack.com/p/what-i-learned-this-summer', date: "Aug '26" },
+  { title: 'Spiderman grew up with us', link: 'https://zachchen.substack.com/p/spiderman-grew-up-with-us', date: "Aug '26" },
+  { title: 'the curse of ambition', link: 'https://zachchen.substack.com/p/the-curse-of-ambition', date: "Jun '26" },
+  { title: 'what harvard feels like from each year', link: 'https://zachchen.substack.com/p/what-harvard-feels-like-from-each', date: "May '26" },
+  { title: 'Reflection of sophomore year at Harvard', link: 'https://zachchen.substack.com/p/reflection-of-sophomore-year-at-harvard', date: "May '26" },
+  { title: 'Diminished Personhood', link: 'https://zachchen.substack.com/p/diminished-personhood', date: "Apr '26" },
+  { title: 'Time just seems to fly by', link: 'https://zachchen.substack.com/p/time-just-seems-to-fly-by', date: "Mar '26" },
+  { title: 'On Birthdays', link: 'https://zachchen.substack.com/p/on-birthdays', date: "Feb '26" },
+  { title: 'how to kill morality', link: 'https://zachchen.substack.com/p/how-to-kill-morality', date: "Jan '26" },
+  { title: 'On Effective Altruism', link: 'https://zachchen.substack.com/p/on-effective-altruism', date: "Jan '26" },
+]
+
+// The resume, for /resume.
+const RESUME = [
+  ["Education", [
+    { name: "Harvard University", meta: "Sep 2024 — May 2028",
+      text: "B.S. Computer Science, secondary in Philosophy. Coursework: Algorithms & Data Structures (CS 120, CS 124), Distributed Systems (CS 262), Systems Programming (CS 61), Artificial Intelligence (CS 182), Proof-Based Linear Algebra (Math 22a), Probability (Stat 110), Statistics & Inference (Stat 111)." },
+  ]],
+  ["Now", [
+    { name: "Circa", meta: "Cofounder · 2026 — present", href: "https://trycirca.org",
+      text: "A friends-first iOS app for staying in touch with the people closest to you, built around relational depth rather than engagement." },
+    { name: "Orbit[s]", meta: "Pre-seed / seed fund",
+      text: "Partners with exceptional young founders to invest in their friends and network." },
+    { name: "Stanford AI Lab (SAIL)", meta: "Research, with Yuzhen Mao", href: "https://yuzhenmao.github.io/",
+      text: "LLM agents for long-horizon tasks and reasoning." },
+    { name: "AI Safety Student Team", meta: "Member · Feb 2026 — present",
+      text: "Technical AI safety workshop at Harvard." },
+    { name: "SpaceXAI", meta: "Campus lead · Sep 2025 — present",
+      text: "Developer adoption, product feedback, and programming for technical students at Harvard." },
+  ]],
+  ["Investing", [
+    { name: "Embedding VC", meta: "Scout · Sep 2025 — present", href: "https://embedding.vc/",
+      text: "Technical diligence on early-stage AI and deep-tech companies: model architecture, infrastructure, data advantages, and defensibility." },
+    { name: "V11", meta: "Venture partner · Mar 2026 — present",
+      text: "Sourcing and evaluating early-stage AI and software companies." },
+    { name: "TNT", meta: "Operator · 2026 — present", href: "https://tnt.so",
+      text: "Operations for a Harvard/MIT accelerator: formation, product strategy, fundraising, and GTM with technical founders." },
+  ]],
+  ["Previously", [
+    { name: "Sapentia AI", meta: "Cofounder · 2026", href: "https://sapentia.ai",
+      text: "Multi-agent admissions platform on Next.js, the OpenAI Agents SDK, LangChain, and pgvector, deployed on AWS ECS/Fargate with streaming APIs and PII-safe observability. Evals for factuality, plan quality, safety, and prompt injection. 750+ on the waitlist." },
+    { name: "Alex AI", meta: "GTM · Jun — Aug 2026",
+      text: "First intern and youngest employee. A Python content pipeline that drafts with Claude and runs an automated brand-QA loop before publishing, a Remotion rendering system for branded clips, and ta20awards.com, which grew the company page from 8,000 to 10,000 followers.",
+      inlink: { t: "ta20awards.com", href: "https://ta20awards.com" } },
+    { name: "Cursor Growth @ Harvard", meta: "2025",
+      text: "Grew Cursor's usage across the Harvard builder ecosystem." },
+    { name: "IvyLine Consulting", meta: "Cofounder & CSO · 2024 — 2025",
+      text: "Ran ops, consulting, marketing, and sales. Five figures of profit in year one." },
+    { name: "MGH / Harvard Medical School", meta: "Computational genomics · 2021 — 2025",
+      text: "Python and R pipelines across 1,000+ patient profiles; logistic regression, AUROC, and permutation-based multiple-testing correction to find markers of Alzheimer's risk. Co-authored work accepted at AAIC 2024." },
+    { name: "Unity Network", meta: "Founder · 2023 — 2024",
+      text: "A national organization helping students with research: resources to 100 Title I schools, 3 state-fair partnerships, leaders in 10+ states." },
+  ]],
+  ["Projects", [
+    { name: "PLVA", meta: "1st place ($1,500), H Company Computer Use Agent Hackathon", href: "https://github.com/Zxch-Chen/cua-privacy-layer",
+      text: "A local, fail-closed privacy proxy for computer-use agents: an ONNX visual detector, OCR, credential rules, and an INT8 MiniLM PII tagger mask sensitive data in screenshots before the model sees them." },
+    { name: "How to Want Better Things", meta: "Co-author · Sep 2025 — Apr 2026", href: "https://www.howtowantbetterthings.org/",
+      text: "A book on career choice and moral ambition. Led launch strategy; presented at Brown, Yale, and Tufts." },
+    { name: "Towards the North Star", meta: "Author · 2025 — present", href: "https://zachchen.substack.com",
+      text: "Essays on technology, history, ambition, and agency." },
+  ]],
+  ["Skills", [
+    { name: "Machine learning", text: "PyTorch, Transformers, ONNX Runtime, SFT, RLHF, mechanistic interpretability, sparse autoencoders, representation steering, LLM evaluation." },
+    { name: "Agents & applied AI", text: "Computer-use agents, tool calling, RAG, vector search, structured generation, prompt-injection defense, PII redaction." },
+    { name: "Engineering", text: "Python, TypeScript, SQL, R. FastAPI, Node.js, PostgreSQL, Docker, AWS, Vercel, Modal, Next.js, React, Playwright." },
+  ]],
+];
+
+// Each subpage: its own title on the horizon and its own glow (warm, cool).
+const PAGES = {
+  "/writing": { title: "Writing", tw: [1, .52, .32], tc: [.62, .36, .42] },
+  "/quotes":  { title: "Quotes",  tw: [.86, .62, 1], tc: [.42, .38, .82] },
+  "/resume":  { title: "Resume",  tw: [.62, 1, .78], tc: [.24, .62, .6] },
+};
+const SUB = PAGES[location.pathname.replace(/\/+$/, "")] || null;
+
 /* ═══ Page ══════════════════════════════════════════════════════════════ */
 
 const $ = (s) => document.querySelector(s);
@@ -725,28 +844,57 @@ const link = (text, href) => href
 const items = (list) => list.map((p) =>
   `<li><span class="n">${link(p.name, p.href)}</span>${p.meta ? `<span class="m">${esc(p.meta)}</span>` : ""}<span class="s">${p.inlink ? esc(p.text).replace(esc(p.inlink.t), link(p.inlink.t, p.inlink.href)) : esc(p.text)}</span></li>`).join("");
 
-$("#bio").innerHTML = BIO.map((para) => "<p>" + para.map((b) => typeof b === "string" ? esc(b) : link(b.t, b.href)).join("") + "</p>").join("");
-$("#now").innerHTML = items(NOW);
-$("#former").innerHTML = items(PAST);
-$("#thoughts").innerHTML = THOUGHTS.map((t) => `<p>${esc(t.text)}${t.src ? ` <span class="src">— ${esc(t.src)}</span>` : ""}</p>`).join("");
-$("#links").innerHTML = LINKS.map((l) => link(l.label, l.href)).join("");
+const sec = (title, inner, id) => `<section class="sec"${id ? ` id="${id}"` : ""}><h2>[${esc(title)}]</h2>${inner}</section>`;
+const quoteHTML = (list) => list.map((t) => `<p>${esc(t.text)}${t.src ? ` <span class="src">— ${esc(t.src)}</span>` : ""}</p>`).join("");
 
-const tile = (a, i, kind) => `<button type="button" data-kind="${kind}" data-i="${i}" aria-label="${esc(a.title)}">
-  <img src="${esc(a.src)}" alt="${esc(a.title)}" loading="lazy" decoding="async" />${kind === "painting" ? '<span class="play">▶</span>' : ""}</button>`;
-$("#paintings").innerHTML = PAINTINGS.map((a, i) => tile(a, i, "painting")).join("");
-$("#photos").innerHTML = PHOTOS.map((a, i) => tile(a, i, "photo")).join("");
+function renderWriting(posts) {
+  const fmt = (d) => { const t = Date.parse(d); return isNaN(t) ? d : new Date(t).toLocaleDateString("en-US", { month: "long", year: "numeric" }); };
+  $("#essays").innerHTML = posts.map((p) =>
+    `<li><span class="n">${link(p.title, p.link)}</span><span class="d">${esc(fmt(p.pubDate || p.date))}</span></li>`).join("");
+}
 
-const view = $("#view"), viewBody = $("#viewBody");
-document.querySelectorAll(".grid button").forEach((b) => b.addEventListener("click", () => {
-  const a = (b.dataset.kind === "painting" ? PAINTINGS : PHOTOS)[+b.dataset.i];
-  viewBody.innerHTML = (a.video
-    ? `<video src="${esc(a.video)}" poster="${esc(a.src)}" autoplay muted playsinline controls></video>`
-    : `<img src="${esc(a.src)}" alt="${esc(a.title)}" />`) + `<p>${esc(a.title)}</p>`;
-  view.showModal();
-}));
-$("#close").addEventListener("click", () => view.close());
-view.addEventListener("click", (e) => { if (e.target === view) view.close(); });
-view.addEventListener("close", () => { viewBody.innerHTML = ""; });
+if (SUB) {
+  document.body.classList.add("sub");
+  document.title = SUB.title + " · Zach Chen";
+  const footer = `<footer class="elsewhere">${LINKS.map((l) => link(l.label, l.href)).join("")}</footer>`;
+  if (location.pathname.startsWith("/writing")) {
+    $("#doc").innerHTML = `<div class="bio"><p>Essays from <a href="https://zachchen.substack.com" target="_blank" rel="noopener">Towards the North Star</a>, on technology, ambition, friendship, and what a good life looks like.</p></div>` +
+      sec("Essays", `<ul class="writing" id="essays"></ul>`) + footer;
+    renderWriting(WRITING_FALLBACK);
+    fetch("/api/substack").then((r) => r.ok ? r.json() : null)
+      .then((d) => { if (d && d.posts && d.posts.length) renderWriting(d.posts); }).catch(() => {});
+  } else if (location.pathname.startsWith("/quotes")) {
+    $("#doc").innerHTML = `<div class="bio"><p>A small commonplace book of ideas, scripture, and fragments worth returning to.</p></div>` +
+      sec("Quotes", `<div class="thoughts">${quoteHTML(ALL_QUOTES)}</div>`) + footer;
+  } else {
+    $("#doc").innerHTML = `<div class="bio"><p>Zach Chen · Harvard, CS, Stats & Philosophy · <a href="mailto:zach.chen101@gmail.com">zach.chen101@gmail.com</a></p></div>` +
+      RESUME.map(([title, list]) => sec(title, `<ul class="list">${items(list)}</ul>`)).join("") + footer;
+  }
+} else {
+  $("#bio").innerHTML = BIO.map((para) => "<p>" + para.map((b) => typeof b === "string" ? esc(b) : link(b.t, b.href)).join("") + "</p>").join("");
+  $("#now").innerHTML = items(NOW);
+  $("#research").innerHTML = items(RESEARCH);
+  $("#former").innerHTML = items(PAST);
+  $("#thoughts").innerHTML = quoteHTML(THOUGHTS);
+  $("#links").innerHTML = LINKS.map((l) => link(l.label, l.href)).join("");
+
+  const tile = (a, i, kind) => `<button type="button" data-kind="${kind}" data-i="${i}" aria-label="${esc(a.title)}">
+    <img src="${esc(a.src)}" alt="${esc(a.title)}" loading="lazy" decoding="async" />${kind === "painting" ? '<span class="play">▶</span>' : ""}</button>`;
+  $("#paintings").innerHTML = PAINTINGS.map((a, i) => tile(a, i, "painting")).join("");
+  $("#photos").innerHTML = PHOTOS.map((a, i) => tile(a, i, "photo")).join("");
+
+  const view = $("#view"), viewBody = $("#viewBody");
+  document.querySelectorAll(".grid button").forEach((b) => b.addEventListener("click", () => {
+    const a = (b.dataset.kind === "painting" ? PAINTINGS : PHOTOS)[+b.dataset.i];
+    viewBody.innerHTML = (a.video
+      ? `<video src="${esc(a.video)}" poster="${esc(a.src)}" autoplay muted playsinline controls></video>`
+      : `<img src="${esc(a.src)}" alt="${esc(a.title)}" />`) + `<p>${esc(a.title)}</p>`;
+    view.showModal();
+  }));
+  $("#close").addEventListener("click", () => view.close());
+  view.addEventListener("click", (e) => { if (e.target === view) view.close(); });
+  view.addEventListener("close", () => { viewBody.innerHTML = ""; });
+}
 
 [...$("#doc").children].forEach((c, i) => c.style.setProperty("--i", Math.min(i, 6)));
 
@@ -803,6 +951,18 @@ const FRAMES = [
   { m: M.paint,    seed: 29, tex: "alpen" },
 ];
 const FINAL = { m: M.end, seed: 40, cap: "Zach Chen", final: true };
+let bg = FINAL;
+
+// After the film, the homepage background changes every 5 seconds, crossfading through
+// a few dark-skied shots. Each keeps its material at the rim and fades to night behind the text.
+const CYCLE_MS = 5000;
+const CYCLE = [FINAL, ...[
+  { m: M.honey, seed: 2 }, { m: M.ocean, seed: 4 }, { m: M.paint, seed: 6, tex: "rowers" },
+  { m: M.agate, seed: 5 }, { m: M.ice, seed: 10 }, { m: M.lava, seed: 16 },
+  { m: M.paint, seed: 9, tex: "boat" }, { m: M.marble, seed: 7 }, { m: M.oil, seed: 3 },
+  { m: M.paint, seed: 29, tex: "alpen" }, { m: M.xray, seed: 13 }, { m: M.paint, seed: 25, tex: "gate" },
+  { m: M.cells, seed: 18 }, { m: M.paint, seed: 17, tex: "rainbow" },
+].map((f) => ({ ...f, still: true, fade: true }))];
 const ON_PAPER = new Set([M.ink, M.topo, M.halftone, M.dunes, M.moss]);
 const capColor = (f) => ON_PAPER.has(f.m) ? DARK : LIGHT;
 
@@ -840,7 +1000,7 @@ function initGL() {
   const loc = gl.getAttribLocation(prog, "p");
   gl.enableVertexAttribArray(loc);
   gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-  for (const n of ["u_res", "u_mat", "u_seed", "u_H", "u_grain", "u_vig", "u_fin", "u_time", "u_stars", "u_sky", "u_crop", "u_tex"]) U[n] = gl.getUniformLocation(prog, n);
+  for (const n of ["u_res", "u_mat", "u_seed", "u_H", "u_grain", "u_vig", "u_fin", "u_time", "u_stars", "u_sky", "u_crop", "u_tex", "u_fade", "u_tint", "u_tw", "u_tc"]) U[n] = gl.getUniformLocation(prog, n);
   return true;
 }
 
@@ -876,14 +1036,18 @@ function size(hi) {
 let sky = { time: 0, stars: 1, settle: 0 };
 function draw(f) {
   // Cuts get a hair of jitter, like hand-made shots; the shot that stays drifts gently into place.
-  const H = horizon() + (f.final ? sky.settle : ((f.seed * 7) % 3 - 1) * .006);   // a hair of jitter between cuts, like hand-made shots
+  const steady = !!(f.final || f.still);
+  const H = horizon() + (steady ? sky.settle : ((f.seed * 7) % 3 - 1) * .006);   // a hair of jitter between cuts, like hand-made shots
   if (!gl || gl.isContextLost()) return;
-  size(!!f.final);
+  size(steady);
   gl.uniform2f(U.u_res, canvas.width, canvas.height);
   gl.uniform1f(U.u_mat, f.m);
   gl.uniform1f(U.u_seed, f.seed);
   gl.uniform1f(U.u_H, H);
   gl.uniform1f(U.u_fin, f.final ? 1 : 0);
+  gl.uniform1f(U.u_fade, f.fade ? 1 : 0);
+  gl.uniform1f(U.u_tint, f.tw ? 1 : 0);
+  if (f.tw) { gl.uniform3f(U.u_tw, ...f.tw); gl.uniform3f(U.u_tc, ...f.tc); }
   gl.uniform1f(U.u_time, sky.time);
   gl.uniform1f(U.u_stars, sky.stars);
   gl.uniform1f(U.u_grain, .07);                  // the last shot is graded like every other shot
@@ -956,15 +1120,15 @@ function skyLoop(now) {
     sky.time = e / 1000 + 40;                    // start mid-drift so stars aren't all in phase
     sky.stars = ease(Math.min(Math.max((e - 250) / STARS_IN_MS, 0), 1));
     sky.settle = skyDrift * (1 - ease(Math.min(e / 3200, 1)));
-    draw(FINAL);
+    if (bg.m === M.end) draw(bg);                // only the end card moves; other shots hold still
   }
   skyRaf = requestAnimationFrame(skyLoop);
 }
 function startSky(drift) {
   skyT0 = performance.now();
   skyDrift = 0;   // the shot that stays stays: no drift, so the name never moves
-  if (reduced) { sky = { time: 40, stars: 1, settle: 0 }; draw(FINAL); return; }
-  sky.stars = 0; sky.settle = skyDrift; draw(FINAL);
+  if (reduced) { sky = { time: 40, stars: 1, settle: 0 }; draw(bg); return; }
+  sky.stars = 0; sky.settle = skyDrift; draw(bg);
   if (!skyRaf) skyRaf = requestAnimationFrame(skyLoop);
 }
 new IntersectionObserver(([e]) => {
@@ -972,13 +1136,37 @@ new IntersectionObserver(([e]) => {
   if (heroVisible && !playing && !skyRaf && !reduced && skyT0) skyRaf = requestAnimationFrame(skyLoop);
 }).observe(hero);
 
+let cycleTimer = 0, cycleI = 0;
+function crossTo(f) {
+  const fc = $("#fade");
+  fc.width = canvas.width; fc.height = canvas.height;
+  fc.getContext("2d").drawImage(canvas, 0, 0);          // freeze the old shot on top
+  fc.style.transition = "none"; fc.style.opacity = 1;
+  bg = f; draw(f);
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    fc.style.transition = "opacity 1.6s ease"; fc.style.opacity = 0;
+  }));
+}
+function startCycle() {
+  if (SUB || reduced || cycleTimer) return;
+  cycleI = 0;
+  cycleTimer = setInterval(() => {
+    if (playing || !heroVisible || document.hidden || !gl || gl.isContextLost()) return;
+    do cycleI = (cycleI + 1) % CYCLE.length; while (CYCLE[cycleI].tex && !textures[CYCLE[cycleI].tex]);
+    crossTo(CYCLE[cycleI]);
+  }, CYCLE_MS);
+}
+function stopCycle() { clearInterval(cycleTimer); cycleTimer = 0; bg = FINAL; $("#fade").style.opacity = 0; }
+
 function land(instant) {
   cancelAnimationFrame(raf);
   timers.forEach(clearTimeout); timers = [];
   playing = false;
   document.body.classList.remove("playing");
   try { localStorage.setItem("zc-intro-seen", "1"); } catch (e) {}
+  bg = FINAL;
   startSky(!instant);
+  later(instant ? 0 : 2600, startCycle);
   if (instant || reduced) {
     setCaption(FINAL.cap, LIGHT, true, true);
     reveal(true);
@@ -995,6 +1183,7 @@ function play() {
     ? FIRST_MS * Math.pow(LAST_MS / FIRST_MS, i / (fast - 1))
     : TAIL[i - fast]);
   const ready = (f) => !f.tex || textures[f.tex];
+  stopCycle();
   playing = true;
   document.body.classList.add("playing", "hide-doc");
   $("#doc").style.setProperty("--base", "0s");
@@ -1030,6 +1219,15 @@ function play() {
 
 async function start() {
   const ok = initGL();
+  if (SUB) {                                            // a subpage: its own tinted horizon, no film
+    if ("scrollRestoration" in history) history.scrollRestoration = "auto";
+    bg = { ...FINAL, cap: SUB.title, tw: SUB.tw, tc: SUB.tc };
+    if (ok) startSky(false);
+    setCaption(SUB.title, LIGHT, true, false);
+    reveal(false);
+    addEventListener("resize", () => { if (!skyRaf) draw(bg); });
+    return;
+  }
   if (!ok) { land(true); return; }
 
   const only = params.get("frame");
@@ -1048,16 +1246,17 @@ async function start() {
   loadAll();                                            // streams in while the film plays
   if (reduced || (seen && !params.has("intro"))) land(true);
   else play();                                          // starts at once; never waits on images
-  addEventListener("resize", () => { if (!playing && !skyRaf) draw(FINAL); });
+  addEventListener("resize", () => { if (!playing && !skyRaf) draw(bg); });
 }
 
 // If the GPU drops the canvas (tab in the background, back/forward cache), go straight to the page.
 canvas.addEventListener("webglcontextlost", (e) => { e.preventDefault(); if (playing) land(true); });
-canvas.addEventListener("webglcontextrestored", () => { if (initGL()) { textures = {}; loadAll(); draw(FINAL); } });
-addEventListener("pageshow", (e) => { if (e.persisted) land(true); });
+canvas.addEventListener("webglcontextrestored", () => { if (initGL()) { textures = {}; loadAll(); draw(bg); } });
+addEventListener("pageshow", (e) => { if (e.persisted && !SUB) land(true); });
 
 // Nav: external links on the right; a backdrop and the name once the hero has scrolled past.
-$("#navLinks").innerHTML = LINKS.filter((l) => l.label !== "Email").map((l) => link(l.label, l.href)).join("");
+$("#navLinks").innerHTML = `<a href="/writing">Writing</a><a href="/resume">Resume</a>` +
+  LINKS.filter((l) => !["Email", "Resume"].includes(l.label)).map((l) => link(l.label, l.href).replace("<a ", '<a class="out" ')).join("");
 const top_ = $("#top");
 const onScroll = () => top_.classList.toggle("scrolled", scrollY > hero.offsetHeight * .6);
 addEventListener("scroll", onScroll, { passive: true }); onScroll();
@@ -1070,7 +1269,7 @@ cap.addEventListener("click", (e) => { if (e.target.id === "replay") { e.prevent
 // The curve drops toward the screen edges, so the page starts low enough that the
 // left end of its first line still sits below the planet's rim. Same circle as the shader.
 function fitDoc() {
-  const W = innerWidth, Hh = hero.clientHeight, bio = $("#bio");
+  const W = innerWidth, Hh = hero.clientHeight, bio = $("#doc .bio");
   const doc = $("#doc");
   doc.style.setProperty("--sag", "0px");
   const x = Math.max(0, W / 2 - bio.getBoundingClientRect().left) / Hh;
