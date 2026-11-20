@@ -32,15 +32,6 @@ export class ContentManager {
                     sceneIndex: 0
                 },
                 {
-                    title: "Embedding VC",
-                    subtitle: "VC Scout",
-                    link: "https://embedding.vc/",
-                    text: "Sourcing and evaluating early-stage startups within the Harvard ecosystem for potential seed-stage investment.",
-                    date: "2025 — Present",
-                    posClass: "pos-side",
-                    sceneIndex: 1
-                },
-                {
                     title: "IvyLine Consulting",
                     subtitle: "Co-Founder & CSO",
                     text: "Scaled a college coaching startup to 5 figures profit in its first year.",

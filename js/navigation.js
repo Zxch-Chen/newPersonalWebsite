@@ -121,11 +121,16 @@ export function initNavigation(dotArt) {
         tab.addEventListener('click', () => {
             const tabId = tab.dataset.tab;
             switchTab(tabId);
+            // Each tab has its own address under /v1 (aesthetics is the "arts" tab).
+            const slug = tabId === 'arts' ? 'aesthetics' : tabId;
+            history.replaceState(null, '', tabId === 'resume' ? '/v1' : `/v1/${slug}`);
         });
     });
 
-    // Initial load
-    switchTab('resume');
+    // Initial load: open the tab named in the address, e.g. /v1/aesthetics.
+    const fromPath = location.pathname.replace(/^\/v1\/?/, '').replace(/\/+$/, '');
+    const startTab = { aesthetics: 'arts', arts: 'arts', writing: 'writing', thoughts: 'thoughts' }[fromPath] || 'resume';
+    switchTab(startTab);
 
     // Silent Pre-warm of ALL background art to make tab switching instant
     Object.keys(backgrounds).forEach(tabId => {

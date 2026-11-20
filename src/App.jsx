@@ -114,7 +114,6 @@ function Header({ theme, onToggle }) {
   const [navOpen, setNavOpen] = useState(false)
 
   const navItems = [
-    { label: 'resume', route: '/resume' },
     { label: 'writing', route: '/writing' },
     { label: 'thoughts', route: '/thoughts' },
     { label: 'aesthetics', route: '/aesthetics' },
@@ -315,7 +314,7 @@ function ProfileSection() {
         <div className="homepage-profile" id="resume">
           <img src="/zach/zach-intro.jpg" alt="Zach Chen" loading="eager" />
         </div>
-        <a href="/old" className="old-style-btn">
+        <a href="/v1" className="old-style-btn">
           view old style →
         </a>
       </div>
@@ -326,12 +325,7 @@ function ProfileSection() {
         studying CS with a secondary in philosophy. Right now I'm building{' '}
         <CustomLink href="https://trycirca.org">Circa</CustomLink>, a friends-first social
         app; working on ML projects — interpretability, evals, and fine-tuning small models;
-        and thinking and writing about the future and human flourishing. I'm also involved
-        with early-stage investing: I scout for{' '}
-        <CustomLink href="https://embedding.vc/">Embedding VC</CustomLink>, am a venture
-        partner at V11, and work with founders at{' '}
-        <CustomLink href="https://tnt.so">TNT</CustomLink>, the Harvard/MIT accelerator —
-        mostly technical diligence on pre-seed and seed AI and deep-tech companies.
+        and thinking and writing about the future and human flourishing.
       </p>
       <p className="intro intro-contact">
         I'm based between Harvard and wherever the next good idea needs me. Get in touch
@@ -370,11 +364,6 @@ function ResumePreview() {
           </a>
         </li>
         <li>
-          <span className="essay-date">Investing,</span>{' '}
-          <a href="https://embedding.vc/">Embedding VC</a>, V11, and{' '}
-          <a href="https://tnt.so">TNT</a> — pre-seed/seed technical diligence
-        </li>
-        <li>
           <span className="essay-date">Prev,</span>{' '}
           <a href="https://sapentia.ai">Sapentia AI — Cofounder</a>
         </li>
@@ -385,9 +374,6 @@ function ResumePreview() {
           </a>
         </li>
       </ul>
-      <p className="background-text">
-        <Link to="/resume" className="view-all-link">view full resume →</Link>
-      </p>
     </>
   )
 }
@@ -476,294 +462,6 @@ function HomePage() {
   )
 }
 
-function ResumePage() {
-  return (
-    <div className="central-column">
-      <ProfileSection />
-
-      <h2 className="post-list-heading">[resume]</h2>
-
-      <div className="resume-full">
-        <h3 className="resume-section-heading">Education</h3>
-        <div className="resume-entry">
-          <div className="resume-entry-header">
-            <strong>Harvard University</strong>
-            <span className="resume-entry-date">Sep 2024 — May 2028</span>
-          </div>
-          <p className="resume-entry-subtitle">B.S. Computer Science, Secondary in Philosophy</p>
-          <p className="resume-entry-detail">
-            <strong>Coursework:</strong> Algorithms &amp; Data Structures (CS 120, CS 124),
-            Distributed Systems (CS 262), Systems Programming (CS 61),
-            Artificial Intelligence (CS 182), Proof-Based Linear Algebra (Math 22a),
-            Multivariable Calculus (Math 21a), Probability (Stat 110),
-            Statistics &amp; Inference (Stat 111).
-          </p>
-        </div>
-
-        <h3 className="resume-section-heading">Now</h3>
-        <div className="resume-entry">
-          <div className="resume-entry-header">
-            <strong>
-              <a href="https://trycirca.org">Circa</a> — Cofounder
-            </strong>
-            <span className="resume-entry-date">2026 — Present</span>
-          </div>
-          <p className="resume-entry-detail">
-            Creating a more authentic space for close friends — a friends-first mobile
-            network built around relational depth rather than engagement metrics, for
-            college students and people in their twenties.
-          </p>
-        </div>
-        <div className="resume-entry">
-          <div className="resume-entry-header">
-            <strong>ML Projects</strong>
-            <span className="resume-entry-date">Ongoing</span>
-          </div>
-          <p className="resume-entry-detail">
-            Independent work on mechanistic interpretability, sparse autoencoders,
-            representation steering, LLM evaluation, and supervised fine-tuning of small
-            models — plus reproducible eval pipelines for measuring factual-recall failures.
-          </p>
-        </div>
-        <div className="resume-entry">
-          <div className="resume-entry-header">
-            <strong>Thinking about the future and human flourishing</strong>
-            <span className="resume-entry-date">Ongoing</span>
-          </div>
-          <p className="resume-entry-detail">
-            Reading and writing on where technology is taking us and what a good life looks
-            like inside it — ambition, friendship, morality, and agency. Published at{' '}
-            <a href="https://zachchen.substack.com/">Towards the North Star</a>.
-          </p>
-        </div>
-        <div className="resume-entry">
-          <div className="resume-entry-header">
-            <strong>AI Safety Student Team — Member</strong>
-            <span className="resume-entry-date">Feb 2026 — Present</span>
-          </div>
-          <p className="resume-entry-detail">
-            Technical AI safety workshop at Harvard.
-          </p>
-        </div>
-        <div className="resume-entry">
-          <div className="resume-entry-header">
-            <strong>SpaceXAI — Campus Lead</strong>
-            <span className="resume-entry-date">Sep 2025 — Present</span>
-          </div>
-          <p className="resume-entry-detail">
-            Growing SpaceXAI at Harvard — developer adoption, product feedback, and
-            programming for technical students.
-          </p>
-        </div>
-
-        <h3 className="resume-section-heading">Early-Stage Investing</h3>
-        <div className="resume-entry">
-          <div className="resume-entry-header">
-            <strong>
-              <a href="https://embedding.vc/">Embedding VC</a> — Scout
-            </strong>
-            <span className="resume-entry-date">Sep 2025 — Present</span>
-          </div>
-          <p className="resume-entry-detail">
-            Technical diligence on early-stage AI and deep-tech companies: model architecture,
-            infrastructure, data advantages, and product defensibility.
-          </p>
-        </div>
-        <div className="resume-entry">
-          <div className="resume-entry-header">
-            <strong>V11 — Venture Partner</strong>
-            <span className="resume-entry-date">Mar 2026 — Present</span>
-          </div>
-          <p className="resume-entry-detail">
-            Sourcing and evaluating high-potential technology companies for leading venture
-            firms as part of a selective network of operators, founders, and researchers.
-            Technical and market diligence on early-stage AI and software startups.
-          </p>
-        </div>
-        <div className="resume-entry">
-          <div className="resume-entry-header">
-            <strong>
-              <a href="https://tnt.so">TNT</a> — Operator
-            </strong>
-            <span className="resume-entry-date">2026 — Present</span>
-          </div>
-          <p className="resume-entry-detail">
-            Operations for a Harvard/MIT accelerator: working with technical founders on
-            formation, product strategy, fundraising, and GTM; sourcing founders and connecting
-            companies to operators and investors across the ecosystem.
-          </p>
-        </div>
-
-        <h3 className="resume-section-heading">Previously</h3>
-        <div className="resume-entry">
-          <div className="resume-entry-header">
-            <strong>
-              <a href="https://sapentia.ai">Sapentia AI</a> — Cofounder
-            </strong>
-            <span className="resume-entry-date">Jan 2026 — 2026</span>
-          </div>
-          <p className="resume-entry-detail">
-            Architected a multi-agent admissions platform on Next.js, TypeScript, the OpenAI
-            Agent SDK, LangChain, PostgreSQL, and pgvector — routing, tool use, RAG, structured
-            outputs, persistent user memory. Deployed containerized inference and app services
-            on AWS ECS/Fargate behind an ALB with streaming APIs, rate limiting, and PII-safe
-            observability. Built LLM evals for factuality, plan quality, safety, and
-            prompt-injection resistance. 750+ waitlist users; led a 40+ person team.
-          </p>
-        </div>
-        <div className="resume-entry">
-          <div className="resume-entry-header">
-            <strong>Alex AI — GTM</strong>
-            <span className="resume-entry-date">Jun 2026 — Aug 2026</span>
-          </div>
-          <p className="resume-entry-detail">
-            Built a Python content-orchestration pipeline that ingests blogs, videos, customer
-            stories, and internal metrics, generates channel-specific content with Claude, and
-            publishes through the Ordinal API — with an automated brand-QA and revision loop
-            that checks factual, stylistic, and positioning constraints before scheduling.
-            Built a Remotion/React rendering system for branded clips, vertical shorts, lower
-            thirds, and quote cards, plus{' '}
-            <a href="https://ta20awards.com">ta20awards.com</a> and internal content tooling.
-          </p>
-        </div>
-        <div className="resume-entry">
-          <div className="resume-entry-header">
-            <strong>Cursor Growth @ Harvard</strong>
-            <span className="resume-entry-date">2025</span>
-          </div>
-          <p className="resume-entry-detail">
-            Grew Cursor's usage across the Harvard builder ecosystem: student adoption,
-            product feedback, and AI-native developer workflows.
-          </p>
-        </div>
-        <div className="resume-entry">
-          <div className="resume-entry-header">
-            <strong>IvyLine Consulting — Cofounder &amp; CSO</strong>
-            <span className="resume-entry-date">2024 — 2025</span>
-          </div>
-          <p className="resume-entry-detail">
-            Ran ops, consulting, marketing, and sales. Scaled to five figures of profit in
-            year one.
-          </p>
-        </div>
-        <div className="resume-entry">
-          <div className="resume-entry-header">
-            <strong>
-              <a href="https://www.mgh.harvard.edu">MGH</a> / Harvard Medical School — Computational Genomics
-            </strong>
-            <span className="resume-entry-date">2021 — 2025</span>
-          </div>
-          <p className="resume-entry-detail">
-            Principal investigator. Python and R pipelines to clean, normalize, and validate
-            genomic data across 1,000+ patient profiles (~80% less manual processing).
-            Logistic regression, covariate adjustment, AUROC, and permutation-based
-            multiple-testing correction to find markers of Alzheimer's risk. Co-authored work
-            accepted at AAIC 2024.
-          </p>
-        </div>
-        <div className="resume-entry">
-          <div className="resume-entry-header">
-            <strong>Unity Network — Founder</strong>
-            <span className="resume-entry-date">Jun 2023 — May 2024</span>
-          </div>
-          <p className="resume-entry-detail">
-            Built a national organization helping students with research. Distributed
-            resources to 100 Title I schools, partnered with 3 state fairs, and ran leaders
-            in 10+ states.
-          </p>
-        </div>
-
-        <h3 className="resume-section-heading">Projects</h3>
-        <div className="resume-entry">
-          <div className="resume-entry-header">
-            <strong>
-              <a href="https://github.com/Zxch-Chen/cua-privacy-layer">
-                PLVA — Privacy Layer for Visual Agents
-              </a>
-            </strong>
-            <span className="resume-entry-date">Jul 2026</span>
-          </div>
-          <p className="resume-entry-subtitle">
-            Python · TypeScript · ONNX · RapidOCR · MiniLM · Playwright · Core ML
-          </p>
-          <p className="resume-entry-detail">
-            1st place at the H Company Computer Use Agent Hackathon. A local, fail-closed
-            privacy layer for autonomous browser agents: an OpenAI-compatible loopback proxy
-            around HoloDesktop's closed runtime that rewrites screenshots and model actions
-            bidirectionally with session-scoped placeholders and hide-use / approval / blocked
-            policies. Fuses an ONNX visual detector, RapidOCR, deterministic credential and
-            card rules, and a quantized semantic PII classifier — irreversible masks for
-            passwords, CVCs, and card numbers before frames reach the model. Fine-tuned a
-            MiniLM-L6-H384 BIO tagger on Modal over 4k synthetic screen/OCR samples, with an
-            INT8 ONNX deployment path. A Playwright harness separates privacy leakage from task
-            capability.
-          </p>
-        </div>
-        <div className="resume-entry">
-          <div className="resume-entry-header">
-            <strong>
-              <a href="https://www.howtowantbetterthings.org/">How to Want Better Things</a> — Co-Author
-            </strong>
-            <span className="resume-entry-date">Sep 2025 — Apr 2026</span>
-          </div>
-          <p className="resume-entry-detail">
-            A book on career choice and moral ambition. Led launch strategy; presented at
-            Brown, Yale, and Tufts.
-          </p>
-        </div>
-        <div className="resume-entry">
-          <div className="resume-entry-header">
-            <strong>
-              <a href="https://zachchen.substack.com/">Towards the North Star</a> — Author
-            </strong>
-            <span className="resume-entry-date">Jan 2025 — Present</span>
-          </div>
-          <p className="resume-entry-detail">
-            Essays on technology, history, ambition, and individual agency in a world shaped by
-            rapidly changing social and technical systems.
-          </p>
-        </div>
-
-        <h3 className="resume-section-heading">Technical Skills</h3>
-        <div className="resume-entry">
-          <p className="resume-entry-detail">
-            <strong>Languages:</strong> Python, TypeScript, JavaScript, SQL, R.
-          </p>
-          <p className="resume-entry-detail">
-            <strong>Machine learning:</strong> PyTorch, Transformers, ONNX Runtime, supervised
-            fine-tuning, BIO sequence tagging, synthetic data generation, mechanistic
-            interpretability, sparse autoencoders, representation steering, LLM evaluation, RLHF.
-          </p>
-          <p className="resume-entry-detail">
-            <strong>Agents &amp; applied AI:</strong> OpenAI Agent SDK, LangChain, computer-use
-            agents, tool calling, RAG, vector search, structured generation, prompt-injection
-            defense, PII detection and redaction, local inference.
-          </p>
-          <p className="resume-entry-detail">
-            <strong>Backend &amp; infra:</strong> FastAPI, Node.js, PostgreSQL, Supabase,
-            pgvector, Docker, AWS ECS/Fargate, ALB, Vercel, Modal.
-          </p>
-          <p className="resume-entry-detail">
-            <strong>Frontend &amp; testing:</strong> Next.js, React, Remotion, Vite, Playwright,
-            Vitest, pytest.
-          </p>
-          <p className="resume-entry-detail">
-            <strong>Tools:</strong> Git, Linux, Claude Code, Cursor, Codex.
-          </p>
-        </div>
-
-        <h3 className="resume-section-heading">Elsewhere</h3>
-        <p>
-          <a href="https://www.linkedin.com/in/zachary-chen31415/">LinkedIn</a> ·{' '}
-          <a href="https://github.com/Zxch-Chen">GitHub</a> ·{' '}
-          <a href="https://zachchen.substack.com/">Substack</a> ·{' '}
-          <a href="https://x.com/theZachChen">X</a> ·{' '}
-          <a href="mailto:zach.chen101@gmail.com">zach.chen101@gmail.com</a>
-        </p>
-      </div>
-    </div>
-  )
-}
 
 function WritingPage() {
   const { posts, loading } = useSubstackPosts()
@@ -1044,7 +742,6 @@ export default function App() {
             <div className="post-content">
               <Routes>
                 <Route path="/" element={<HomePage />} />
-                <Route path="/resume" element={<ResumePage />} />
                 <Route path="/writing" element={<WritingPage />} />
                 <Route path="/thoughts" element={<ThoughtsPage />} />
                 <Route path="/aesthetics" element={<AestheticsPage />} />

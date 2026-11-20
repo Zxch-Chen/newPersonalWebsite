@@ -55,3 +55,21 @@ npm run build
 ```
 
 The built files will be in the `dist/` directory.
+
+## Versions
+
+Every design of the site stays live under its own prefix. The newest one is also the homepage.
+
+| Version | URL | Source | What it is |
+|---|---|---|---|
+| v1 | `/v1`, `/v1/writing`, `/v1/thoughts`, `/v1/aesthetics` | `v1/index.html`, `js/`, `styles/` | Halftone site with the SF / Boston / NY backgrounds |
+| v2 | `/v2`, `/v2/writing`, `/v2/thoughts`, `/v2/aesthetics` | `index.html`, `src/` (React) | Beige / dark minimal site |
+| v3 | `/`, `/writing`, `/quotes`, `/aesthetics` (also under `/v3`) | `v3/index.html` | Horizon-film site, current |
+
+Routing lives in two places that must agree: `vercel.json` (production) and the
+`versionRouter` in `vite.config.js` (dev). To start a v4: copy `v3/` to `v4/`, add it
+to `build.rollupOptions.input`, point `scripts/home.cjs` at `dist/v4/index.html`, add
+`/v4` rewrites in both routers, and add v4 to `VERSIONS` in the footer code.
+
+Old addresses redirect: `/old` → `/v1`, `/launch` → `/`, `/thoughts` → `/quotes`,
+and `/resume` and `/paper` → `/`.

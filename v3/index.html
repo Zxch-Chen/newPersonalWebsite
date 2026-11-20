@@ -115,6 +115,9 @@
     .elsewhere { display: flex; flex-wrap: wrap; gap: 6px 26px; margin-top: 120px; }
     .elsewhere a { color: var(--dim); }
     .elsewhere a:hover { color: var(--text); }
+    .versions { margin-left: auto; display: flex; gap: 14px; }
+    .versions a, .versions span { color: var(--dim); opacity: .7; }
+    .versions span { opacity: 1; color: var(--text); }
 
     /* Aesthetics: paintings, then photos. Square crops, no chrome. */
     .lede { margin-bottom: 22px; max-width: 34em; }
@@ -937,7 +940,6 @@ const LINKS = [
   { label: "Substack", href: "https://zachchen.substack.com" },
   { label: "X", href: "https://x.com/theZachChen" },
   { label: "GitHub", href: "https://github.com/Zxch-Chen" },
-  { label: "Resume", href: "/resume" },
 ];
 
 // Every quote, for /quotes.
@@ -975,72 +977,20 @@ const WRITING_FALLBACK = [
   { title: 'On Effective Altruism', link: 'https://zachchen.substack.com/p/on-effective-altruism', date: "Jan '26" },
 ]
 
-// The resume, for /resume.
-const RESUME = [
-  ["Education", [
-    { name: "Harvard University", meta: "Sep 2024 — May 2028",
-      text: "Computer Science, Statistics & Philosophy." },
-    { name: "Coursework",
-      text: "Algorithms & Data Structures (CS 120, CS 124), Distributed Systems (CS 262), Systems Programming (CS 61), Artificial Intelligence (CS 182), Proof-Based Linear Algebra (Math 22a), Probability (Stat 110), Statistics & Inference (Stat 111)." },
-  ]],
-  ["Now", [
-    { name: "Circa", meta: "Cofounder · 2026 — present", href: "https://trycirca.org",
-      text: "A friends-first iOS app for staying in touch with the people closest to you, built around relational depth rather than engagement." },
-    { name: "Orbit[s]", meta: "Pre-seed / seed fund",
-      text: "Partners with exceptional young founders to invest in their friends and network." },
-    { name: "Stanford AI Lab (SAIL)", meta: "Research, with Yuzhen Mao", href: "https://yuzhenmao.github.io/",
-      text: "LLM agents for long-horizon tasks and reasoning." },
-    { name: "AI Safety Student Team", meta: "Member · Feb 2026 — present",
-      text: "Technical AI safety workshop at Harvard." },
-    { name: "SpaceXAI × Cursor", meta: "Campus lead · Sep 2025 — present", logos: ["x.ai", "cursor.com"],
-      text: "Grew Cursor's usage across the Harvard builder ecosystem: developer adoption, product feedback, and programming for technical students." },
-  ]],
-  ["Investing", [
-    { name: "Embedding VC", meta: "Investor · Sep 2025 — present", href: "https://embedding.vc/",
-      text: "Technical diligence on early-stage AI and deep-tech companies: model architecture, infrastructure, data advantages, and defensibility." },
-    { name: "V11", meta: "Venture partner · Mar 2026 — present",
-      text: "Sourcing and evaluating early-stage AI and software companies." },
-    { name: "TNT", meta: "Operator · 2026 — present", href: "https://tnt.so",
-      text: "Operations for a Harvard/MIT accelerator: formation, product strategy, fundraising, and GTM with technical founders." },
-  ]],
-  ["Previously", [
-    { name: "Sapentia AI", meta: "Cofounder · 2026", href: "https://sapentia.ai",
-      text: "Multi-agent admissions platform on Next.js, the OpenAI Agents SDK, LangChain, and pgvector, deployed on AWS ECS/Fargate with streaming APIs and PII-safe observability. Evals for factuality, plan quality, safety, and prompt injection. 750+ on the waitlist." },
-    { name: "Alex AI", meta: "GTM · Jun — Aug 2026",
-      text: "First intern and youngest employee. A Python content pipeline that drafts with Claude and runs an automated brand-QA loop before publishing, a Remotion rendering system for branded clips, and ta20awards.com, which grew the company page from 8,000 to 10,000 followers.",
-      inlink: { t: "ta20awards.com", href: "https://ta20awards.com" } },
-    { name: "IvyLine Consulting", meta: "Cofounder & CSO · 2024 — 2025",
-      text: "Ran ops, consulting, marketing, and sales. Five figures of profit in year one." },
-    { name: "MGH / Harvard Medical School", meta: "Computational genomics · 2021 — 2025",
-      text: "Python and R pipelines across 1,000+ patient profiles; logistic regression, AUROC, and permutation-based multiple-testing correction to find markers of Alzheimer's risk. Co-authored work accepted at AAIC 2024." },
-    { name: "Unity Network", meta: "Founder · 2023 — 2024",
-      text: "A national organization helping students with research: resources to 100 Title I schools, 3 state-fair partnerships, leaders in 10+ states." },
-  ]],
-  ["Projects", [
-    { name: "PLVA", meta: "1st place ($1,500), H Company Computer Use Agent Hackathon", href: "https://github.com/Zxch-Chen/cua-privacy-layer",
-      text: "A local, fail-closed privacy proxy for computer-use agents: an ONNX visual detector, OCR, credential rules, and an INT8 MiniLM PII tagger mask sensitive data in screenshots before the model sees them." },
-    { name: "How to Want Better Things", meta: "Co-author · Sep 2025 — Apr 2026", href: "https://www.howtowantbetterthings.org/",
-      text: "A book on career choice and moral ambition. Led launch strategy; presented at Brown, Yale, and Tufts." },
-    { name: "Towards the North Star", meta: "Author · 2025 — present", href: "https://zachchen.substack.com",
-      text: "Essays on technology, history, ambition, and agency." },
-  ]],
-  ["Skills", [
-    { name: "Machine learning", text: "PyTorch, Transformers, ONNX Runtime, SFT, RLHF, mechanistic interpretability, sparse autoencoders, representation steering, LLM evaluation." },
-    { name: "Agents & applied AI", text: "Computer-use agents, tool calling, RAG, vector search, structured generation, prompt-injection defense, PII redaction." },
-    { name: "Engineering", text: "Python, TypeScript, SQL, R. FastAPI, Node.js, PostgreSQL, Docker, AWS, Vercel, Modal, Next.js, React, Playwright." },
-  ]],
-];
-
 // Each subpage: its own title on the horizon and its own glow (warm, cool).
 // Each subpage: its own title on the horizon and its own frame from the film,
 // held still, with the material at the rim fading to night behind the text.
 const PAGES = {
   "/writing":    { title: "Writing",    frame: { m: 2,  seed: 3 } },              // oil
   "/quotes":     { title: "Quotes",     frame: { m: 1,  seed: 2 } },              // honey
-  "/resume":     { title: "Resume",     frame: { m: 11, seed: 10 } },             // ice
   "/aesthetics": { title: "Aesthetics", frame: { m: 4,  seed: 6, tex: "rowers" } }, // the Rowers painting
 };
-const SUB = PAGES[location.pathname.replace(/\/+$/, "")] || null;
+// Earlier designs stay up at /v1 and /v2; this one is v3.
+const VERSIONS = [{ v: "v1", href: "/v1" }, { v: "v2", href: "/v2" }, { v: "v3" }];
+const versionsHTML = `<span class="versions">${VERSIONS.map((x) => x.href ? `<a href="${x.href}">${x.v}</a>` : `<span>${x.v}</span>`).join("")}</span>`;
+// v3 also answers at /v3/..., so strip that prefix before routing.
+const PATH = location.pathname.replace(/^\/v3(?=\/|$)/, "").replace(/\/+$/, "") || "/";
+const SUB = PAGES[PATH] || null;
 
 /* ═══ Page ══════════════════════════════════════════════════════════════ */
 
@@ -1082,24 +1032,21 @@ function renderAesthetics() {
 if (SUB) {
   document.body.classList.add("sub");
   document.title = SUB.title + " · Zach Chen";
-  const footer = `<footer class="elsewhere">${LINKS.map((l) => link(l.label, l.href)).join("")}</footer>`;
-  if (location.pathname.startsWith("/writing")) {
+  const footer = `<footer class="elsewhere">${LINKS.map((l) => link(l.label, l.href)).join("")}${versionsHTML}</footer>`;
+  if (PATH === "/writing") {
     $("#doc").innerHTML = `<div class="bio"><p>Essays from <a href="https://zachchen.substack.com" target="_blank" rel="noopener">Towards the North Star</a>, on technology, ambition, friendship, and what a good life looks like.</p></div>` +
       sec("Essays", `<ul class="writing" id="essays"></ul>`) + footer;
     renderWriting(WRITING_FALLBACK);
     fetch("/api/substack").then((r) => r.ok ? r.json() : null)
       .then((d) => { if (d && d.posts && d.posts.length) renderWriting(d.posts); }).catch(() => {});
-  } else if (location.pathname.startsWith("/quotes")) {
+  } else if (PATH === "/quotes") {
     $("#doc").innerHTML = `<div class="bio"><p>A small commonplace book of ideas, scripture, and fragments worth returning to.</p></div>` +
       sec("Quotes", `<div class="thoughts">${quoteHTML(ALL_QUOTES)}</div>`) + footer;
-  } else if (location.pathname.startsWith("/aesthetics")) {
+  } else if (PATH === "/aesthetics") {
     $("#doc").innerHTML = `<div class="bio"><p>Four paintings made stroke by stroke by a brush engine written in code, and photographs worth holding onto. Open a painting to watch it being painted.</p></div>` +
       sec("Paintings", `<div class="grid paintings" id="paintings"></div>`) +
       sec("Photographs", `<div class="grid" id="photos"></div>`) + footer;
     renderAesthetics();
-  } else {
-    $("#doc").innerHTML = `<div class="bio"><p>Zach Chen · Harvard, CS, Stats & Philosophy · <a href="mailto:zach.chen101@gmail.com">zach.chen101@gmail.com</a></p></div>` +
-      RESUME.map(([title, list]) => sec(title, `<ul class="list">${items(list)}</ul>`)).join("") + footer;
   }
 } else {
   $("#bio").innerHTML = BIO.map((para) => "<p>" + para.map((b) => typeof b === "string" ? esc(b) : link(b.t, b.href)).join("") + "</p>").join("");
@@ -1111,7 +1058,7 @@ if (SUB) {
   }
   $("#former").innerHTML = items(PAST);
   $("#thoughts").innerHTML = quoteHTML(THOUGHTS);
-  $("#links").innerHTML = LINKS.map((l) => link(l.label, l.href)).join("");
+  $("#links").innerHTML = LINKS.map((l) => link(l.label, l.href)).join("") + versionsHTML;
 
   view.addEventListener("close", () => { viewBody.innerHTML = ""; });
 }
@@ -1445,8 +1392,8 @@ canvas.addEventListener("webglcontextrestored", () => { if (initGL()) { textures
 addEventListener("pageshow", (e) => { if (e.persisted && !SUB) land(true); });
 
 // Nav: external links on the right; a backdrop and the name once the hero has scrolled past.
-$("#navLinks").innerHTML = `<a href="/writing">Writing</a><a href="/resume">Resume</a>` +
-  LINKS.filter((l) => !["Email", "Resume"].includes(l.label)).map((l) => link(l.label, l.href).replace("<a ", '<a class="out" ')).join("");
+$("#navLinks").innerHTML = `<a href="/writing">Writing</a>` +
+  LINKS.filter((l) => !["Email"].includes(l.label)).map((l) => link(l.label, l.href).replace("<a ", '<a class="out" ')).join("");
 const top_ = $("#top");
 const onScroll = () => top_.classList.toggle("scrolled", scrollY > hero.offsetHeight * .6);
 addEventListener("scroll", onScroll, { passive: true }); onScroll();

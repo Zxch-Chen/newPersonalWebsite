@@ -5,17 +5,84 @@
     }
   },
   "rewrites": [
-    { "source": "/old", "destination": "/old/index.html" },
-    { "source": "/paper", "destination": "/paper/index.html" },
-    { "source": "/launch", "destination": "/launch/index.html" },
-    { "source": "/writing", "destination": "/launch/index.html" },
-    { "source": "/quotes", "destination": "/launch/index.html" },
-    { "source": "/resume", "destination": "/launch/index.html" },
-    { "source": "/aesthetics", "destination": "/launch/index.html" },
-    { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/old/(.*)", "destination": "/old/$1" },
-    { "source": "/paper/(.*)", "destination": "/paper/$1" },
-    { "source": "/launch/(.*)", "destination": "/launch/$1" },
-    { "source": "/((?!assets|styles|js|css|zach|art|fonts|paper-assets|favicon|old|paper|launch).*)", "destination": "/app.html" }
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/v1",
+      "destination": "/v1/index.html"
+    },
+    {
+      "source": "/v1/:path*",
+      "destination": "/v1/index.html"
+    },
+    {
+      "source": "/v2",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/v2/:path*",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/v3",
+      "destination": "/v3/index.html"
+    },
+    {
+      "source": "/v3/:path*",
+      "destination": "/v3/index.html"
+    },
+    {
+      "source": "/(writing|quotes|aesthetics)",
+      "destination": "/v3/index.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/old",
+      "destination": "/v1",
+      "permanent": false
+    },
+    {
+      "source": "/old/:path*",
+      "destination": "/v1",
+      "permanent": false
+    },
+    {
+      "source": "/launch",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/launch/:path*",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/paper",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/paper/:path*",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/resume",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/thoughts",
+      "destination": "/quotes",
+      "permanent": false
+    },
+    {
+      "source": "/v2/resume",
+      "destination": "/v2",
+      "permanent": false
+    }
   ]
 }
