@@ -179,7 +179,7 @@
 <body class="hide-doc">
 
   <nav class="top" id="top" aria-label="Site">
-    <span><a class="me" href="/">Zach Chen</a><a href="/#s-now">Tinkering</a><a href="/#s-research">Research</a><a href="/#s-former">Past</a><a href="/#s-thoughts">Thoughts</a><a href="/#s-investments">Investments</a><a href="/#s-aesthetics">Aesthetics</a></span>
+    <span><a class="me" href="/">Zach Chen</a><a href="/#s-now">Tinkering</a><a href="/#s-research">Research</a><a href="/#s-former">Past</a><a href="/#s-thoughts">Thoughts</a><a href="/#s-investments">Investments</a><a href="/aesthetics">Aesthetics</a></span>
     <span class="ext" id="navLinks"></span>
   </nav>
 
@@ -219,15 +219,6 @@
     <section class="sec" id="s-investments">
       <h2>[Investments]</h2>
       <p class="dimp">Not disclosed yet.</p>
-    </section>
-
-    <section class="sec" id="s-aesthetics">
-      <h2>[Aesthetics]</h2>
-      <div>
-        <p class="lede">Four paintings made stroke by stroke by a brush engine written in code, and photographs worth holding onto. Open a painting to watch it being painted.</p>
-        <div class="grid paintings" id="paintings"></div>
-        <div class="grid" id="photos"></div>
-      </div>
     </section>
 
     <footer class="elsewhere" id="links"></footer>
@@ -832,10 +823,13 @@ const RESUME = [
 ];
 
 // Each subpage: its own title on the horizon and its own glow (warm, cool).
+// Each subpage: its own title on the horizon and its own frame from the film,
+// held still, with the material at the rim fading to night behind the text.
 const PAGES = {
-  "/writing": { title: "Writing", tw: [1, .52, .32], tc: [.62, .36, .42] },
-  "/quotes":  { title: "Quotes",  tw: [.86, .62, 1], tc: [.42, .38, .82] },
-  "/resume":  { title: "Resume",  tw: [.62, 1, .78], tc: [.24, .62, .6] },
+  "/writing":    { title: "Writing",    frame: { m: 2,  seed: 3 } },              // oil
+  "/quotes":     { title: "Quotes",     frame: { m: 1,  seed: 2 } },              // honey
+  "/resume":     { title: "Resume",     frame: { m: 11, seed: 10 } },             // ice
+  "/aesthetics": { title: "Aesthetics", frame: { m: 4,  seed: 6, tex: "rowers" } }, // the Rowers painting
 };
 const SUB = PAGES[location.pathname.replace(/\/+$/, "")] || null;
 
@@ -858,31 +852,7 @@ function renderWriting(posts) {
     `<li><span class="n">${link(p.title, p.link)}</span><span class="d">${esc(fmt(p.pubDate || p.date))}</span></li>`).join("");
 }
 
-if (SUB) {
-  document.body.classList.add("sub");
-  document.title = SUB.title + " · Zach Chen";
-  const footer = `<footer class="elsewhere">${LINKS.map((l) => link(l.label, l.href)).join("")}</footer>`;
-  if (location.pathname.startsWith("/writing")) {
-    $("#doc").innerHTML = `<div class="bio"><p>Essays from <a href="https://zachchen.substack.com" target="_blank" rel="noopener">Towards the North Star</a>, on technology, ambition, friendship, and what a good life looks like.</p></div>` +
-      sec("Essays", `<ul class="writing" id="essays"></ul>`) + footer;
-    renderWriting(WRITING_FALLBACK);
-    fetch("/api/substack").then((r) => r.ok ? r.json() : null)
-      .then((d) => { if (d && d.posts && d.posts.length) renderWriting(d.posts); }).catch(() => {});
-  } else if (location.pathname.startsWith("/quotes")) {
-    $("#doc").innerHTML = `<div class="bio"><p>A small commonplace book of ideas, scripture, and fragments worth returning to.</p></div>` +
-      sec("Quotes", `<div class="thoughts">${quoteHTML(ALL_QUOTES)}</div>`) + footer;
-  } else {
-    $("#doc").innerHTML = `<div class="bio"><p>Zach Chen · Harvard, CS, Stats & Philosophy · <a href="mailto:zach.chen101@gmail.com">zach.chen101@gmail.com</a></p></div>` +
-      RESUME.map(([title, list]) => sec(title, `<ul class="list">${items(list)}</ul>`)).join("") + footer;
-  }
-} else {
-  $("#bio").innerHTML = BIO.map((para) => "<p>" + para.map((b) => typeof b === "string" ? esc(b) : link(b.t, b.href)).join("") + "</p>").join("");
-  $("#now").innerHTML = items(NOW);
-  $("#research").innerHTML = items(RESEARCH);
-  $("#former").innerHTML = items(PAST);
-  $("#thoughts").innerHTML = quoteHTML(THOUGHTS);
-  $("#links").innerHTML = LINKS.map((l) => link(l.label, l.href)).join("");
-
+function renderAesthetics() {
   const tile = (a, i, kind) => `<button type="button" data-kind="${kind}" data-i="${i}" aria-label="${esc(a.title)}">
     <img src="${esc(a.src)}" alt="${esc(a.title)}" loading="lazy" decoding="async" />${kind === "painting" ? '<span class="play">▶</span>' : ""}</button>`;
   $("#paintings").innerHTML = PAINTINGS.map((a, i) => tile(a, i, "painting")).join("");
@@ -898,6 +868,38 @@ if (SUB) {
   }));
   $("#close").addEventListener("click", () => view.close());
   view.addEventListener("click", (e) => { if (e.target === view) view.close(); });
+}
+
+if (SUB) {
+  document.body.classList.add("sub");
+  document.title = SUB.title + " · Zach Chen";
+  const footer = `<footer class="elsewhere">${LINKS.map((l) => link(l.label, l.href)).join("")}</footer>`;
+  if (location.pathname.startsWith("/writing")) {
+    $("#doc").innerHTML = `<div class="bio"><p>Essays from <a href="https://zachchen.substack.com" target="_blank" rel="noopener">Towards the North Star</a>, on technology, ambition, friendship, and what a good life looks like.</p></div>` +
+      sec("Essays", `<ul class="writing" id="essays"></ul>`) + footer;
+    renderWriting(WRITING_FALLBACK);
+    fetch("/api/substack").then((r) => r.ok ? r.json() : null)
+      .then((d) => { if (d && d.posts && d.posts.length) renderWriting(d.posts); }).catch(() => {});
+  } else if (location.pathname.startsWith("/quotes")) {
+    $("#doc").innerHTML = `<div class="bio"><p>A small commonplace book of ideas, scripture, and fragments worth returning to.</p></div>` +
+      sec("Quotes", `<div class="thoughts">${quoteHTML(ALL_QUOTES)}</div>`) + footer;
+  } else if (location.pathname.startsWith("/aesthetics")) {
+    $("#doc").innerHTML = `<div class="bio"><p>Four paintings made stroke by stroke by a brush engine written in code, and photographs worth holding onto. Open a painting to watch it being painted.</p></div>` +
+      sec("Paintings", `<div class="grid paintings" id="paintings"></div>`) +
+      sec("Photographs", `<div class="grid" id="photos"></div>`) + footer;
+    renderAesthetics();
+  } else {
+    $("#doc").innerHTML = `<div class="bio"><p>Zach Chen · Harvard, CS, Stats & Philosophy · <a href="mailto:zach.chen101@gmail.com">zach.chen101@gmail.com</a></p></div>` +
+      RESUME.map(([title, list]) => sec(title, `<ul class="list">${items(list)}</ul>`)).join("") + footer;
+  }
+} else {
+  $("#bio").innerHTML = BIO.map((para) => "<p>" + para.map((b) => typeof b === "string" ? esc(b) : link(b.t, b.href)).join("") + "</p>").join("");
+  $("#now").innerHTML = items(NOW);
+  $("#research").innerHTML = items(RESEARCH);
+  $("#former").innerHTML = items(PAST);
+  $("#thoughts").innerHTML = quoteHTML(THOUGHTS);
+  $("#links").innerHTML = LINKS.map((l) => link(l.label, l.href)).join("");
+
   view.addEventListener("close", () => { viewBody.innerHTML = ""; });
 }
 
@@ -958,16 +960,6 @@ const FRAMES = [
 const FINAL = { m: M.end, seed: 40, cap: "Zach Chen", final: true };
 let bg = FINAL;
 
-// After the film, the homepage background changes every 5 seconds, crossfading through
-// a few dark-skied shots. Each keeps its material at the rim and fades to night behind the text.
-const CYCLE_MS = 5000;
-const CYCLE = [FINAL, ...[
-  { m: M.honey, seed: 2 }, { m: M.ocean, seed: 4 }, { m: M.paint, seed: 6, tex: "rowers" },
-  { m: M.agate, seed: 5 }, { m: M.ice, seed: 10 }, { m: M.lava, seed: 16 },
-  { m: M.paint, seed: 9, tex: "boat" }, { m: M.marble, seed: 7 }, { m: M.oil, seed: 3 },
-  { m: M.paint, seed: 29, tex: "alpen" }, { m: M.xray, seed: 13 }, { m: M.paint, seed: 25, tex: "gate" },
-  { m: M.cells, seed: 18 }, { m: M.paint, seed: 17, tex: "rainbow" },
-].map((f) => ({ ...f, still: true, fade: true }))];
 const ON_PAPER = new Set([M.ink, M.topo, M.halftone, M.dunes, M.moss]);
 const capColor = (f) => ON_PAPER.has(f.m) ? DARK : LIGHT;
 
@@ -1141,28 +1133,6 @@ new IntersectionObserver(([e]) => {
   if (heroVisible && !playing && !skyRaf && !reduced && skyT0) skyRaf = requestAnimationFrame(skyLoop);
 }).observe(hero);
 
-let cycleTimer = 0, cycleI = 0;
-function crossTo(f) {
-  const fc = $("#fade");
-  fc.width = canvas.width; fc.height = canvas.height;
-  fc.getContext("2d").drawImage(canvas, 0, 0);          // freeze the old shot on top
-  fc.style.transition = "none"; fc.style.opacity = 1;
-  bg = f; draw(f);
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    fc.style.transition = "opacity 1.6s ease"; fc.style.opacity = 0;
-  }));
-}
-function startCycle() {
-  if (SUB || reduced || cycleTimer) return;
-  cycleI = 0;
-  cycleTimer = setInterval(() => {
-    if (playing || !heroVisible || document.hidden || !gl || gl.isContextLost()) return;
-    do cycleI = (cycleI + 1) % CYCLE.length; while (CYCLE[cycleI].tex && !textures[CYCLE[cycleI].tex]);
-    crossTo(CYCLE[cycleI]);
-  }, CYCLE_MS);
-}
-function stopCycle() { clearInterval(cycleTimer); cycleTimer = 0; bg = FINAL; $("#fade").style.opacity = 0; }
-
 function land(instant) {
   cancelAnimationFrame(raf);
   timers.forEach(clearTimeout); timers = [];
@@ -1171,7 +1141,6 @@ function land(instant) {
   try { localStorage.setItem("zc-intro-seen", "1"); } catch (e) {}
   bg = FINAL;
   startSky(!instant);
-  later(instant ? 0 : 2600, startCycle);
   if (instant || reduced) {
     setCaption(FINAL.cap, LIGHT, true, true);
     reveal(true);
@@ -1188,7 +1157,6 @@ function play() {
     ? FIRST_MS * Math.pow(LAST_MS / FIRST_MS, i / (fast - 1))
     : TAIL[i - fast]);
   const ready = (f) => !f.tex || textures[f.tex];
-  stopCycle();
   playing = true;
   document.body.classList.add("playing", "hide-doc");
   $("#doc").style.setProperty("--base", "0s");
@@ -1226,8 +1194,8 @@ async function start() {
   const ok = initGL();
   if (SUB) {                                            // a subpage: its own tinted horizon, no film
     if ("scrollRestoration" in history) history.scrollRestoration = "auto";
-    bg = { ...FINAL, cap: SUB.title, tw: SUB.tw, tc: SUB.tc };
-    if (ok) startSky(false);
+    bg = { ...SUB.frame, cap: SUB.title, still: true, fade: true };
+    if (ok) { startSky(false); if (bg.tex) loadTexture(bg.tex).then(() => draw(bg)).catch(() => {}); }
     setCaption(SUB.title, LIGHT, true, false);
     reveal(false);
     addEventListener("resize", () => { if (!skyRaf) draw(bg); });

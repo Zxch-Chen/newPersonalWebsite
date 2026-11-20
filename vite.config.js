@@ -9,7 +9,7 @@ import { vitePluginSubstackApi } from './vite-plugin-substack-api.js'
 // does the same job through the rewrites in vercel.json.
 const STANDALONE_PAGES = ['old', 'paper', 'launch']
 // Served by the launch page, which reads its own path.
-const LAUNCH_PATHS = ['/', '/writing', '/quotes', '/resume']
+const LAUNCH_PATHS = ['/', '/writing', '/quotes', '/resume', '/aesthetics']
 
 function standalonePageRedirect() {
   const middleware = (req, res, next) => {

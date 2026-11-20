@@ -11,6 +11,7 @@
     { "source": "/writing", "destination": "/launch/index.html" },
     { "source": "/quotes", "destination": "/launch/index.html" },
     { "source": "/resume", "destination": "/launch/index.html" },
+    { "source": "/aesthetics", "destination": "/launch/index.html" },
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/old/(.*)", "destination": "/old/$1" },
     { "source": "/paper/(.*)", "destination": "/paper/$1" },
