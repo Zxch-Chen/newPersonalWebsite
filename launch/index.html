@@ -599,6 +599,221 @@ vec3 halftone(vec2 q, float a, float t, float d, float asp, float px) {
   return mix(col, col * vec3(1., .42, .58), pink * .9);
 }
 
+// Voronoi with the distance to the nearest cell border (F2 - F1), and that cell's hash.
+vec3 voroEdge(vec2 p) {
+  vec2 i = floor(p), f = fract(p), mc = vec2(0.), mr = vec2(0.);
+  float md = 8.;
+  for (int y = -1; y <= 1; y++) for (int x = -1; x <= 1; x++) {
+    vec2 g = vec2(float(x), float(y));
+    vec2 r = g + vec2(hash(i + g), hash(i + g + 19.7)) * .8 + .1 - f;
+    float dd = dot(r, r);
+    if (dd < md) { md = dd; mr = r; mc = i + g; }
+  }
+  float ed = 8.;
+  for (int y = -2; y <= 2; y++) for (int x = -2; x <= 2; x++) {
+    vec2 g = vec2(float(x), float(y));
+    vec2 r = g + vec2(hash(i + g), hash(i + g + 19.7)) * .8 + .1 - f;
+    if (dot(r - mr, r - mr) > .0001) ed = min(ed, dot(.5 * (mr + r), normalize(r - mr)));
+  }
+  return vec3(ed, hash(mc + 3.1), hash(mc + 7.7));
+}
+
+// Aurora over snow: green-to-violet curtains hanging off to the sides, a wind-carved
+// snowfield below that picks up their light, and a cold bright rim.
+vec3 aurora(vec2 q, float a, float t, float d, float asp, float px) {
+  float sd = max(d, 0.);
+  vec3 sky = mix(vec3(.008, .012, .035), vec3(.03, .06, .1), exp(-sd * 3.));
+  vec2 sg = q * 70.; vec2 si = floor(sg);
+  vec2 so = fract(sg) - .5 - (vec2(hash(si + 1.), hash(si + 2.)) - .5) * .6;
+  sky += vec3(.8, .85, 1.) * step(.93, hash(si)) * (1. - smoothstep(0., .08, length(so))) * .5 * hash(si + 3.);
+  vec3 au = vec3(0.);
+  for (int i = 0; i < 2; i++) {
+    float fi = float(i);
+    float x = q.x;
+    float y0 = u_H - .24 - .12 * fi + .06 * sin(x * (1.7 + fi * .8) + fi * 2. + 1.) + .08 * (fbm(vec2(x * 1.3, fi * 7.)) - .5);
+    float h = y0 - q.y;                                                  // height above the curtain's hem
+    float rx = x * 60. + fbm(vec2(x * 3., fi)) * 8.;
+    float rays = .35 + .65 * noise(vec2(rx, h * 2.));
+    h += (noise(vec2(rx * .7, fi * 5.)) - .5) * .05;                   // each ray starts at its own height
+    float body = smoothstep(-.09, .03, h) * smoothstep(-.07, .01, h) * exp(-max(h, 0.) * (4. + 3. * fi));
+    float side = mix(.2, 1., smoothstep(.1, .7, abs(x - asp * .5) / (asp * .5)));
+    vec3 c = mix(vec3(.12, .95, .55), vec3(.55, .22, .85), smoothstep(.03, .25, h));
+    au += c * body * rays * side * (1. - .5 * fi);
+  }
+  sky += au * .85;
+  float tt = max(t, 0.);
+  float sas = fbm(vec2(a * 3., t * 90.) + 4.);                           // sastrugi streaks
+  vec3 g = mix(vec3(.58, .68, .8), vec3(.1, .14, .27), smoothstep(0., .45, tt));
+  g *= .78 + .38 * sas;
+  g += vec3(.1, .55, .35) * exp(-tt * 9.) * .3 * mix(.4, 1., smoothstep(.1, .7, abs(a) / (asp * .5)));
+  g += vec3(.9, 1., 1.) * step(.998, hash(floor(vec2(a, t) * vec2(500., 700.)))) * exp(-tt * 6.) * .35;  // glints
+  g += vec3(.75, .95, .92) * exp(-tt * 150.) * .55;                    // cold rim
+  return mix(sky, g, smoothstep(-px, px, t));
+}
+
+// Terrazzo: a polished floor of chipped marble in cream cement against a sage plaster wall,
+// with a brass divider strip on the rim.
+vec3 terrazzo(vec2 q, float a, float t, float d, float asp, float px) {
+  float sd = max(d, 0.);
+  vec3 sky = mix(vec3(.52, .58, .5), vec3(.67, .71, .62), exp(-sd * 3.5));
+  sky *= .94 + .08 * fbm(q * vec2(6., 9.)) + .03 * noise(q * 300.);
+  sky *= 1. - .18 * exp(-sd * 50.);
+  vec2 p = vec2(a, t);
+  vec3 g = vec3(.93, .87, .81) * (.95 + .06 * fbm(p * 40.));
+  vec3 f = voro(p * 110.);
+  g = mix(g, mix(vec3(.7, .6, .55), vec3(.99, .97, .93), f.z), (1. - smoothstep(.12, .22, f.x)) * step(.5, f.y) * .55);
+  for (int i = 0; i < 2; i++) {
+    float fi = float(i);
+    float sc = mix(16., 34., fi);
+    vec2 pp = p * sc + fi * 17.;
+    pp += (vec2(noise(pp * 2.3), noise(pp * 2.3 + 5.)) - .5) * .35;  // rough the straight cell walls
+    vec3 v = voroEdge(pp);
+    float on = step(mix(.55, .5, fi), v.y);
+    float chip = smoothstep(.1 + .12 * v.z, .12 + .12 * v.z, v.x);
+    float k = fract(v.y * 7.31) * 5.;
+    vec3 cc = k < 1. ? vec3(.74, .33, .22) : k < 2. ? vec3(.42, .53, .44) : k < 3. ? vec3(.9, .7, .36) : k < 4. ? vec3(.24, .31, .44) : vec3(.97, .95, .91);
+    cc = mix(cc, vec3(.9, .85, .8), .18) * (.84 + .28 * fbm(pp * 3. + v.z * 10.));
+    g = mix(g, cc, on * chip);
+  }
+  g *= 1. - .2 * smoothstep(0., .6, t);
+  g += vec3(1., .97, .9) * exp(-max(t, 0.) * 18.) * .1 * exp(-a * a * 2.);   // a sheen of reflected light
+  vec3 col = mix(sky, g, smoothstep(-px, px, t));
+  vec3 brass = mix(vec3(.55, .38, .16), vec3(.95, .78, .42), smoothstep(-.003, .003, t - .003));
+  col = mix(col, brass, near(abs(t - .003), .0028, px));
+  return col;
+}
+
+// Herbarium page: pressed flowers and leaves taped to aged rag paper, the deckled sheet
+// lying on a dark kraft board.
+vec3 herbarium(vec2 q, float a, float t, float d, float asp, float px) {
+  vec3 board = vec3(.27, .2, .14) * (.85 + .25 * fbm(q * vec2(5., 40.)));
+  float de = t - .006 * (noise(vec2(a * 60., 3.)) - .5) - .003 * (noise(vec2(a * 220., 7.)) - .5);
+  board *= 1. - .6 * exp(-max(-de, 0.) * 80.);                       // the sheet's shadow on the board
+  vec2 p = vec2(a, t);
+  vec3 g = vec3(.93, .89, .8) * (.95 + .05 * fbm(p * 30.) + .02 * noise(p * 400.));
+  g = mix(g, vec3(.84, .76, .6), smoothstep(.2, .8, fbm(p * 3. + 8.)) * .35);
+  vec3 fx = voro(p * 14. + 3.);
+  g = mix(g, vec3(.72, .55, .35), step(.85, fx.y) * (1. - smoothstep(.0, .12 + .1 * fx.z, fx.x)) * .35);  // foxing
+  g = mix(g, vec3(.98, .96, .9), exp(-max(de, 0.) * 200.) * .5);     // the bright deckle
+  float K = 4.2;
+  vec2 cell = floor(p * K);
+  for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) {
+    vec2 c = cell + vec2(float(i), float(j));
+    float h1 = hash(c + 11.), h2 = hash(c + 12.), h3 = hash(c + 13.), h4 = hash(c + 14.);
+    vec2 fc = (c + .25 + .5 * vec2(h1, h2)) / K;
+    float R = .028 + .02 * h3;
+    if (fc.y < R + .05 || h4 < .15) continue;
+    // stem and two leaves, hanging down from the flower
+    float ang = 1.2 + (h1 - .5) * 1.4;
+    vec2 dir = vec2(cos(ang), sin(ang));
+    vec2 tip = fc + dir * (.12 + .08 * h2);
+    float stem = near(seg(p, fc, tip), .0014, px);
+    vec3 leafc = mix(vec3(.42, .48, .28), vec3(.55, .5, .3), h3);
+    g = mix(g, leafc * .8, stem * .9);
+    for (int k = 0; k < 2; k++) {
+      float fk = float(k);
+      float sgn = fk * 2. - 1.;
+      vec2 lp = mix(fc, tip, .45 + .25 * fk);
+      float la = ang + sgn * (.7 + .3 * h4);
+      vec2 ld = vec2(cos(la), sin(la));
+      vec2 lc = lp + ld * .03;
+      vec2 v = p - lc;
+      vec2 uv = vec2(dot(v, ld), dot(v, vec2(-ld.y, ld.x)));
+      float lf = length(uv / vec2(.032, .011 * (1. - .6 * abs(uv.x) / .032)));
+      float leaf = 1. - smoothstep(1. - px * 40., 1., lf);
+      vec3 lcol = leafc * (.85 + .25 * fbm(p * 80. + fk)) ;
+      lcol = mix(lcol, leafc * .6, near(abs(uv.y), .0008, px) * step(abs(uv.x), .03));   // midrib
+      g = mix(g, lcol, leaf * .92);
+    }
+    // the flower: five petals, faded
+    vec2 v = p - fc;
+    float r = length(v), th = atan(v.y, v.x) + h4 * 6.28;
+    float rp = R * (.45 + .55 * pow(abs(cos(th * 2.5)), .7));
+    float fl = 1. - smoothstep(rp - px, rp + px, r);
+    float kk = h2 * 4.;
+    vec3 pc = kk < 1. ? vec3(.58, .42, .62) : kk < 2. ? vec3(.8, .48, .46) : kk < 3. ? vec3(.86, .7, .32) : vec3(.42, .52, .74);
+    pc = mix(pc, vec3(.8, .74, .62), .35);
+    pc *= .8 + .3 * (r / R) + .08 * sin(th * 30.);
+    pc *= 1. - .25 * smoothstep(rp - .004, rp, r);                      // veins, paler at the tips
+    pc = mix(pc, vec3(.45, .3, .15), 1. - smoothstep(R * .16, R * .22, r));
+    g = mix(g * (1. - .15 * (1. - smoothstep(rp, rp + .006, r))), pc, fl * .8);  // and a faint press stain
+    // a strip of gummed tape across the stem
+    vec2 tc = mix(fc, tip, .78);
+    vec2 tv = p - tc;
+    vec2 tu = vec2(dot(tv, dir), dot(tv, vec2(-dir.y, dir.x)));
+    float tape = (1. - smoothstep(.006, .006 + px, abs(tu.x))) * (1. - smoothstep(.02, .02 + px, abs(tu.y)));
+    g = mix(g, vec3(.95, .9, .78), tape * .65);
+  }
+  g *= 1. - .18 * smoothstep(0., .6, t);
+  return mix(board, g, smoothstep(-px, px, de));
+}
+
+// Ringed giant: butterscotch cloud belts with a storm oval, a ring arc across the black sky
+// with its Cassini gap, the rings' shadow on the clouds, and a thin bright limb.
+vec3 ringed(vec2 q, float a, float t, float d, float asp, float px) {
+  float sd = max(d, 0.);
+  vec3 sky = mix(vec3(.008, .008, .016), vec3(.04, .035, .05), exp(-sd * 3.));
+  sky += vec3(.8, .85, 1.) * step(.96, hash(floor(q * 90.))) * (1. - smoothstep(0., .1, length(fract(q * 90.) - .5))) * .35;
+  sky += vec3(.95, .82, .6) * exp(-sd * 160.) * .55 + vec3(.5, .45, .55) * exp(-sd * 30.) * .12;
+  vec2 rv = q - vec2(asp * .5 + .2, u_H + .52);
+  float ca = cos(.1), sa = sin(.1);
+  rv = mat2(ca, -sa, sa, ca) * rv;
+  float rr = length(rv / vec2(max(asp, 1.3) * .7, .84));
+  float f = (rr - 1.) / .11;
+  float ringA = smoothstep(0., .03, f) * (1. - smoothstep(.97, 1., f));
+  float bands = .55 + .45 * noise(vec2(f * 60., 1.)) * (.6 + .4 * noise(vec2(f * 13., 4.)));
+  float gap = smoothstep(.04, .06, abs(f - .64));
+  vec3 rc = mix(vec3(.62, .52, .4), vec3(.95, .86, .68), smoothstep(.0, .6, f)) * bands;
+  sky = mix(sky, rc, ringA * gap * mix(.55, .95, smoothstep(.2, .55, f)));
+  vec2 p = vec2(a, t);
+  float lat = t + .012 * sin(a * 5. + fbm(p * 4.) * 3.);
+  lat += (fbm(vec2(a * 6., lat * 40.)) - .5) * .02;
+  float bv = fbm(vec2(a * .6, lat * 26.) + 2.);
+  float bs = sin(lat * 70. + bv * 5.) * .5 + .5;
+  vec3 g = mix(vec3(.88, .78, .58), vec3(.78, .55, .28), bs);
+  g = mix(g, vec3(.55, .32, .17), smoothstep(.6, .85, bv) * .7);
+  g = mix(g, vec3(.96, .9, .76), smoothstep(.75, .95, bs) * smoothstep(.3, .6, fbm(vec2(a * 3., lat * 60.))) * .5);
+  vec2 so = (p - vec2(-.62, .2)) / vec2(.07, .028);                // storm oval, left of center
+  float sw = length(so);
+  g = mix(g, mix(vec3(.72, .34, .16), vec3(.94, .74, .5), smoothstep(.0, 1., sw) * (.5 + .5 * sin(sw * 9. + atan(so.y, so.x) * 2.))), 1. - smoothstep(.9, 1.05, sw));
+  float sh = smoothstep(.0, .006, abs(t - .3) - .025) ;              // the rings' shadow
+  sh = mix(.45, 1., sh) ; sh = max(sh, 1. - smoothstep(.002, .004, abs(t - .302)));
+  g *= sh;
+  g *= .6 + .4 * smoothstep(0., .1, t);                               // limb darkening
+  g *= 1. - .3 * smoothstep(.2, .6, t);
+  return mix(sky, g, smoothstep(-px, px, t));
+}
+
+// Burnt paper: an old ruled ledger page whose edge has burnt away; a ragged glowing ember
+// line on the rim, a band of char, brown scorch, and smoke and sparks above.
+vec3 ember(vec2 q, float a, float t, float d, float asp, float px) {
+  float sd = max(d, 0.);
+  vec3 sky = mix(vec3(.018, .016, .016), vec3(.09, .055, .04), exp(-sd * 4.));
+  float smoke = fbm(vec2(q.x * 2., q.y * 5.) + vec2(fbm(q * 3.) * 1.5, 0.));
+  sky += vec3(.16, .12, .1) * smoothstep(.4, .85, smoke) * exp(-sd * 2.);
+  sky += vec3(1., .4, .1) * exp(-sd * 30.) * .3 * (.5 + .8 * noise(vec2(a * 8., 1.)));
+  vec2 sc = q * vec2(14., 10.); vec2 si = floor(sc);
+  vec2 sp = fract(sc) - .5 - (vec2(hash(si + 4.), hash(si + 5.)) - .5) * .7;
+  float spk = step(.9, hash(si + 6.)) * (1. - smoothstep(0., .06, length(sp * vec2(1., .5))));
+  spk *= smoothstep(.15, .5, abs(q.x - asp * .5)) * smoothstep(.02, .1, sd) * exp(-sd * 3.);
+  sky += vec3(1., .6, .2) * spk * 1.2;
+  vec2 p = vec2(a, t);
+  float rag = (fbm(vec2(a * 14., 2.)) - .5) * .012 + (noise(vec2(a * 90., 5.)) - .5) * .003;
+  float e = t + rag;
+  vec3 paper = vec3(.92, .87, .76) * (.95 + .05 * fbm(p * 30.));
+  paper = mix(paper, vec3(.5, .62, .8), near(abs(fract(t * 24. + .5) - .5) / 24., .0007, px) * .5);
+  paper = mix(paper, vec3(.8, .3, .3), near(abs(a + .7), .0009, px) * .6);  // the red margin
+  float cw = .03 + .03 * fbm(vec2(a * 6., 9.)) + (fbm(p * vec2(18., 26.)) - .5) * .03;
+  float scorch = 1. - smoothstep(cw, cw * 2.6 + .02, e);
+  vec3 g = mix(paper, vec3(.42, .23, .09), scorch * .85);
+  g = mix(g, vec3(.03, .022, .02), 1. - smoothstep(cw * .55, cw * .85, e));
+  g += vec3(1., .3, .05) * step(.82, noise(p * vec2(120., 160.))) * (1. - smoothstep(0., cw * .6, e)) * .5;  // hot flecks in the char
+  float fl = .5 + .9 * noise(vec2(a * 40., 0.));
+  float ep = max(e, 0.);
+  g += vec3(1., .42, .08) * exp(-ep * 220.) * fl + vec3(1., .85, .5) * exp(-ep * 900.) * fl * .8;
+  return mix(sky, g, smoothstep(-px, px, e));
+}
+
 vec2 mirror(vec2 uv) { return 1. - abs(1. - mod(uv, 2.)); }
 vec3 painting(vec2 q, float a, float t, float d, float asp, float px) {
   float gh = 1. - u_H;
@@ -643,6 +858,11 @@ void main() {
   else if (m == 16) col = dunes(q, a, t, d, asp, px);
   else if (m == 17) col = lava(q, a, t, d, asp, px);
   else if (m == 18) col = halftone(q, a, t, d, asp, px);
+  else if (m == 21) col = aurora(q, a, t, d, asp, px);
+  else if (m == 22) col = terrazzo(q, a, t, d, asp, px);
+  else if (m == 24) col = herbarium(q, a, t, d, asp, px);
+  else if (m == 25) col = ringed(q, a, t, d, asp, px);
+  else if (m == 26) col = ember(q, a, t, d, asp, px);
   else              col = orbit(q, a, t, d, asp, px, u_fin);   // 10: the end card; u_fin runs 0 → 1 as it settles
   vec2 vq = (q - vec2(asp * .5, .5)) / vec2(asp, 1.);
   // Behind the page, a shot keeps its material at the rim and fades to night where the text sits.
@@ -676,18 +896,10 @@ const NOW = [
     text: "An iOS app that helps your closest friends stay in touch. It learns the rhythm of each friendship, nudges you when it's been too long since you saw someone, and orders the feed by closeness rather than engagement. Built on AWS and Cloudflare Workers." },
   { name: "Orbit[s]", meta: "Pre-seed / seed fund",
     text: "Partners with exceptional young founders to invest in their friends and network. They are capital constrained, not network constrained." },
-  { name: "Long-horizon agents and reasoning", meta: "Research at Stanford AI Lab (SAIL), with Yuzhen Mao", href: "https://yuzhenmao.github.io/",
-    text: "Research on LLM agents for long-horizon tasks and reasoning." },
 ];
 
+// Empty for now: entries go back in once their results are solid. The section hides itself while empty.
 const RESEARCH = [
-  { name: "Persona vs. math in post-training", meta: "CS 2881R",
-    text: "We taught a small model to talk like Sheldon Cooper while getting better at math, then looked inside to see what fine-tuning actually changed. The persona turns out to be a single direction in the model's activations, findable from a few dozen examples, and most of what fine-tuning changes has nothing to do with the persona.",
-    href: "https://huggingface.co/zachchxn/Qwen2.5-3B-Instruct-Sheldon-SFT-v2" },
-  { name: "Are neural networks already clean?", meta: "Interpretability",
-    text: "Replicating Goodfire's neuron-level interpretability claims on Qwen3-1.7B and Pythia-160m, on one laptop." },
-  { name: "Dropping small activations", meta: "Interpretability",
-    text: "Zeroing an LLM's smallest activations to see whether facts break before perplexity and other averages show it." },
 ];
 
 const PAST = [
@@ -898,6 +1110,10 @@ if (SUB) {
   $("#bio").innerHTML = BIO.map((para) => "<p>" + para.map((b) => typeof b === "string" ? esc(b) : link(b.t, b.href)).join("") + "</p>").join("");
   $("#now").innerHTML = items(NOW);
   $("#research").innerHTML = items(RESEARCH);
+  if (!RESEARCH.length) {
+    $("#s-research").hidden = true;
+    document.querySelectorAll('a[href="/#s-research"]').forEach((el) => el.remove());
+  }
   $("#former").innerHTML = items(PAST);
   $("#thoughts").innerHTML = quoteHTML(THOUGHTS);
   $("#links").innerHTML = LINKS.map((l) => link(l.label, l.href)).join("");
@@ -922,7 +1138,8 @@ const PAINT = {
   shore:   { src: BLOB + "bahamas.avif",            cy: .55, sh: .42, sky: [.03, .06, .1] },
 };
 const M = { orbit: 0, honey: 1, oil: 2, agate: 3, paint: 4, soil: 5, collage: 6, xray: 7, cells: 8, ink: 9, end: 10,
-            ice: 11, marble: 12, ocean: 13, topo: 14, moss: 15, dunes: 16, lava: 17, halftone: 18 };
+            ice: 11, marble: 12, ocean: 13, topo: 14, moss: 15, dunes: 16, lava: 17, halftone: 18,
+            aurora: 21, terrazzo: 22, herbarium: 24, ringed: 25, ember: 26 };
 const LIGHT = "#f4ede4", DARK = "#231b14";
 
 // The cut list. Words carry across cuts the way the film holds a word over several shots.
@@ -936,25 +1153,28 @@ const FRAMES = [
   { m: M.agate,    seed: 5 },
   { m: M.paint,    seed: 6, tex: "rowers" },
   { m: M.marble,   seed: 7 },
+  { m: M.ringed,   seed: 36 },
   { m: M.soil,     seed: 8 },
   { m: M.paint,    seed: 9,  tex: "boat" },
   { m: M.ice,      seed: 10 },
   { m: M.collage,  seed: 11 },
+  { m: M.ember,    seed: 32 },
   { m: M.dunes,    seed: 12 },
   { m: M.xray,     seed: 13 },
   { m: M.paint,    seed: 14, tex: "gold" },
   { m: M.halftone, seed: 15 },
   { m: M.lava,     seed: 16 },
+  { m: M.aurora,   seed: 31 },
   { m: M.paint,    seed: 17, tex: "rainbow" },
   { m: M.cells,    seed: 18 },
   { m: M.topo,     seed: 19 },
   { m: M.ink,      seed: 20 },
   { m: M.moss,     seed: 21 },
+  { m: M.terrazzo, seed: 33 },
   { m: M.paint,    seed: 22, tex: "pink" },
   { m: M.paint,    seed: 23, tex: "redsky" },
-  { m: M.agate,    seed: 24 },
   { m: M.paint,    seed: 25, tex: "gate" },
-  { m: M.ice,      seed: 26 },
+  { m: M.herbarium, seed: 35 },
   { m: M.paint,    seed: 27, tex: "shore" },
   { m: M.honey,    seed: 28 },
   { m: M.paint,    seed: 29, tex: "alpen" },
@@ -962,7 +1182,7 @@ const FRAMES = [
 const FINAL = { m: M.end, seed: 40, cap: "Zach Chen", final: true };
 let bg = FINAL;
 
-const ON_PAPER = new Set([M.ink, M.topo, M.halftone, M.dunes, M.moss]);
+const ON_PAPER = new Set([M.ink, M.topo, M.halftone, M.dunes, M.moss, M.terrazzo]);
 const capColor = (f) => ON_PAPER.has(f.m) ? DARK : LIGHT;
 
 // Cut lengths: exponential from 1.5s down to ~3ms, then the last TAIL cuts slow back
