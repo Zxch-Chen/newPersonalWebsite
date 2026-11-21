@@ -58,7 +58,6 @@
       content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 32%; z-index: 1; pointer-events: none;
       background: linear-gradient(to bottom, rgba(7, 11, 18, 0), rgba(7, 11, 18, .55) 55%, var(--night));
     }
-    body.sub { --heroH: 64svh; }
     body.sub .doc .bio { margin: 0 auto 0; text-align: center; padding-top: var(--subGap, 9svh); }
     .writing { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 22px 48px; }
     .writing .d { display: block; color: var(--dim); font-size: .86em; font-style: italic; }
@@ -1029,6 +1028,7 @@ function renderAesthetics() {
   view.addEventListener("click", (e) => { if (e.target === view) view.close(); });
 }
 
+if (!RESEARCH.length) document.querySelectorAll('a[href="/#s-research"]').forEach((el) => el.remove());   // every page's nav
 if (SUB) {
   document.body.classList.add("sub");
   document.title = SUB.title + " · Zach Chen";
@@ -1052,10 +1052,7 @@ if (SUB) {
   $("#bio").innerHTML = BIO.map((para) => "<p>" + para.map((b) => typeof b === "string" ? esc(b) : link(b.t, b.href)).join("") + "</p>").join("");
   $("#now").innerHTML = items(NOW);
   $("#research").innerHTML = items(RESEARCH);
-  if (!RESEARCH.length) {
-    $("#s-research").hidden = true;
-    document.querySelectorAll('a[href="/#s-research"]').forEach((el) => el.remove());
-  }
+  if (!RESEARCH.length) $("#s-research").hidden = true;
   $("#former").innerHTML = items(PAST);
   $("#thoughts").innerHTML = quoteHTML(THOUGHTS);
   $("#links").innerHTML = LINKS.map((l) => link(l.label, l.href)).join("") + versionsHTML;
