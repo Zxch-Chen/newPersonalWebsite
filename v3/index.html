@@ -1247,7 +1247,7 @@ function setCaption(text, color, slow, asLink) {
   cap.style.setProperty("--cap-shadow", color === DARK ? 0 : .3);
   if (cap.dataset.text === text) return;
   cap.dataset.text = text;
-  cap.innerHTML = asLink ? `<a href="#" id="replay" title="Play the intro again">${esc(text)}</a>` : esc(text);
+  cap.innerHTML = asLink && gl && !gl.isContextLost() ? `<a href="#" id="replay" title="Play the intro again">${esc(text)}</a>` : esc(text);
   cap.classList.remove("focus", "focus-slow");
   void cap.offsetWidth;
   if (text) cap.classList.add(slow ? "focus-slow" : "focus");
@@ -1360,67 +1360,64 @@ function drawFallback(f) {
   const ctx = fbCanvas.getContext("2d");
   if (!ctx) return;
   const W = Math.max(1, hero.clientWidth), Hh = Math.max(1, hero.clientHeight);
-  const dpr = Math.min(devicePixelRatio || 1, 2);
-  fbCanvas.width = Math.round(W * dpr); fbCanvas.height = Math.round(Hh * dpr);
-  // The glow is smooth, so shade it at half size and let the browser scale it up.
-  const w = Math.max(1, Math.round(W / 2)), h = Math.max(1, Math.round(Hh / 2));
-  const img = new ImageData(w, h), px = img.data;
+  // Shade every device pixel (up to ~2.4M) so the rim stays crisp and the glow has no steps.
+  const dpr = Math.min(devicePixelRatio || 1, 2, Math.sqrt(2.4e6 / (W * Hh)));
+  const w = Math.max(1, Math.round(W * dpr)), h = Math.max(1, Math.round(Hh * dpr));
+  fbCanvas.width = w; fbCanvas.height = h;
+  const img = ctx.createImageData(w, h), px = img.data;
   const asp = w / h, H = horizon(), R = Math.max(asp, .8) * 1.7, cx = asp * .5, cy = H + R;
+  const aa = 1.2 / h;                                    // the rim is antialiased over about a pixel
   const warm = (f && f.tw) || (f && FB_WARM[f.m]) || [.95, .72, .58];
   const cool = (f && f.tc) || [.48, .72, .86];
-  const night = [7 / 255, 11 / 255, 18 / 255];
+  const N = [7 / 255, 11 / 255, 18 / 255];
   const sub = !!(f && f.fade);
+  let seed = 1;
   for (let y = 0; y < h; y++) {
-    const qy = (y + .5) / h;
+    const qy = (y + .5) / h, dy = qy - cy;
     for (let x = 0; x < w; x++) {
-      const qx = (x + .5) / h, dx = qx - cx, dy = qy - cy;
-      const dist = Math.sqrt(dx * dx + dy * dy), d = dist - R, t = -d;
+      const qx = (x + .5) / h, dx = qx - cx;
+      const d = Math.sqrt(dx * dx + dy * dy) - R, t = -d;
       const a = Math.atan2(dx, -dy) * R, cen = Math.exp(-a * a * (sub ? 1.4 : 2.4));
-      let r, g, b;
-      if (t < 0) {                                       // sky
-        const sd = d, e5 = Math.exp(-sd * 5), ec = Math.exp(-sd * 26) * .9;
-        const ew = Math.exp(-sd * (sub ? 70 : 110)) * cen * (sub ? 1.3 : .9) + Math.exp(-sd * 11) * cen * (sub ? .14 : .06);
-        r = .045 + (.11 - .045) * e5 + cool[0] * ec + warm[0] * ew;
-        g = .07 + (.19 - .07) * e5 + cool[1] * ec + warm[1] * ew;
-        b = .12 + (.28 - .12) * e5 + cool[2] * ec + warm[2] * ew;
-      } else {                                           // the planet, dark below a lit rim
-        const ew = Math.exp(-t * (sub ? 40 : 220)) * cen * (sub ? 1.1 : .6), ec = Math.exp(-t * 60) * .22;
-        r = night[0] + warm[0] * ew + cool[0] * ec;
-        g = night[1] + warm[1] * ew + cool[1] * ec;
-        b = night[2] + warm[2] * ew + cool[2] * ec;
-        if (sub) {                                       // the long fade down the planet, as on the film
-          const k = Math.min(Math.max(t / .2, 0), 1), s = k * k * (3 - 2 * k);
-          r += (night[0] - r) * s; g += (night[1] - g) * s; b += (night[2] - b) * s;
-        }
+      const sd = Math.max(d, 0), st = Math.max(t, 0);
+      // sky, as the shader's end card
+      const e5 = Math.exp(-sd * 5), ec = Math.exp(-sd * 26) * .9;
+      const ew = Math.exp(-sd * (sub ? 70 : 110)) * cen * (sub ? 1.3 : .9) + Math.exp(-sd * 11) * cen * (sub ? .14 : .06);
+      const sr = .045 + .065 * e5 + cool[0] * ec + warm[0] * ew;
+      const sg = .07 + .12 * e5 + cool[1] * ec + warm[1] * ew;
+      const sb = .12 + .16 * e5 + cool[2] * ec + warm[2] * ew;
+      // the planet: dark below a lit rim
+      const gw = Math.exp(-st * (sub ? 40 : 220)) * cen * (sub ? 1.1 : .6), gc = Math.exp(-st * 60) * .22;
+      let gr = N[0] + warm[0] * gw + cool[0] * gc, gg = N[1] + warm[1] * gw + cool[1] * gc, gb = N[2] + warm[2] * gw + cool[2] * gc;
+      if (sub) {                                         // the long fade down the planet, as on the film
+        const k = Math.min(st / .2, 1), s2 = k * k * (3 - 2 * k);
+        gr += (N[0] - gr) * s2; gg += (N[1] - gg) * s2; gb += (N[2] - gb) * s2;
       }
-      const vx = (qx - asp * .5) / asp, vy = qy - .5, vig = 1 - .55 * (vx * vx + vy * vy) * 1.6;
+      let m = Math.min(Math.max((t + aa) / (2 * aa), 0), 1); m = m * m * (3 - 2 * m);
+      const vx = (qx - cx) / asp, vy = qy - .5, vig = (1 - .88 * (vx * vx + vy * vy)) * 255;
+      seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+      const n = (seed / 0x7fffffff - .5) * 2.2;          // a little grain, so the long gradients never band
       const i = (y * w + x) * 4;
-      px[i] = Math.min(255, Math.max(0, r * vig * 255));
-      px[i + 1] = Math.min(255, Math.max(0, g * vig * 255));
-      px[i + 2] = Math.min(255, Math.max(0, b * vig * 255));
+      px[i] = (sr + (gr - sr) * m) * vig + n;
+      px[i + 1] = (sg + (gg - sg) * m) * vig + n;
+      px[i + 2] = (sb + (gb - sb) * m) * vig + n;
       px[i + 3] = 255;
     }
   }
-  const tmp = document.createElement("canvas");
-  tmp.width = w; tmp.height = h; tmp.getContext("2d").putImageData(img, 0, 0);
-  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
-  ctx.drawImage(tmp, 0, 0, fbCanvas.width, fbCanvas.height);
+  ctx.putImageData(img, 0, 0);
   // Stars, fixed in place, thinning toward the horizon.
-  const S = fbCanvas.height, A = fbCanvas.width / S, Rs = Math.max(A, .8) * 1.7;
-  let seed = 7;
-  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-  const n = Math.round(260 * A);
-  for (let k = 0; k < n; k++) {
-    const sx = rnd() * A, sy = rnd() * H, big = rnd(), br = .35 + .65 * rnd();
-    const d = Math.hypot(sx - A * .5, sy - (H + Rs)) - Rs;
-    const fade = Math.min(Math.max((d - .05) / .27, 0), 1);
+  let r = 7;
+  const rnd = () => (r = (r * 16807) % 2147483647) / 2147483647;
+  for (let k = 0, n = Math.round(260 * asp); k < n; k++) {
+    const sx = rnd() * asp, sy = rnd() * H, big = rnd(), br = .35 + .65 * rnd();
+    const fade = Math.min(Math.max((Math.hypot(sx - cx, sy - cy) - R - .05) / .27, 0), 1);
     if (fade <= 0) continue;
     ctx.fillStyle = `rgba(214,230,255,${(br * fade * .8).toFixed(3)})`;
-    ctx.beginPath(); ctx.arc(sx * S, sy * S, (big > .85 ? 1.1 : .7) * dpr, 0, 6.283); ctx.fill();
+    ctx.beginPath(); ctx.arc(sx * h, sy * h, (big > .85 ? 1.1 : .7) * dpr, 0, 6.283); ctx.fill();
   }
   fbCanvas.style.opacity = 1;
 }
-const fallback = () => { drawFallback(bg); addEventListener("resize", () => drawFallback(bg)); };
+let fbTimer = 0;
+const fallback = () => { gl = null; drawFallback(bg); addEventListener("resize", () => { clearTimeout(fbTimer); fbTimer = setTimeout(() => drawFallback(bg), 150); }); };
 
 async function start() {
   const ok = initGL();
@@ -1434,7 +1431,7 @@ async function start() {
     addEventListener("resize", () => { if (!skyRaf) draw(bg); });
     return;
   }
-  if (!ok) { land(true); fallback(); return; }
+  if (!ok) { gl = null; land(true); fallback(); return; }
 
   const only = params.get("frame");
   if (only !== null) {                                  // debug: hold one frame
@@ -1470,7 +1467,7 @@ document.querySelector(".top .me").addEventListener("click", (e) => { e.preventD
 
 $("#skip").addEventListener("click", () => { if (playing) land(); });
 addEventListener("keydown", (e) => { if (playing && (e.key === "Escape" || e.key === " " || e.key === "Enter")) { e.preventDefault(); land(); } });
-cap.addEventListener("click", (e) => { if (e.target.id === "replay") { e.preventDefault(); if (!playing) play(); } });
+cap.addEventListener("click", (e) => { if (e.target.id === "replay") { e.preventDefault(); if (!playing && gl && !gl.isContextLost()) play(); } });
 
 // The curve drops toward the screen edges, so the page starts low enough that the
 // left end of its first line still sits below the planet's rim. Same circle as the shader.
