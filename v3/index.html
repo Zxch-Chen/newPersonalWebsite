@@ -1351,18 +1351,90 @@ function play() {
   raf = requestAnimationFrame(tick);
 }
 
+// Without WebGL (turned off, blocklisted, or the GPU dropped it), the hero would be an empty
+// gradient. This paints the end card on the spare canvas in plain 2D: same planet, same
+// horizon, same glow, without the film's textures. Subpages get their own warm rim.
+const fbCanvas = $("#fade");
+const FB_WARM = { 1: [1, .62, .22], 2: [1, .5, .18], 4: [.95, .36, .2] };   // honey, oil, the painting
+function drawFallback(f) {
+  const ctx = fbCanvas.getContext("2d");
+  if (!ctx) return;
+  const W = Math.max(1, hero.clientWidth), Hh = Math.max(1, hero.clientHeight);
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  fbCanvas.width = Math.round(W * dpr); fbCanvas.height = Math.round(Hh * dpr);
+  // The glow is smooth, so shade it at half size and let the browser scale it up.
+  const w = Math.max(1, Math.round(W / 2)), h = Math.max(1, Math.round(Hh / 2));
+  const img = new ImageData(w, h), px = img.data;
+  const asp = w / h, H = horizon(), R = Math.max(asp, .8) * 1.7, cx = asp * .5, cy = H + R;
+  const warm = (f && f.tw) || (f && FB_WARM[f.m]) || [.95, .72, .58];
+  const cool = (f && f.tc) || [.48, .72, .86];
+  const night = [7 / 255, 11 / 255, 18 / 255];
+  const sub = !!(f && f.fade);
+  for (let y = 0; y < h; y++) {
+    const qy = (y + .5) / h;
+    for (let x = 0; x < w; x++) {
+      const qx = (x + .5) / h, dx = qx - cx, dy = qy - cy;
+      const dist = Math.sqrt(dx * dx + dy * dy), d = dist - R, t = -d;
+      const a = Math.atan2(dx, -dy) * R, cen = Math.exp(-a * a * (sub ? 1.4 : 2.4));
+      let r, g, b;
+      if (t < 0) {                                       // sky
+        const sd = d, e5 = Math.exp(-sd * 5), ec = Math.exp(-sd * 26) * .9;
+        const ew = Math.exp(-sd * (sub ? 70 : 110)) * cen * (sub ? 1.3 : .9) + Math.exp(-sd * 11) * cen * (sub ? .14 : .06);
+        r = .045 + (.11 - .045) * e5 + cool[0] * ec + warm[0] * ew;
+        g = .07 + (.19 - .07) * e5 + cool[1] * ec + warm[1] * ew;
+        b = .12 + (.28 - .12) * e5 + cool[2] * ec + warm[2] * ew;
+      } else {                                           // the planet, dark below a lit rim
+        const ew = Math.exp(-t * (sub ? 40 : 220)) * cen * (sub ? 1.1 : .6), ec = Math.exp(-t * 60) * .22;
+        r = night[0] + warm[0] * ew + cool[0] * ec;
+        g = night[1] + warm[1] * ew + cool[1] * ec;
+        b = night[2] + warm[2] * ew + cool[2] * ec;
+        if (sub) {                                       // the long fade down the planet, as on the film
+          const k = Math.min(Math.max(t / .2, 0), 1), s = k * k * (3 - 2 * k);
+          r += (night[0] - r) * s; g += (night[1] - g) * s; b += (night[2] - b) * s;
+        }
+      }
+      const vx = (qx - asp * .5) / asp, vy = qy - .5, vig = 1 - .55 * (vx * vx + vy * vy) * 1.6;
+      const i = (y * w + x) * 4;
+      px[i] = Math.min(255, Math.max(0, r * vig * 255));
+      px[i + 1] = Math.min(255, Math.max(0, g * vig * 255));
+      px[i + 2] = Math.min(255, Math.max(0, b * vig * 255));
+      px[i + 3] = 255;
+    }
+  }
+  const tmp = document.createElement("canvas");
+  tmp.width = w; tmp.height = h; tmp.getContext("2d").putImageData(img, 0, 0);
+  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(tmp, 0, 0, fbCanvas.width, fbCanvas.height);
+  // Stars, fixed in place, thinning toward the horizon.
+  const S = fbCanvas.height, A = fbCanvas.width / S, Rs = Math.max(A, .8) * 1.7;
+  let seed = 7;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const n = Math.round(260 * A);
+  for (let k = 0; k < n; k++) {
+    const sx = rnd() * A, sy = rnd() * H, big = rnd(), br = .35 + .65 * rnd();
+    const d = Math.hypot(sx - A * .5, sy - (H + Rs)) - Rs;
+    const fade = Math.min(Math.max((d - .05) / .27, 0), 1);
+    if (fade <= 0) continue;
+    ctx.fillStyle = `rgba(214,230,255,${(br * fade * .8).toFixed(3)})`;
+    ctx.beginPath(); ctx.arc(sx * S, sy * S, (big > .85 ? 1.1 : .7) * dpr, 0, 6.283); ctx.fill();
+  }
+  fbCanvas.style.opacity = 1;
+}
+const fallback = () => { drawFallback(bg); addEventListener("resize", () => drawFallback(bg)); };
+
 async function start() {
   const ok = initGL();
   if (SUB) {                                            // a subpage: its own tinted horizon, no film
     if ("scrollRestoration" in history) history.scrollRestoration = "auto";
     bg = { ...SUB.frame, cap: SUB.title, still: true, fade: true };
     if (ok) { startSky(false); if (bg.tex) loadTexture(bg.tex).then(() => draw(bg)).catch(() => {}); }
+    else fallback();
     setCaption(SUB.title, LIGHT, true, false);
     reveal(false);
     addEventListener("resize", () => { if (!skyRaf) draw(bg); });
     return;
   }
-  if (!ok) { land(true); return; }
+  if (!ok) { land(true); fallback(); return; }
 
   const only = params.get("frame");
   if (only !== null) {                                  // debug: hold one frame
@@ -1384,8 +1456,8 @@ async function start() {
 }
 
 // If the GPU drops the canvas (tab in the background, back/forward cache), go straight to the page.
-canvas.addEventListener("webglcontextlost", (e) => { e.preventDefault(); if (playing) land(true); });
-canvas.addEventListener("webglcontextrestored", () => { if (initGL()) { textures = {}; loadAll(); draw(bg); } });
+canvas.addEventListener("webglcontextlost", (e) => { e.preventDefault(); if (playing) land(true); drawFallback(bg); });
+canvas.addEventListener("webglcontextrestored", () => { if (initGL()) { textures = {}; loadAll(); draw(bg); fbCanvas.style.opacity = 0; } });
 addEventListener("pageshow", (e) => { if (e.persisted && !SUB) land(true); });
 
 // Nav: external links on the right; a backdrop and the name once the hero has scrolled past.
